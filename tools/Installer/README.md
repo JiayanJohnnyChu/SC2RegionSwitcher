@@ -25,3 +25,5 @@ The original 3.3.0 package contains no downgrade protection. A newer package can
 Run `scripts/Test-Package.ps1 -ReleaseDirectory <directory>` and `scripts/Test-ReleaseGuards.ps1 -ReleaseDirectory <directory>`. These validate content and rejection cases; they do not install the product. The separate lifecycle lab uses copies with isolated product, directory, shortcut and registry identities. Its failure injection must never target the production product family.
 
 Real upgrade results belong to an exact MSI hash. Local rebuilds and CI builds cannot share an installation pass merely because their source or version matches.
+
+On the current test host, a deterministic failure after InstallExecute produced access-denied errors while Windows Installer rolled back its own registry data. The previous product was not automatically restored. The isolated test's normal uninstall/reinstall recovery worked, but automatic recovery is not marked passed. Do not change system registry ACLs or Installer security policy to make the test pass. Resolve this on an appropriate clean test environment before public release.
