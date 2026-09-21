@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0-windows</TargetFramework><UseWPF>true</UseWPF><Nullable>disable</Nullable><ImplicitUsings>disable</ImplicitUsings><NuGetAudit>false</NuGetAudit></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src\SC2Switcher.Wpf\Core.cs" Link="Core.cs" />
+    <Compile Include="..\..\src\SC2Switcher.Wpf\ConfigurationStore.cs" Link="ConfigurationStore.cs" />
+    <Compile Include="..\..\src\SC2Switcher.Wpf\Localization.cs" Link="Localization.cs" />
+    <Compile Include="..\..\src\SC2Switcher.Wpf\MainViewModel.cs" Link="MainViewModel.cs" />
+    <EmbeddedResource Include="..\..\src\SC2Switcher.Wpf\Strings.zh-CN.json" LogicalName="Sc2Switch2.Strings.zh-CN.json"><WithCulture>false</WithCulture></EmbeddedResource>
+    <EmbeddedResource Include="..\..\src\SC2Switcher.Wpf\Strings.en-US.json" LogicalName="Sc2Switch2.Strings.en-US.json"><WithCulture>false</WithCulture></EmbeddedResource>
+  </ItemGroup>
+</Project>

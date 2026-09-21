@@ -1,0 +1,33 @@
+# Build output, validation fixtures, local baseline installers, logs
+**/bin/
+**/obj/
+/artifacts/
+/work/
+/.tools/
+/.vs/
+*.user
+*.suo
+*.log
+*.tmp
+__pycache__/
+
+# Runtime state and game/account configuration do not belong in source control.
+profiles.json
+ui-preferences.json
+pending-language.json
+Variables.txt
+Battle.net.config
+ConfigurationBackups/
+LanguageBackups/
+.env
+.env.*
+*.pfx
+*.p12
+
+# Distribution binaries are generated under artifacts or attached to releases.
+*.msi
+*.cab
+*.zip
+*.exe
+*.dll
+*.pdb

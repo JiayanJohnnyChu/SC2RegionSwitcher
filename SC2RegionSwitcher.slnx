@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SC2Switcher.Wpf/SC2Switcher.Wpf.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SC2Switcher.Tests/SC2Switcher.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/IconGenerator/IconGenerator.csproj" />
+  </Folder>
+</Solution>

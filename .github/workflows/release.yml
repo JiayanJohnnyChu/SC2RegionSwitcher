@@ -1,0 +1,57 @@
+name: Prepare draft prerelease
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  draft-release:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      RELEASE_TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Prepare workflow checker
+        run: .\scripts\Setup-WorkflowTools.ps1
+      - name: Check workflows
+        run: .\scripts\Check-Workflows.ps1
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+      - name: Check repository contents
+        run: .\scripts\Check-Repository.ps1
+      - name: Build
+        run: .\scripts\Build.ps1
+      - name: Isolated regression tests
+        run: .\scripts\Test.ps1
+      - name: Build release files for the tag
+        id: package
+        run: .\scripts\Package.ps1 -VersionTag $env:RELEASE_TAG
+      - name: Check release payload
+        env:
+          RELEASE_DIRECTORY: ${{ steps.package.outputs.release-directory }}
+        run: .\scripts\Test-Package.ps1 -ReleaseDirectory $env:RELEASE_DIRECTORY
+      - name: Create draft prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_DIRECTORY: ${{ steps.package.outputs.release-directory }}
+        run: |
+          $assets = @(Get-ChildItem -LiteralPath $env:RELEASE_DIRECTORY -File | ForEach-Object FullName)
+          gh release create $env:RELEASE_TAG @assets --verify-tag --draft --prerelease --title "SC2 Region Switcher $env:RELEASE_TAG" --notes-file docs/RELEASE-NOTES-3.3.0.md
+          if ($LASTEXITCODE -ne 0) { throw 'Draft release creation failed. Existing releases are not overwritten automatically.' }

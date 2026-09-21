@@ -1,0 +1,94 @@
+<Application x:Class="Sc2Wpf.App" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Application.Resources>
+    <SolidColorBrush x:Key="Ink" Color="#18212D"/>
+    <SolidColorBrush x:Key="Muted" Color="#626C78"/>
+    <SolidColorBrush x:Key="Line" Color="#DCE1E7"/>
+    <SolidColorBrush x:Key="Accent" Color="#2855DC"/>
+    <DrawingImage x:Key="SwitcherMark">
+      <DrawingImage.Drawing>
+        <DrawingGroup>
+          <GeometryDrawing Brush="Transparent"><GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,64,64"/></GeometryDrawing.Geometry></GeometryDrawing>
+          <GeometryDrawing Brush="#2855DC"><GeometryDrawing.Geometry><RectangleGeometry Rect="2,2,60,60" RadiusX="13.5" RadiusY="13.5"/></GeometryDrawing.Geometry></GeometryDrawing>
+          <GeometryDrawing Brush="#F8FAFF" Geometry="M14,14 H30 L38,22 H22 V50 H14 Z"/>
+          <GeometryDrawing Brush="#F8FAFF" Geometry="M50,50 H34 L26,42 H42 V14 H50 Z"/>
+        </DrawingGroup>
+      </DrawingImage.Drawing>
+    </DrawingImage>
+    <Style TargetType="TextBlock"><Setter Property="TextWrapping" Value="Wrap"/></Style>
+    <Style x:Key="LanguageOption" TargetType="ComboBoxItem">
+      <Setter Property="MinHeight" Value="32"/>
+      <Setter Property="Padding" Value="12,6"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="HorizontalContentAlignment" Value="Left"/>
+      <Setter Property="SnapsToDevicePixels" Value="True"/>
+    </Style>
+    <Style x:Key="LanguagePicker" TargetType="ComboBox">
+      <Setter Property="MinHeight" Value="36"/>
+      <Setter Property="Padding" Value="12,0,8,0"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="HorizontalContentAlignment" Value="Left"/>
+      <Setter Property="ItemContainerStyle" Value="{StaticResource LanguageOption}"/>
+      <Setter Property="SnapsToDevicePixels" Value="True"/>
+    </Style>
+    <Style x:Key="FocusRing" TargetType="Control">
+      <Setter Property="Template"><Setter.Value><ControlTemplate><Border BorderBrush="#2855DC" BorderThickness="2" CornerRadius="7" Margin="-4"/></ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style TargetType="Button">
+      <Setter Property="Foreground" Value="{StaticResource Ink}"/><Setter Property="Background" Value="White"/>
+      <Setter Property="BorderBrush" Value="{StaticResource Line}"/><Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Padding" Value="18,10"/><Setter Property="MinHeight" Value="42"/>
+      <Setter Property="FontSize" Value="14"/><Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Cursor" Value="Hand"/><Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+        <Border x:Name="Surface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+          <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+        </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="Opacity" Value="0.82"/></Trigger>
+          <Trigger Property="IsPressed" Value="True"><Setter TargetName="Surface" Property="Opacity" Value="0.66"/></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Surface" Property="Opacity" Value="0.4"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="Background" Value="{StaticResource Accent}"/><Setter Property="BorderBrush" Value="{StaticResource Accent}"/><Setter Property="Foreground" Value="White"/><Setter Property="MinHeight" Value="48"/>
+    </Style>
+    <Style x:Key="QuietButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="FontSize" Value="13"/><Setter Property="FontWeight" Value="Normal"/><Setter Property="MinHeight" Value="34"/>
+      <Setter Property="Background" Value="Transparent"/><Setter Property="BorderThickness" Value="0"/><Setter Property="Foreground" Value="{StaticResource Muted}"/><Setter Property="Padding" Value="8,8"/>
+    </Style>
+    <Style x:Key="ServerRow" TargetType="RadioButton">
+      <Setter Property="Background" Value="White"/><Setter Property="BorderBrush" Value="{StaticResource Line}"/>
+      <Setter Property="Foreground" Value="{StaticResource Ink}"/><Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Padding" Value="20,17"/><Setter Property="Cursor" Value="Hand"/><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="MinHeight" Value="68"/>
+      <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="RadioButton">
+        <Border x:Name="Card" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5" Padding="{TemplateBinding Padding}">
+          <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <ContentPresenter Grid.Column="1" VerticalAlignment="Center"/>
+            <Border x:Name="Ring" Width="18" Height="18" BorderThickness="1" BorderBrush="#A4ADBA" CornerRadius="9" VerticalAlignment="Center" Margin="0,0,16,0">
+              <Ellipse x:Name="Dot" Width="7" Height="7" Fill="White" Visibility="Collapsed"/>
+            </Border>
+          </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Card" Property="BorderBrush" Value="#8FA6E9"/></Trigger>
+          <Trigger Property="IsChecked" Value="True"><Setter TargetName="Card" Property="Background" Value="#EFF3FF"/><Setter TargetName="Card" Property="BorderBrush" Value="#2855DC"/><Setter TargetName="Ring" Property="Background" Value="#2855DC"/><Setter TargetName="Ring" Property="BorderBrush" Value="#2855DC"/><Setter TargetName="Dot" Property="Visibility" Value="Visible"/></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Card" Property="Opacity" Value="0.5"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="RegionChoice" TargetType="RadioButton">
+      <Setter Property="Foreground" Value="{StaticResource Muted}"/><Setter Property="Padding" Value="16,8"/><Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="FocusVisualStyle" Value="{StaticResource FocusRing}"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="RadioButton">
+        <Border x:Name="Chip" Padding="{TemplateBinding Padding}" CornerRadius="4" Background="Transparent" BorderThickness="1" BorderBrush="Transparent"><ContentPresenter/></Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chip" Property="Background" Value="#E6EAF0"/></Trigger>
+          <Trigger Property="IsChecked" Value="True"><Setter TargetName="Chip" Property="Background" Value="White"/><Setter TargetName="Chip" Property="BorderBrush" Value="#C4CEDF"/><Setter Property="Foreground" Value="#2855DC"/><Setter Property="FontWeight" Value="SemiBold"/></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Chip" Property="Opacity" Value="0.5"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+  </Application.Resources>
+</Application>

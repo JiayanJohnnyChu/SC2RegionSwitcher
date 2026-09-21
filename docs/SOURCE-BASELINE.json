@@ -1,0 +1,82 @@
+{
+  "Baseline": "3.3.0",
+  "Date": "2026-09-21",
+  "Purpose": "Source and design files unchanged during project reorganization",
+  "UnchangedFiles": [
+    {
+      "Path": "src/SC2Switcher.Wpf/app.manifest",
+      "SHA256": "E42D59B343882FE0EB9FB88FE5186A16A62136C7A0327809D4CD86B55A1AACE3"
+    },
+    {
+      "Path": "src/SC2Switcher.Wpf/App.xaml",
+      "SHA256": "A6CCF4DD3F3BBC895A6F101BAD970D998EEB5CF24D666312EA27E48381D19206"
+    },
+    {
+      "Path": "src/SC2Switcher.Wpf/App.xaml.cs",
+      "SHA256": "F88150634F093BFE48B57DCA772152AF37824FAD70ADAAD413BE21BEABB308F2"
+    },
+    {
+      "Path": "src/SC2Switcher.Wpf/ConfigurationStore.cs",
+      "SHA256": "EE200F67247371574265103AD6FEFF9C26EDC41C5C010C1965BD683C4A9B1D6F"
+    },
+    {
+      "Path": "src/SC2Switcher.Wpf/Core.cs",
+      "SHA256": "4491FFD04CFD8CD0E3EF147DC4173E6CB9F4E40B25F99CAC32C19D8AC84F50A1"
+    },
+    {
+      "Path": "src/SC2Switcher.Wpf/Localization.cs",
+      "SHA256": "0903E1386654117749315591D8F34890D314142F7508F4409C883AA06A427857"
+    },
+    {
+      "Path": "src/SC2Switcher.Wpf/MainViewModel.cs",
+      "SHA256": "0D5CFD96DFB2A7DBB612078E5417CF621B46308C7312FCA9329E719942672A13"
+    },
+    {
+      "Path": "src/SC2Switcher.Wpf/MainWindow.xaml",
+      "SHA256": "7C75396ABADBDFCD456A366543012513A78ABF1BF3C1AB1EAD612241B257C63A"
+    },
+    {
+      "Path": "src/SC2Switcher.Wpf/MainWindow.xaml.cs",
+      "SHA256": "2B45760EB6A563DAF3BE092196B8A3DA951738718D43F5BCD7E514F1402426A1"
+    },
+    {
+      "Path": "src/SC2Switcher.Wpf/SettingsPage.xaml",
+      "SHA256": "A6E3170D9283F4168D222704E85216694A59E121FF37CEF9EBE3D0E52B0E86DD"
+    },
+    {
+      "Path": "src/SC2Switcher.Wpf/SettingsPage.xaml.cs",
+      "SHA256": "5C49AA90F4D2788B2BDBD7C6F8FF4E3D9C12FBC8EA5B5A9C4630F52EF0FE291B"
+    },
+    {
+      "Path": "src/SC2Switcher.Wpf/Strings.en-US.json",
+      "SHA256": "4F7B37650E47ED8805BCD63BECFBE1173326DF2F336308F5F307CDE5A332FAF0"
+    },
+    {
+      "Path": "src/SC2Switcher.Wpf/Strings.zh-CN.json",
+      "SHA256": "B24128FD0DCFC2C5E7648A504A6DDD2D29F4F875CCA780FD75A4FF42F9A42DE5"
+    },
+    {
+      "Path": "assets/icon/switcher.ico",
+      "SHA256": "8996CA2C11FA3E119F5A04C3AE59BFE2BBE85D6B1465FCD726DA2DEA21284C56"
+    },
+    {
+      "Path": "tests/SC2Switcher.Tests/Tests.cs",
+      "SHA256": "4ACFEBF6FF1F72B1780E60937A4EF363CCC3DA073925DD940B40A553375912BC"
+    },
+    {
+      "Path": "tools/IconGenerator/Program.cs",
+      "SHA256": "559F685501EC50137F78ADB5096254A13CACC5AF3B3AEAD26423957C55393032"
+    },
+    {
+      "Path": "assets/icon/icon.svg",
+      "SHA256": "C01EF8B346F7752443226A847A951368404DBB9BE2DCDB141D1B1929C2383CC1"
+    }
+  ],
+  "AdjustedFiles": [
+    "src/SC2Switcher.Wpf/SC2Switcher.Wpf.csproj",
+    "tests/SC2Switcher.Tests/SC2Switcher.Tests.csproj",
+    "tools/Installer/Build-CurrentUserMsi.ps1"
+  ],
+  "AdjustmentScope": "Relative project and resource references; installer default paths",
+  "GitImportNote": "Historical local snapshot before first Git import. Git line-ending normalization and removal of terminal blank lines may change byte hashes without changing application behavior."
+}
