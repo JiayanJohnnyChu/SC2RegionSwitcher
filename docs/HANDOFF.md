@@ -35,4 +35,4 @@
 
 2026-09-21 已初始化本地 Git main 分支，并补充固定版本 SDK、自动构建／测试／打包入口及 GitHub 工作流。随后用户授权首次提交，目标为 JiayanJohnnyChu/SC2RegionSwitcher 私有仓库；源码许可证与软件公开发布仍待确定。后续按 [GitHub 接入说明](GITHUB-RELEASE.md) 操作。
 
-本地开发默认选用项目 `.tools/dotnet`，已不依赖旧工作区 SDK 路径。GitHub workflow 的源文件已准备，远程执行结论仍需第一次连接仓库后确认。
+本地开发默认选用项目 `.tools/dotnet`，已不依赖旧工作区 SDK 路径。首次 GitHub 远程 CI 已通过，记录见 [VALIDATION.md](VALIDATION.md)。源码已进入私有仓库，尚未触发版本标签发布或创建公开 Release。

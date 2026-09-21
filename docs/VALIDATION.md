@@ -40,6 +40,17 @@
 
 本轮验证发现并修复了 NuGet 用户配置枚举和 MSI 检查中 COM 返回值混入结果的两处脚本问题。原始失败与成功日志均保留于 `artifacts/validation/github-preparation`。这不改变应用切换逻辑，也不构成 GitHub 托管运行或新 MSI 实机安装的通过结论。
 
+## 首次 GitHub 远程 CI
+
+2026-09-21，私有仓库 `JiayanJohnnyChu/SC2RegionSwitcher` 的初始提交 `5886efa9bf49312a84b59ac7e98ddc4dda6100f1` 完成 [首次 GitHub Actions 运行](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35629504891)，结论为 success。
+
+- Windows 托管 runner 完成工作流检查、固定 SDK 安装和源码检查。
+- Release 编译 0 警告、0 错误；实际日志确认隔离回归 52 / 52。
+- ZIP／MSI 生成、哈希与包内容检查全部通过，MSI 未安装。
+- 已上传 `SC2RegionSwitcher-win-x64-preview` 构建产物，包含安装包、便携包、发布清单和校验文件。
+
+该结果对应明确的提交与运行记录，不替代后续提交的 CI。没有推送版本标签或创建 Release；双服在线与安装升级验证边界保持不变。
+
 ## 尚未完成
 
 - 最终安装版本完整双服往返在线测试。
@@ -47,6 +58,6 @@
 - 多种缩放比例、多显示器及外部完整像素验证。
 - 缺失运行环境的安装体验和完整安装升级矩阵。
 - 代码签名、公开仓库许可与正式发布。
-- 指定远程仓库后的首次 GitHub Actions 运行和草稿 Release 附件核验。
+- 版本标签触发的草稿 Release 流程及其附件核验。
 
 原始截图、用户路径、安装现场数据与恢复备份保留在原工作区，不放入公开源码。新验证日志放在 Git 忽略的 `artifacts/validation` 和 `artifacts/tests` 中。

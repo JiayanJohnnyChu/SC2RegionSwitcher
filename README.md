@@ -56,6 +56,6 @@ SC2RegionSwitcher/
 
 本地 `artifacts/baseline/3.3.0` 保留此前已测试安装包的原件和校验值。新构建输出位于 `artifacts/packages/<本次构建>/release`，包含 MSI、ZIP、SHA-256 校验文件和无本机路径的发布清单。其安装测试结论须单独记录。`artifacts` 和 `.tools` 整体不纳入 Git。
 
-仓库已准备 Windows 自动构建、隔离测试和包内容检查。推送版本标签时，发布工作流只创建 **Draft / Pre-release**，供维护者核对后手动发布；不会自动覆盖已有 Release。尚未连接远程仓库，因此工作流还没有实际在 GitHub 上运行。
+仓库位于 [JiayanJohnnyChu/SC2RegionSwitcher](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher)，当前为私有。首次 GitHub CI 已通过 Windows 构建、52 项隔离回归和包内容检查，并上传预览构建产物；详细记录见 [验证范围](docs/VALIDATION.md)。推送版本标签时，发布工作流配置为创建 **Draft / Pre-release**，供维护者核对后手动发布；该标签发布流程尚未实际触发。
 
 本项目尚未公开发布，也尚未确定开源许可证。本目录整理不代表已授予某种开源许可。现有安装包未签名，跨电脑兼容性与完整升级流程仍待验证。详见 [验证范围](docs/VALIDATION.md)。
