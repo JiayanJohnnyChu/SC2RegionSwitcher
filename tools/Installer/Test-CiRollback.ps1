@@ -49,6 +49,18 @@ function Get-NativeFaultEvidence([string[]]$logLines,[string]$appTarget){
     }|Select-Object -First 1)
     [pscustomobject]@{Remove=$remove;InstallFinalize=$installFinalize;Copy=$copy;CopyTarget=$copyTarget;NativeError=$nativeError;Rollback=$rollback}
 }
+function Get-RollbackMessages([string[]]$logLines){
+    $messages=@($logLines|Select-String -SimpleMatch -Pattern 'Error in rollback skipped.')
+    # Logged action return 5 means success. Preserve the normal End opcode
+    # messages separately from failed rollback operations.
+    # https://learn.microsoft.com/en-us/windows/win32/msi/logging-of-action-return-values
+    $endMessages=@($messages|Where-Object{
+        $_.Line-match'Return:\s*5\s*$'-and$_.LineNumber-gt1-and$logLines[$_.LineNumber-2]-match'Executing op: End\('
+    })
+    $endLineNumbers=@($endMessages|ForEach-Object{$_.LineNumber})
+    $errors=@($messages|Where-Object{$_.LineNumber-notin$endLineNumbers})
+    [pscustomobject]@{Errors=$errors;EndMessages=$endMessages}
+}
 
 if($env:GITHUB_ACTIONS-ne'true'-or$env:RUNNER_ENVIRONMENT-ne'github-hosted'-or$env:CI-ne'true'){throw 'This script runs only on a GitHub-hosted Actions runner.'}
 if($ChildMode){
@@ -77,9 +89,11 @@ if($ChildMode){
         if(Test-Path $appTarget){throw 'Native collision target already exists.'};[IO.File]::WriteAllText($appTarget,'native-file-collision',[Text.UTF8Encoding]::new($false));$collisionHash=(Get-FileHash $appTarget).Hash
         $exit=Run-Msi native-upgrade @('/i',$CandidateFixture) @(1603) $logs $steps
         $log=Join-Path $logs 'native-upgrade.log'
-        $fault=Get-NativeFaultEvidence (Get-Content -LiteralPath $log) $appTarget
-        $error5=@(Select-String $log -Pattern 'Note: 1: 140[1-4].* 3: 5\s*$')
-        $rollbackSkipped=@(Select-String $log -SimpleMatch 'Error in rollback skipped.')
+        $logLines=@(Get-Content -LiteralPath $log)
+        $fault=Get-NativeFaultEvidence $logLines $appTarget
+        $error5=@($logLines|Select-String -Pattern 'Note: 1: 140[1-4].* 3: 5\s*$')
+        $rollbackMessages=Get-RollbackMessages $logLines
+        $rollbackSkipped=$rollbackMessages.Errors
         $after=[ordered]@{BaselineProductState=Product-State $manifest.Baseline.ProductCode;CandidateProductState=Product-State $manifest.Candidate.ProductCode;Hashes=File-Hashes $oldDir;Shortcut=Link-Target $shortcut;AppPath=Reg-Default $reg;ApplicationMarker=Reg-Named $marker Application;StartMenuMarker=Reg-Named $marker StartMenu;Canary=(Get-FileHash $config).Hash}
         $restored=$after.BaselineProductState-eq5-and$after.CandidateProductState-eq-1-and(($after.Hashes|ConvertTo-Json -Compress)-eq($oldHashes|ConvertTo-Json -Compress))-and$after.Shortcut-eq$before.Shortcut-and$after.AppPath-eq$before.AppPath-and$after.ApplicationMarker-eq$before.ApplicationMarker-and$after.StartMenuMarker-eq$before.StartMenuMarker-and$after.Canary-eq$canaryHash
         $testPass=$exit-eq1603-and[bool]$fault.Remove-and[bool]$fault.Copy-and[bool]$fault.CopyTarget-and[bool]$fault.NativeError-and[bool]$fault.InstallFinalize-and[bool]$fault.Rollback-and$error5.Count-eq0-and$rollbackSkipped.Count-eq0-and$restored
@@ -103,6 +117,7 @@ if($ChildMode){
             MSIError5=$error5.Count
             RollbackSkippedErrorCount=$rollbackSkipped.Count
             RollbackSkippedErrorLines=@($rollbackSkipped|ForEach-Object{$_.Line})
+            RollbackEndMessageCount=$rollbackMessages.EndMessages.Count
             OldVersionRestored=$restored
             Before=$before
             After=$after
