@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   ordinary-user-recovery:
-    runs-on: windows-latest
+    runs-on: windows-11-arm
     timeout-minutes: 15
     defaults:
       run:
@@ -41,6 +41,28 @@ jobs:
           ref: ${{ steps.candidate.outputs.source-commit }}
           fetch-depth: 0
           persist-credentials: false
+      - name: Record Windows client test environment
+        env:
+          CANDIDATE_SOURCE: ${{ steps.candidate.outputs.source-commit }}
+          WORKFLOW_SOURCE: ${{ github.sha }}
+        run: |
+          $ErrorActionPreference='Stop'
+          $os=Get-CimInstance Win32_OperatingSystem
+          $directory=Join-Path $env:GITHUB_WORKSPACE 'artifacts\ci-installer-rollback'
+          [void][IO.Directory]::CreateDirectory($directory)
+          [ordered]@{
+            Caption=$os.Caption
+            Version=$os.Version
+            BuildNumber=$os.BuildNumber
+            ProductType=$os.ProductType
+            OSArchitecture=[Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
+            ProcessArchitecture=[Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture.ToString()
+            InstallerVersion=[Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $env:WINDIR 'System32\msi.dll')).FileVersion
+            CandidateSource=$env:CANDIDATE_SOURCE
+            WorkflowSource=$env:WORKFLOW_SOURCE
+            Scope='MSI recovery on a Windows client; not native x64 application or game coverage.'
+          } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $directory 'environment.json') -Encoding utf8
+          if($os.ProductType -ne 1){throw 'Recovery requires a Windows client; Windows Server restricts unmanaged installations.'}
       - name: Download original candidate files
         env:
           GH_TOKEN: ${{ github.token }}
