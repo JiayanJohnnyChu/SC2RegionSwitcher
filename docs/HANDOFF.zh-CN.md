@@ -19,7 +19,7 @@
 3. 根据最终变更重新评估界面与在线覆盖，提升候选前重跑受影响检查。
 4. 在版本说明中保留多显示器、跨电脑及签名方面的限制。
 
-开发提交 `68d5d31f823de5992eb331b7bf07803557b80bc5` 的 [CI 运行 35663508108](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35663508108) 已通过。独立的[标准用户恢复运行 35663705665](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35663705665) 在基线安装阶段被 Windows Server 运行器策略阻止（错误 1625），未进入回滚场景。测试资源清理检查通过，输入 MSI 原文件哈希不变。这些开发运行早于最终文档修订，不代表最终发布候选。
+提交 `d3a179bbbb1ec55f9850f1c0846b79d126ffac4d` 通过 [CI 运行 35667524580](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35667524580)。Windows 11 ARM64 配对恢复测试使用相同候选和测试程序：[管理员上下文运行](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35668661867) 完整恢复旧安装；[标准用户运行](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35668664128) 恢复了可见资源，但旧产品处于已播发状态，MSI 清理检查失败。两次均到达旧产品移除后的原生文件复制失败阶段。输入 MSI 原文件不变，临时测试环境已移除。权限条件原型通过了结构检查，但尚未采用或完成全生命周期测试。发布验收仍未完成，详见 [3.4.1 验证记录](VALIDATION-3.4.1.zh-CN.md)。
 
 ## 发布约束
 

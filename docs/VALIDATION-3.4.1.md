@@ -18,12 +18,49 @@ The Global card now identifies the selected Battle.net login region. `Core.cs` a
 
 ## Development CI
 
-Commit `68d5d31f823de5992eb331b7bf07803557b80bc5` passed [CI run 35663508108](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35663508108), including build, regressions and package checks. Documentation was still under revision, so this run is recorded as development validation rather than the final release candidate.
+Commit `d3a179bbbb1ec55f9850f1c0846b79d126ffac4d` passed [CI run 35667524580](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35667524580), including compilation, regressions and package checks. This candidate remains under evaluation while installer recovery acceptance is incomplete.
 
 ## Installer recovery acceptance
 
-Installation-failure recovery has not passed in the standard-user test environment. A separate installer control reproduced the failure; a comparison under a different privilege context completed recovery. This establishes an environment-dependent observation, not a resolved cause or a successful production upgrade.
+### Paired privilege-context comparison
 
-The dedicated CI recovery test uses isolated product identities to test a native file-copy failure after old-product removal. In [run 35663705665](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35663705665), the Windows Server runner policy rejected baseline MSI installation for the fresh standard-user account with error 1625. The rollback scenario was never reached, so this is a blocked test rather than a rollback result. Test account, profile and working-directory cleanup checks passed, and the input MSI hash remained unchanged. Schema validation and normal installation success do not test this failure path.
+The [administrator-context run 35668661867](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35668661867) and [standard-user run 35668664128](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35668664128) used the same original candidate and test harness. Both ran on hosted Windows 11 ARM64, build 26200, with Windows Installer 5.0.26100.9444. Isolated product identities kept these tests separate from the production installation. They exercised installer behavior, not application or game operation.
 
-The next candidate requires a clean CI source revision, original package hashes, and installation lifecycle evidence against those exact files. Local package checks do not transfer to subsequently rebuilt candidates.
+| Evidence | Identity |
+| --- | --- |
+| Candidate source | `d3a179bbbb1ec55f9850f1c0846b79d126ffac4d` |
+| Recovery workflow and harness | `f512175ef8697632cd240a2df1722ed4c3e8a406` |
+| Original MSI SHA-256 | `A8C62B46FFA4DF577D6E64CE1EEA1A36025D0012F1D2D530D25A8FE0DACFB89A` |
+
+Both tests reached the intended native file-copy failure, error 1312, after old-product removal.
+
+| Observation | Administrator context | Standard user |
+| --- | --- | --- |
+| Registry operations reporting error 5 (access denied) | 0 | 81 |
+| Actual rollback failures | 0 | 80 |
+| Old product `ProductState` | 5 → 5, remained installed | 5 → 1, changed from installed to advertised |
+| Candidate `ProductState` | -1, absent | -1, absent |
+| Restored resources | All four old file hashes, shortcut, App Paths and authored markers matched; the configuration test file remained unchanged | Visible old application resources returned, but product registration was not restored |
+| MSI cleanup | All resource-removal checks passed | Uninstall returned success, but old files, menu entry, App Paths and markers remained; cleanup assertions failed |
+
+After the standard-user test, removal of the disposable account, profile and working directory completed. The administrator test also completed its cleanup. Both runs left the original input MSI unchanged. The separate cleanup steps do not convert the failed MSI cleanup into a passing result.
+
+The results strongly associate the recovery failure with privilege context in this environment. They do not establish a specific root cause or an officially confirmed Windows defect. The administrator result is a diagnostic comparison, not acceptance of standard-user recovery. Normal MSI action-end return values were excluded from the rollback-failure count.
+
+### Earlier evidence
+
+The complete code and documentation revision `a3d0cf55acb694f31f3c3b3eccef8adb0978339b` passed [CI run 35664932110](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35664932110). Its Windows 11 ARM64 [standard-user recovery run 35666330406](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35666330406) independently reproduced the same installed-to-advertised transition after the native failure. The earlier Windows Server [run 35663705665](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35663705665) stopped at baseline installation with policy error 1625 and did not enter rollback.
+
+### Isolated authoring probes
+
+Local metadata prototypes using `WordCount = 2` alone, or `ALLUSERS = 2`, `MSIINSTALLPERUSER = 1` and `WordCount = 2` together, did not resolve the failure. The combined prototype still recorded registry access-denied events.
+
+A separate prototype combined `WordCount = 2` with an explicit `Privileged` launch condition. Its quiet standard-user probe rejected installation before `InstallInitialize`, with no registry rollback errors or installed test resources. This tests early rejection, not successful recovery.
+
+A separately built guarded MSI using the unchanged application payload from CI run 35664932110 passed the full unsuppressed ICE suite with zero errors and four expected ICE91 warnings. Validation left its bytes unchanged. That package has not been installed, tested through the full lifecycle or promoted. The guard has not been adopted in production authoring.
+
+Raw packages and diagnostic records remain under ignored `artifacts/validation/3.4.1/` directories.
+
+## Release status
+
+The release remains on hold. These diagnostics did not change application code, install the production 3.4.1 package locally, or publish a release. Acceptance still requires a defined installation approach and complete lifecycle evidence for the exact candidate files. Schema validation, early rejection and normal installation success do not establish recovery after a failed upgrade.
