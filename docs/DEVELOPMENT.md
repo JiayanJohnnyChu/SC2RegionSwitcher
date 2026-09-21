@@ -49,6 +49,8 @@ Invoke-ProjectDotNet -Arguments @('run', '--project', '.\tools\IconGenerator\Ico
 
 `--ui-report <绝对 JSON 路径> --compact` 用于输出窗口诊断与自渲染图；相关文件写入 `artifacts`。实际双服验证与用户登录需要另行安排，构建和自动回归不包含这些操作。
 
+English-first 界面的 `--matrix` 诊断必须同时指定独立的 `--data-dir`，会导出两种界面的模拟状态，并在导出期间禁止切换和目录保存。F12 可捕获主页面、设置页及参考页。进行 DPI 验证时应启动生成的 EXE，确保应用清单生效；通过 `dotnet` 运行 DLL 的渲染不能代替 EXE 的 PerMonitorV2 验证。详细设计与证据边界见 [UI-DESIGN.md](UI-DESIGN.md)。
+
 ## 安装版本与构建产物
 
 本机现有安装使用先前测试过的基线包。重新编译后，即使版本仍为 3.3.0，文件哈希、MSI PackageCode 也可能变化。不要直接覆盖已安装文件，也不要将基线安装测试结论套用到新包上。

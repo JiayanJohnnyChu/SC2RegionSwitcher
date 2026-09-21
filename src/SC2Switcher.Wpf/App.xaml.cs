@@ -11,6 +11,7 @@ public partial class App : Application {
             var root=AppContext.BaseDirectory;
             var state=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"SC2RegionSwitcherV2");
             int dataIndex=Array.IndexOf(e.Args,"--data-dir");
+            if(Array.IndexOf(e.Args,"--matrix")>=0&&dataIndex<0)throw new ArgumentException("--matrix requires an isolated --data-dir.");
             if(dataIndex>=0){if(dataIndex+1>=e.Args.Length||!Path.IsPathFullyQualified(e.Args[dataIndex+1]))throw new ArgumentException("--data-dir requires an absolute path.");state=Path.GetFullPath(e.Args[dataIndex+1]);}
             var preferences=Path.Combine(state,"ui-preferences.json");
             UiText.SetLanguage(UiPreferences.Load(preferences));
@@ -22,6 +23,12 @@ public partial class App : Application {
                 Json.Write(Path.GetFullPath(e.Args[1]),new {Builds=new Engine(settings,state,new NativePlatform(settings.BattleNetPath)).Inspect(),Runtime=Environment.Version.ToString(),Region=new NativePlatform(settings.BattleNetPath).ReadRegion()});Shutdown();return;
             }
             string report=e.Args.Length>=2&&e.Args[0]=="--ui-report"?Path.GetFullPath(e.Args[1]):null;
+            if(report!=null){
+                Directory.CreateDirectory(Path.GetDirectoryName(report));
+                System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level=System.Diagnostics.SourceLevels.Error;
+                System.Diagnostics.PresentationTraceSources.DataBindingSource.Listeners.Add(new System.Diagnostics.TextWriterTraceListener(Path.Combine(Path.GetDirectoryName(report),"bindings.log")));
+                System.Diagnostics.Trace.AutoFlush=true;
+            }
             var window=new MainWindow(loaded,configuration,state,report);
             if(report!=null&&Array.IndexOf(e.Args,"--compact")>=0){window.Width=520;window.Height=560;}
             if(report!=null&&Array.IndexOf(e.Args,"--matrix")>=0)window.ContentRendered+=async(_,_)=>{try{await window.ExportDesignStates(Path.GetDirectoryName(report));}catch(Exception error){Json.Write(Path.Combine(Path.GetDirectoryName(report),"layout-error.json"),new{error.Message});Shutdown(1);}};

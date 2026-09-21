@@ -220,17 +220,17 @@ SC2Switcher.Wpf.runtimeconfig.json
 | 设置项 | 应选择的内容 | 核对方法 |
 | --- | --- | --- |
 | 战网目录 / Battle.net folder | 包含 `Battle.net.exe` 的文件夹 | 选择安装根目录，不要选择开始菜单快捷方式或某个版本子目录。 |
-| 国服游戏目录 / China game folder | 国服游戏根目录 | 直接包含 `StarCraft II.exe`、`.build.info` 和 `Versions`。 |
-| 外服游戏目录 / Global game folder | 国际服游戏根目录 | 与国服目录独立；确认没有多选或少选一层目录。 |
+| 国服游戏目录 / China installation | 国服游戏根目录 | 直接包含 `StarCraft II.exe`、`.build.info` 和 `Versions`。 |
+| 外服游戏目录 / Global installation | 国际服游戏根目录 | 与国服目录独立；确认没有多选或少选一层目录。 |
 | 高级选项 → 共享游戏设置文件 | 实际的 `Variables.txt` 文件 | 此处选择文件，其余三项选择文件夹。 |
 
 每项支持手动输入或点击“浏览 / Browse”。手动输入完整路径，例如 `D:\Games\StarCraft II CN`；输入框不会自动展开 `%USERPROFILE%` 等环境变量表达式。
 
-点击 **“保存并检查 / Save and check”**。程序会检查路径、安装分支、更新完成标记、语言声明及共享设置文件。通过后会显示目录已保存的提示，再点击“返回切换 / Back to switching”。
+点击 **“保存并检查 / Save & check”**。程序会检查路径、安装分支、更新完成标记、语言声明及共享设置文件。通过后会显示目录已保存的提示，再点击“返回切换 / Back”。
 
 检查失败时，按提示修正对应字段后重新保存。无效候选不会覆盖原有配置。存在未保存的目录编辑时，返回、Esc 或关闭窗口都会要求先保存或放弃；“放弃修改 / Discard changes”恢复已保存的目录。
 
-界面语言在此页面即时切换并单独保存，无需点击目录的保存按钮。
+新用户默认显示英文。需要中文时，打开 **Settings → Display language → 简体中文**。界面语言在此页面即时切换并单独保存，无需点击目录的保存按钮；已有的中英文偏好不会被新默认值覆盖。
 
 ## 5. 日常切换
 

@@ -36,3 +36,13 @@
 2026-09-21 已初始化本地 Git main 分支，并补充固定版本 SDK、自动构建／测试／打包入口及 GitHub 工作流。随后用户授权首次提交，目标为 JiayanJohnnyChu/SC2RegionSwitcher 私有仓库；源码许可证与软件公开发布仍待确定。后续按 [GitHub 接入说明](GITHUB-RELEASE.md) 操作。
 
 本地开发默认选用项目 `.tools/dotnet`，已不依赖旧工作区 SDK 路径。首次 GitHub 远程 CI 已通过，记录见 [VALIDATION.md](VALIDATION.md)。源码已进入私有仓库，尚未触发版本标签发布或创建公开 Release。
+
+## 后续界面改版：English first
+
+2026-09-21，按用户新的设计要求，以瑞士排版的网格、文字层级和受控色块重新组织主页面、设置和参考页面。默认窗口为 760 × 650 DIP，最小窗口保持 520 × 560 DIP。主页面的两个目标并列，当前配置独立呈现；设置页统一了路径输入、语言选择和滚动控件。
+
+英文为主要设计与开发语言，简体中文完整适配。新用户默认英文；已有偏好保留。中文使用 Microsoft YaHei UI 并调整大标题字重，英文使用 Segoe UI。`Core.cs` 和 `ConfigurationStore.cs` 的切换与配置事务未更改。
+
+此改版属于当前工作树的 UI 预览，未替换旧 MSI 基线，也未自动上传或发布。样式、文案和诊断变化见 [UI-DESIGN.md](UI-DESIGN.md)；自动回归与实际交互证据分别记录，设计状态截图不代表两服在线验证。
+
+随后按用户确认的配色方案，将两服身份色分别设为 Radix Tomato 11 与 Indigo 9，共用 Sand 中性色。颜色资源集中在 `Palette.xaml`。当前配置标记独立绑定 `CurrentLoginRegion`，选中目标不改变当前配置；按钮、焦点、设置及进度保留中性设计。最新验证见 `VALIDATION.md` 的“双服配色实现”。

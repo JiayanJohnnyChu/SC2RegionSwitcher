@@ -15,8 +15,8 @@ public sealed class UiText : INotifyPropertyChanged {
         ["zh-CN"] = Read("zh-CN"), ["en-US"] = Read("en-US")
     };
     public static UiText Instance { get; } = new();
-    public static string Language { get; private set; } = "zh-CN";
-    public static IReadOnlyCollection<string> Keys => catalogs["zh-CN"].Keys;
+    public static string Language { get; private set; } = "en-US";
+    public static IReadOnlyCollection<string> Keys => catalogs["en-US"].Keys;
     public event PropertyChangedEventHandler PropertyChanged;
     public string this[string key] => T(key);
     static Dictionary<string,string> Read(string language) {
@@ -42,8 +42,8 @@ public sealed class UiText : INotifyPropertyChanged {
 public static class UiPreferences {
     sealed class Document { public Document(){} public string Language {get;set;} }
     public static string Load(string path) {
-        try {var value=Json.Read<Document>(path)?.Language;return UiText.IsSupported(value)?value:"zh-CN";}
-        catch(IOException){return "zh-CN";}catch(UnauthorizedAccessException){return "zh-CN";}catch(JsonException){return "zh-CN";}
+        try {var value=Json.Read<Document>(path)?.Language;return UiText.IsSupported(value)?value:"en-US";}
+        catch(IOException){return "en-US";}catch(UnauthorizedAccessException){return "en-US";}catch(JsonException){return "en-US";}
     }
     public static void Save(string path,string language) {
         if(!UiText.IsSupported(language))throw new ArgumentException("Unsupported interface language.");

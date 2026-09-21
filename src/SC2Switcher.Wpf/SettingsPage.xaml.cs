@@ -30,7 +30,7 @@ public sealed class SettingsPageModel:INotifyPropertyChanged {
     public string Notice=>UiText.T(notice);
     public Visibility NoticeVisibility=>String.IsNullOrEmpty(notice)?Visibility.Collapsed:Visibility.Visible;
     public string Message=>String.IsNullOrEmpty(errorField)?UiText.T(messageKey):UiText.T(FieldName(errorField))+": "+detail;
-    public string MessageColor=>error?"#975019":saving?"#2855DC":"#247456";
+    public string MessageColor=>error?"#975019":saving?"#63635E":"#247456";
     public Visibility MessageVisibility=>String.IsNullOrEmpty(Message)?Visibility.Collapsed:Visibility.Visible;
     public static string FieldName(string name)=>name switch{"BattleNetDirectory"=>"战网目录","ChinaDirectory"=>"国服游戏目录","GlobalDirectory"=>"外服游戏目录","VariablesFile"=>"共享游戏设置文件",_=>"安装目录"};
     public Settings Candidate()=>ConfigurationValidator.FromDirectories(baseline,battle,china,global,variables);

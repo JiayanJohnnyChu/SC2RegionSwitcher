@@ -28,6 +28,8 @@ public partial class MainWindow : Window {
     readonly BuildInfo[] builds=new BuildInfo[2];
     readonly Grid host=new();
     Border sheet;
+    Button sheetCloseButton;
+    bool exportingDesignStates;
     IInputElement previousFocus;
     bool inspecting;
     SwitchPhase currentPhase;
@@ -42,12 +44,20 @@ public partial class MainWindow : Window {
         UiText.Instance.PropertyChanged+=LanguageChanged;
         Closed+=(_,_)=>UiText.Instance.PropertyChanged-=LanguageChanged;
         Closing+=(_,e)=>{if(!model.IsIdle||settingsPage?.IsSaving==true){e.Cancel=true;model.Status("切换尚未结束","请等待切换结束后再关闭窗口。","working");}else if(settingsPage!=null&&!settingsPage.CanLeave())e.Cancel=true;};
-        PreviewKeyDown+=(_,e)=>{if(e.Key==Key.Escape&&sheet!=null){CloseSheet();e.Handled=true;}if(e.Key==Key.F12&&report!=null&&sheet==null){WriteDiagnostics(Path.Combine(Path.GetDirectoryName(report),model.Target+(ActualWidth<740?"-narrow":"")+".json"));e.Handled=true;}};
+        PreviewKeyDown+=(_,e)=>{if(e.Key==Key.Escape&&sheet!=null){CloseSheet();e.Handled=true;}if(e.Key==Key.F12&&report!=null){WriteDiagnostics(Path.Combine(Path.GetDirectoryName(report),(settingsPage!=null?"settings":sheet!=null?"reference":model.Target)+(ActualWidth<620?"-narrow":"")+".json"));e.Handled=true;}};
     }
     void AdaptLayout(){
-        double margin=ActualWidth<620?24:32;
-        Workspace.Margin=new Thickness(margin,25,margin,22);
-        DockContent.Margin=new Thickness(margin,19,margin,22);
+        bool compact=ActualWidth<620;
+        double margin=compact?22:32;
+        Header.Padding=new Thickness(margin,compact?12:16,margin,compact?12:16);
+        BrandDescriptor.Visibility=compact?Visibility.Collapsed:Visibility.Visible;
+        Workspace.Margin=new Thickness(margin,compact?18:26,margin,compact?16:26);
+        Intro.Margin=new Thickness(0,0,0,compact?18:28);
+        HeroTitle.FontSize=compact?26:30;
+        ChinaCard.Padding=GlobalCard.Padding=new Thickness(compact?18:22,compact?12:18,compact?18:22,compact?12:18);
+        ChinaCard.MinHeight=GlobalCard.MinHeight=compact?110:126;
+        RegionRow.Margin=new Thickness(0,compact?16:22,0,0);
+        DockContent.Margin=new Thickness(margin,compact?14:19,margin,compact?16:22);
     }
     async Task Inspect(){
         if(!model.IsIdle||inspecting)return;
@@ -70,7 +80,7 @@ public partial class MainWindow : Window {
     async void Check_Click(object sender,RoutedEventArgs e){try{await Inspect();}catch(Exception error){ShowError(error);}}
     async void Switch_Click(object sender,RoutedEventArgs e){await Switch();}
     async Task Switch(){
-        if(!model.CanSwitch||inspecting)return;
+        if(exportingDesignStates||!model.CanSwitch||inspecting)return;
         bool acquired=false;
         using var mutex=new Mutex(false,"Local\\SC2DualRegionSwitcher");
         try{
@@ -134,6 +144,7 @@ public partial class MainWindow : Window {
         sheet.Child=settingsPage;host.Children.Add(sheet);
     }
     async Task<Settings> SaveDirectories(Settings candidate){
+        if(exportingDesignStates)throw new InvalidOperationException("Design snapshots cannot save installation settings.");
         var saved=await Task.Run(()=>configuration.Save(candidate));
         settings=saved;platform=new NativePlatform(settings.BattleNetPath);initialConfiguration.NeedsSetup=false;
         await Inspect();return ConfigurationValidator.Clone(settings);
@@ -141,42 +152,22 @@ public partial class MainWindow : Window {
     void ShowSheet(string title,string intro,List<(string,string)> sections){
         if(sheet!=null)return;
         previousFocus=Keyboard.FocusedElement;Root.IsEnabled=false;Root.Visibility=Visibility.Hidden;
-        sheet=new Border{Background=Background,Padding=new Thickness(40,32,40,28)};
+        sheet=new Border{Background=Background};
         KeyboardNavigation.SetTabNavigation(sheet,KeyboardNavigationMode.Cycle);
-        var grid=new Grid();grid.RowDefinitions.Add(new RowDefinition{Height=new GridLength(1,GridUnitType.Star)});grid.RowDefinitions.Add(new RowDefinition{Height=GridLength.Auto});
-        var stack=new StackPanel();stack.Children.Add(new TextBlock{Text=UiText.T(title),FontSize=26,FontWeight=FontWeights.SemiBold,Margin=new Thickness(0,0,0,8)});stack.Children.Add(new TextBlock{Text=UiText.T(intro),Foreground=(Brush)FindResource("Muted"),Margin=new Thickness(0,0,0,24)});
+        var grid=new Grid();grid.RowDefinitions.Add(new RowDefinition{Height=GridLength.Auto});grid.RowDefinitions.Add(new RowDefinition{Height=new GridLength(1,GridUnitType.Star)});grid.RowDefinitions.Add(new RowDefinition{Height=GridLength.Auto});
+        var heading=new Grid();heading.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});heading.ColumnDefinitions.Add(new ColumnDefinition{Width=GridLength.Auto});
+        heading.Children.Add(new TextBlock{Text=UiText.T(title),Style=(Style)FindResource("PageTitle")});
+        var category=new TextBlock{Text=UiText.T("参考信息"),Style=(Style)FindResource("Eyebrow"),VerticalAlignment=VerticalAlignment.Center,Margin=new Thickness(20,0,0,0)};Grid.SetColumn(category,1);heading.Children.Add(category);
+        grid.Children.Add(new Border{Child=heading,Padding=new Thickness(28,19,28,19),BorderBrush=(Brush)FindResource("Line"),BorderThickness=new Thickness(0,0,0,1)});
+        var stack=new StackPanel{Margin=new Thickness(28,22,28,8)};stack.Children.Add(new TextBlock{Text=UiText.T(intro),Foreground=(Brush)FindResource("Muted"),FontSize=13,Margin=new Thickness(0,0,0,24)});
         foreach(var section in sections){
-            stack.Children.Add(new TextBlock{Text=UiText.T(section.Item1),FontWeight=FontWeights.SemiBold,Margin=new Thickness(0,0,0,8)});
-            stack.Children.Add(new TextBox{Text=UiText.T(section.Item2),IsReadOnly=true,TextWrapping=TextWrapping.Wrap,Background=Brushes.Transparent,BorderThickness=new Thickness(0),Padding=new Thickness(0),Foreground=(Brush)FindResource("Muted"),FontSize=13,Margin=new Thickness(0,0,0,22),VerticalScrollBarVisibility=ScrollBarVisibility.Disabled});
+            var group=new StackPanel();group.Children.Add(new TextBlock{Text=UiText.T(section.Item1),FontSize=13,FontWeight=FontWeights.SemiBold,Margin=new Thickness(0,0,0,7)});
+            group.Children.Add(new TextBox{Text=UiText.T(section.Item2),IsReadOnly=true,TextWrapping=TextWrapping.Wrap,Background=Brushes.Transparent,BorderThickness=new Thickness(0),Padding=new Thickness(0),Foreground=(Brush)FindResource("Muted"),FontSize=13,VerticalScrollBarVisibility=ScrollBarVisibility.Disabled});
+            stack.Children.Add(new Border{Child=group,BorderBrush=(Brush)FindResource("Line"),BorderThickness=new Thickness(0,0,0,1),Padding=new Thickness(0,0,0,18),Margin=new Thickness(0,0,0,18)});
         }
-        grid.Children.Add(new ScrollViewer{Content=stack,VerticalScrollBarVisibility=ScrollBarVisibility.Auto,HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled});
-        var close=new Button{Content=UiText.T("返回切换"),Style=(Style)FindResource("PrimaryButton"),HorizontalAlignment=HorizontalAlignment.Right,MinWidth=140,Margin=new Thickness(0,18,0,0)};close.Click+=(_,_)=>CloseSheet();Grid.SetRow(close,1);grid.Children.Add(close);sheet.Child=grid;host.Children.Add(sheet);close.Focus();
+        var scroll=new ScrollViewer{Content=stack,VerticalScrollBarVisibility=ScrollBarVisibility.Auto,HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled};Grid.SetRow(scroll,1);grid.Children.Add(scroll);
+        sheetCloseButton=new Button{Content=UiText.T("返回切换"),Style=(Style)FindResource("QuietButton"),HorizontalAlignment=HorizontalAlignment.Left,MinWidth=70};sheetCloseButton.Click+=(_,_)=>CloseSheet();
+        var footer=new Border{Child=sheetCloseButton,BorderBrush=(Brush)FindResource("Line"),BorderThickness=new Thickness(0,1,0,0),Padding=new Thickness(18,14,28,18)};Grid.SetRow(footer,2);grid.Children.Add(footer);sheet.Child=grid;host.Children.Add(sheet);sheetCloseButton.Focus();
     }
-    void CloseSheet(){if(sheet==null)return;if(settingsPage!=null&&!settingsPage.CanLeave())return;host.Children.Remove(sheet);sheet=null;settingsPage=null;Root.Visibility=Visibility.Visible;Root.IsEnabled=true;if(previousFocus!=null)Keyboard.Focus(previousFocus);}
-    [DllImport("user32.dll")]static extern IntPtr GetWindowDpiAwarenessContext(IntPtr hwnd);
-    [DllImport("user32.dll")]static extern bool AreDpiAwarenessContextsEqual(IntPtr a,IntPtr b);
-    void WriteDiagnostics(string path){
-        var dpi=VisualTreeHelper.GetDpi(this);
-        var primary=model.IsIdle?(FrameworkElement)SwitchButton:BusyIndicator;
-        Point location=primary.TranslatePoint(new Point(),Root);
-        bool reachable=location.Y>=0&&location.Y+primary.ActualHeight<=Root.ActualHeight&&location.X>=0&&location.X+primary.ActualWidth<=Root.ActualWidth;
-        Json.Write(path,new {Framework="WPF",Design="Round 2",Version=typeof(MainWindow).Assembly.GetName().Version.ToString(3),UiLanguage=UiText.Language,UserCancellationAvailable=false,CommitStarted=model.IsCommitStarted,Runtime=Environment.Version.ToString(),DpiX=dpi.PixelsPerInchX,DpiY=dpi.PixelsPerInchY,PerMonitorV2=AreDpiAwarenessContextsEqual(GetWindowDpiAwarenessContext(new WindowInteropHelper(this).Handle),new IntPtr(-4)),UseLayoutRounding,SnapsToDevicePixels,Width=ActualWidth,Height=ActualHeight,Selected=model.Target,Ready=model.CanSwitch,CurrentRegion=model.CurrentRegion,Status=model.StatusTitle,ScrollHeight=MainScroll.ScrollableHeight,PrimaryActionFullyVisible=reachable,PrimaryActionTop=location.Y,PrimaryActionBottom=location.Y+primary.ActualHeight,ContentHeight=Root.ActualHeight,Versions=builds.Select(x=>x?.Version).ToArray()});
-        if(!reachable)throw new InvalidOperationException("主操作未完整显示。");
-        double width=Root.ActualWidth+Root.Margin.Left+Root.Margin.Right,height=Root.ActualHeight+Root.Margin.Top+Root.Margin.Bottom;
-        var bitmap=new RenderTargetBitmap((int)Math.Ceiling(width*dpi.DpiScaleX),(int)Math.Ceiling(height*dpi.DpiScaleY),dpi.PixelsPerInchX,dpi.PixelsPerInchY,PixelFormats.Pbgra32);bitmap.Render(Root);
-        var encoder=new PngBitmapEncoder();encoder.Frames.Add(BitmapFrame.Create(bitmap));using var stream=File.Create(Path.ChangeExtension(path,"png"));encoder.Save(stream);
-    }
-    // Isolated visual regression mode. It changes only this window's presentation state.
-    public async Task ExportDesignStates(string directory){
-        while(inspecting)await Task.Delay(10);
-        await Inspect();
-        async Task Snapshot(string name){await Dispatcher.InvokeAsync(()=>{},DispatcherPriority.ApplicationIdle);UpdateLayout();WriteDiagnostics(Path.Combine(directory,name+".json"));}
-        await Snapshot("默认");model.IsChina=true;await Snapshot("国服目标");model.IsGlobal=true;
-        Width=520;Height=560;await Snapshot("最小窗口");
-        model.SetBusy(true);model.SetStage(2);model.Status("正在设置游戏语言","正在设置目标语言并保存原始配置备份。","working");await Snapshot("切换中-状态预览");
-        model.SetPhase(SwitchPhase.StartingBattleNet);model.Status("正在打开目标战网","正在核对战网区域。完成后恢复操作。","working");await Snapshot("核对区域-状态预览");model.SetBusy(false);
-        model.Status("操作未完成","检测到游戏文件变化或监测中断。需等待更新、安装或修复结束后重新检查。","error");await Snapshot("错误-状态预览");
-        Width=740;Height=678;model.Status("已打开外服战网","区域配置已核对；账号登录与游戏启动需在战网中完成。");await Snapshot("完成-状态预览");
-        Close();
-    }
+    void CloseSheet(){if(sheet==null)return;if(settingsPage!=null&&!settingsPage.CanLeave())return;host.Children.Remove(sheet);sheet=null;settingsPage=null;sheetCloseButton=null;Root.Visibility=Visibility.Visible;Root.IsEnabled=true;if(previousFocus!=null)Keyboard.Focus(previousFocus);}
 }

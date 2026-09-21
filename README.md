@@ -2,12 +2,13 @@
 
 用于 Windows 的《星际争霸 II》国服／国际服切换器，采用 C#、WPF 和 .NET 10。当前基线为 **3.3.0 预览版**。
 
-程序使用一套 Battle.net 和两套独立游戏目录，切换 Battle.net 登录区域并同步共享游戏语言设置。国服使用简体中文，国际服使用英文；界面语言可独立设置为简体中文或 English。账号登录、游戏安装、更新和游戏启动仍由官方战网完成。
+程序使用一套 Battle.net 和两套独立游戏目录，切换 Battle.net 登录区域并同步共享游戏语言设置。国服使用简体中文，国际服使用英文；界面采用 English-first 设计，新用户默认英文，可在独立设置页选择简体中文。已有语言偏好继续生效。账号登录、游戏安装、更新和游戏启动仍由官方战网完成。
 
 ## 使用与开发入口
 
 - 普通用户：[环境配置与使用指南](docs/SETUP.zh-CN.md)。运行需要 .NET 10 Desktop Runtime（Windows x64）。
 - 后续开发：[开发与构建](docs/DEVELOPMENT.md)、[架构说明](docs/ARCHITECTURE.md)。构建需要 Windows x64 和 .NET 10 SDK。
+- 界面维护：[English-first UI design](docs/UI-DESIGN.md)。英文文案与布局先行，中英文资源和状态同步维护。
 - 接续当前工作：[项目交接记录](docs/HANDOFF.md)、[验证范围与发布待办](docs/VALIDATION.md)。
 - 安装包维护：[当前用户 MSI 构建说明](tools/Installer/README.md)。
 - 接入 GitHub：[首次提交、自动检查与预发布流程](docs/GITHUB-RELEASE.md)。

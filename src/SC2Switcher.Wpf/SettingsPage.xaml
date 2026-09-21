@@ -1,60 +1,69 @@
 <UserControl x:Class="Sc2Wpf.SettingsPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" UseLayoutRounding="True" SnapsToDevicePixels="True">
  <UserControl.Resources>
-  <Style x:Key="PathField" TargetType="TextBox">
-   <Setter Property="MinHeight" Value="36"/><Setter Property="Padding" Value="10,0"/><Setter Property="VerticalContentAlignment" Value="Center"/>
-   <Setter Property="Background" Value="White"/><Setter Property="BorderBrush" Value="{StaticResource Line}"/><Setter Property="BorderThickness" Value="1"/>
-   <Setter Property="TextWrapping" Value="NoWrap"/><Setter Property="HorizontalScrollBarVisibility" Value="Hidden"/>
-  </Style>
-  <Style x:Key="FieldLabel" TargetType="TextBlock"><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Margin" Value="0,0,0,7"/></Style>
-  <Style x:Key="BrowseButton" TargetType="Button" BasedOn="{StaticResource QuietButton}"><Setter Property="MinHeight" Value="36"/><Setter Property="Margin" Value="8,0,0,0"/></Style>
+  <Style x:Key="FieldLabel" TargetType="TextBlock"><Setter Property="FontSize" Value="13"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Margin" Value="0,0,0,6"/></Style>
+  <Style x:Key="BrowseButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="MinHeight" Value="40"/><Setter Property="MinWidth" Value="82"/><Setter Property="Margin" Value="8,0,0,0"/></Style>
  </UserControl.Resources>
- <Grid Margin="32,26,32,24">
+ <Grid>
   <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-  <TextBlock Text="{Binding Text[设置]}" FontSize="26" FontWeight="SemiBold" Margin="0,0,0,21"/>
+  <Border BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1" Padding="28,19">
+   <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <TextBlock Text="{Binding Text[设置]}" Style="{StaticResource PageTitle}"/>
+    <TextBlock Grid.Column="1" Text="{Binding Text[界面与安装]}" Style="{StaticResource Eyebrow}" VerticalAlignment="Center" Margin="16,0,0,0"/>
+   </Grid>
+  </Border>
   <ScrollViewer x:Name="FormScroll" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
-   <StackPanel Margin="0,0,12,6">
-    <TextBlock Text="{Binding Notice}" Foreground="{StaticResource Muted}" FontSize="13" Margin="0,0,0,18" Visibility="{Binding NoticeVisibility}"/>
-    <TextBlock Text="{Binding Text[界面语言]}" Style="{StaticResource FieldLabel}"/>
-    <ComboBox x:Name="LanguagePicker" Width="220" Style="{StaticResource LanguagePicker}" HorizontalAlignment="Left" SelectedValuePath="Tag" SelectedValue="{Binding UiLanguage, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanEdit}" AutomationProperties.Name="{Binding Text[界面语言]}">
-     <ComboBoxItem Tag="zh-CN" Content="简体中文"/><ComboBoxItem Tag="en-US" Content="English"/>
-    </ComboBox>
-    <TextBlock Text="{Binding Text[界面语言与游戏语言相互独立。修改立即生效，并在下次启动时保留。]}" FontSize="13" Foreground="{StaticResource Muted}" Margin="0,10,0,24"/>
-    <TextBlock Text="{Binding Text[安装目录]}" FontSize="17" FontWeight="SemiBold" Margin="0,0,0,7"/>
-    <TextBlock Text="{Binding Text[选择已安装的目录，并与战网识别的位置保持一致。保存设置不会移动或下载游戏。]}" Foreground="{StaticResource Muted}" FontSize="13" Margin="0,0,0,18"/>
+   <StackPanel Margin="28,20,28,6">
+    <TextBlock Text="{Binding Notice}" Foreground="{StaticResource Muted}" FontSize="12" Margin="0,0,0,18" Visibility="{Binding NoticeVisibility}"/>
+    <TextBlock Text="{Binding Text[界面]}" Style="{StaticResource Eyebrow}" Margin="0,0,0,12"/>
+    <Grid>
+     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+     <StackPanel Margin="0,0,20,0" VerticalAlignment="Center">
+      <TextBlock Text="{Binding Text[界面语言]}" Style="{StaticResource FieldLabel}"/>
+      <TextBlock Text="{Binding Text[立即保存，不影响游戏语言。]}" FontSize="12" Foreground="{StaticResource Muted}"/>
+     </StackPanel>
+     <ComboBox x:Name="LanguagePicker" Grid.Column="1" Width="190" VerticalAlignment="Center" Style="{StaticResource LanguagePicker}" SelectedValuePath="Tag" SelectedValue="{Binding UiLanguage,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanEdit}" AutomationProperties.Name="{Binding Text[界面语言]}">
+      <ComboBoxItem Tag="en-US" Content="English"/><ComboBoxItem Tag="zh-CN" Content="简体中文"/>
+     </ComboBox>
+    </Grid>
+    <Border Height="1" Background="{StaticResource Line}" Margin="0,22,0,18"/>
+    <TextBlock Text="{Binding Text[安装目录]}" Style="{StaticResource Eyebrow}" Margin="0,0,0,6"/>
+    <TextBlock Text="{Binding Text[选择战网已识别的安装目录。文件不会被移动。]}" Foreground="{StaticResource Muted}" FontSize="12" Margin="0,0,0,17"/>
     <TextBlock Text="{Binding Text[战网目录]}" Style="{StaticResource FieldLabel}"/>
-    <Grid Margin="0,0,0,16" IsEnabled="{Binding CanEdit}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <Grid Margin="0,0,0,13" IsEnabled="{Binding CanEdit}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
      <TextBox x:Name="BattleField" Style="{StaticResource PathField}" Text="{Binding BattleNetDirectory,UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="{Binding Text[战网目录]}"/>
      <Button Grid.Column="1" Content="{Binding Text[浏览]}" Style="{StaticResource BrowseButton}" Tag="BattleNetDirectory" Click="BrowseFolder_Click" AutomationProperties.Name="{Binding Text[浏览战网目录]}"/>
     </Grid>
     <TextBlock Text="{Binding Text[国服游戏目录]}" Style="{StaticResource FieldLabel}"/>
-    <Grid Margin="0,0,0,16" IsEnabled="{Binding CanEdit}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <Grid Margin="0,0,0,13" IsEnabled="{Binding CanEdit}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
      <TextBox x:Name="ChinaField" Style="{StaticResource PathField}" Text="{Binding ChinaDirectory,UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="{Binding Text[国服游戏目录]}"/>
      <Button Grid.Column="1" Content="{Binding Text[浏览]}" Style="{StaticResource BrowseButton}" Tag="ChinaDirectory" Click="BrowseFolder_Click" AutomationProperties.Name="{Binding Text[浏览国服游戏目录]}"/>
     </Grid>
     <TextBlock Text="{Binding Text[外服游戏目录]}" Style="{StaticResource FieldLabel}"/>
-    <Grid Margin="0,0,0,18" IsEnabled="{Binding CanEdit}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <Grid Margin="0,0,0,17" IsEnabled="{Binding CanEdit}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
      <TextBox x:Name="GlobalField" Style="{StaticResource PathField}" Text="{Binding GlobalDirectory,UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="{Binding Text[外服游戏目录]}"/>
      <Button Grid.Column="1" Content="{Binding Text[浏览]}" Style="{StaticResource BrowseButton}" Tag="GlobalDirectory" Click="BrowseFolder_Click" AutomationProperties.Name="{Binding Text[浏览外服游戏目录]}"/>
     </Grid>
-    <Expander x:Name="Advanced" Header="{Binding Text[高级选项]}" Margin="0,0,0,8">
+    <Expander x:Name="Advanced" Header="{Binding Text[高级选项]}" FontSize="13" IsEnabled="{Binding CanEdit}">
      <StackPanel Margin="0,14,0,0">
       <TextBlock Text="{Binding Text[共享游戏设置文件]}" Style="{StaticResource FieldLabel}"/>
-      <Grid IsEnabled="{Binding CanEdit}"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
        <TextBox x:Name="VariablesField" Style="{StaticResource PathField}" Text="{Binding VariablesFile,UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="{Binding Text[共享游戏设置文件]}"/>
        <Button Grid.Column="1" Content="{Binding Text[浏览]}" Style="{StaticResource BrowseButton}" Click="BrowseVariables_Click" AutomationProperties.Name="{Binding Text[浏览共享游戏设置文件]}"/>
       </Grid>
-      <TextBlock Text="{Binding Text[通常位于文档文件夹的 StarCraft II 子目录，用于保存共享游戏语言设置。]}" FontSize="13" Foreground="{StaticResource Muted}" Margin="0,9,0,8"/>
+      <TextBlock Text="{Binding Text[通常位于文档文件夹的 StarCraft II 子目录，用于保存共享游戏语言设置。]}" FontSize="12" Foreground="{StaticResource Muted}" Margin="0,9,0,0"/>
      </StackPanel>
     </Expander>
    </StackPanel>
   </ScrollViewer>
-  <StackPanel Grid.Row="2" Margin="0,15,0,0">
-   <TextBlock Text="{Binding Message}" Foreground="{Binding MessageColor}" FontSize="13" Margin="0,0,0,12" MaxHeight="76" TextTrimming="CharacterEllipsis" ToolTip="{Binding Message}" AutomationProperties.LiveSetting="Polite" Visibility="{Binding MessageVisibility}"/>
-   <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-    <Button Content="{Binding Text[返回切换]}" Style="{StaticResource QuietButton}" HorizontalAlignment="Left" Margin="-8,0,0,0" Click="Back_Click" IsEnabled="{Binding CanEdit}"/>
-    <Button Grid.Column="1" Content="{Binding Text[放弃修改]}" Style="{StaticResource QuietButton}" Margin="4,0,12,0" Click="Discard_Click" Visibility="{Binding DiscardVisibility}" IsEnabled="{Binding CanEdit}"/>
-    <Button Grid.Column="2" x:Name="SaveButton" Content="{Binding SaveLabel}" Style="{StaticResource PrimaryButton}" MinWidth="150" Click="Save_Click" IsEnabled="{Binding CanEdit}"/>
-   </Grid>
-  </StackPanel>
+  <Border Grid.Row="2" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="28,15,28,20">
+   <StackPanel>
+    <TextBlock Text="{Binding Message}" Foreground="{Binding MessageColor}" FontSize="12" Margin="0,0,0,12" MaxHeight="72" TextTrimming="CharacterEllipsis" ToolTip="{Binding Message}" AutomationProperties.LiveSetting="Polite" Visibility="{Binding MessageVisibility}"/>
+    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+     <Button Content="{Binding Text[返回切换]}" Style="{StaticResource QuietButton}" HorizontalAlignment="Left" Margin="-10,0,0,0" Click="Back_Click" IsEnabled="{Binding CanEdit}"/>
+     <Button Grid.Column="1" Content="{Binding Text[放弃修改]}" Style="{StaticResource QuietButton}" Margin="4,0,8,0" Click="Discard_Click" Visibility="{Binding DiscardVisibility}" IsEnabled="{Binding CanEdit}"/>
+     <Button Grid.Column="2" x:Name="SaveButton" Content="{Binding SaveLabel}" Style="{StaticResource PrimaryButton}" MinWidth="148" Click="Save_Click" IsEnabled="{Binding CanEdit}"/>
+    </Grid>
+   </StackPanel>
+  </Border>
  </Grid>
 </UserControl>

@@ -1,0 +1,17 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+ <!-- Radix Colors, light sRGB scales: https://github.com/radix-ui/colors/blob/main/src/light.ts
+      Tomato 11 is intentionally used as a solid selection surface: opaque white text is 4.98:1.
+      Indigo 9 with opaque white text is 5.21:1. Region identity is independent of operation status. -->
+ <SolidColorBrush x:Key="Paper" Color="#F9F9F8"/>
+ <SolidColorBrush x:Key="Surface" Color="#FDFDFC"/>
+ <SolidColorBrush x:Key="Ink" Color="#21201C"/>
+ <SolidColorBrush x:Key="Muted" Color="#63635E"/>
+ <SolidColorBrush x:Key="Line" Color="#CFCECA"/>
+ <SolidColorBrush x:Key="Soft" Color="#F1F0EF"/>
+ <SolidColorBrush x:Key="SoftHover" Color="#E9E8E6"/>
+ <SolidColorBrush x:Key="DisabledInk" Color="#82827C"/>
+ <SolidColorBrush x:Key="ScrollGrip" Color="#BCBBB5"/>
+ <SolidColorBrush x:Key="ChinaAccent" Color="#D13415"/>
+ <SolidColorBrush x:Key="GlobalAccent" Color="#3E63DD"/>
+ <SolidColorBrush x:Key="OnRegion" Color="#FFFFFF"/>
+</ResourceDictionary>
