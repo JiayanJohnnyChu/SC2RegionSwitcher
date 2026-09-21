@@ -90,8 +90,8 @@ foreach($file in $files){
  $sequence++
 }
 Insert Media @('DiskId','LastSequence','DiskPrompt','Cabinet','VolumeLabel','Source') @([int]1,[int]4,$null,'#app.cab',$null,$null)
-Insert Shortcut @('Shortcut','Directory_','Name','Component_','Target','Arguments','Description','Hotkey','Icon_','IconIndex','ShowCmd','WkDir') @('StartMenu','MenuGroup','SC2REG~1|SC2 Region Switcher','StartMenu','[#AppExe]',$null,'StarCraft II CN and Global region switcher',$null,'SwitcherIcon',[int]0,[int]1,'INSTALLDIR')
-Insert Registry @('Registry','Root','Key','Name','Value','Component_') @('AppPath',[int]1,'Software\Microsoft\Windows\CurrentVersion\App Paths\SC2Switcher.Wpf.exe',$null,'[#AppExe]','AppRegistration')
+Insert Shortcut @('Shortcut','Directory_','Name','Component_','Target','Arguments','Description','Hotkey','Icon_','IconIndex','ShowCmd','WkDir') @('StartMenu','MenuGroup','SC2REG~1|SC2 Region Switcher','StartMenu','[INSTALLDIR]SC2Switcher.Wpf.exe',$null,'StarCraft II CN and Global region switcher',$null,'SwitcherIcon',[int]0,[int]1,'INSTALLDIR')
+Insert Registry @('Registry','Root','Key','Name','Value','Component_') @('AppPath',[int]1,'Software\Microsoft\Windows\CurrentVersion\App Paths\SC2Switcher.Wpf.exe',$null,'[INSTALLDIR]SC2Switcher.Wpf.exe','AppRegistration')
 Insert Registry @('Registry','Root','Key','Name','Value','Component_') @('MenuMarker',[int]1,'Software\SC2RegionSwitcher\Installer','StartMenu','#1','StartMenu')
 Insert RemoveFile @('FileKey','Component_','FileName','DirProperty','InstallMode') @('RemoveMenuGroup','StartMenu',$null,'MenuGroup',[int]2)
 Insert RemoveFile @('FileKey','Component_','FileName','DirProperty','InstallMode') @('RemoveApplicationFolder','Application',$null,'INSTALLDIR',[int]2)
