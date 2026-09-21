@@ -37,10 +37,13 @@ if($ChildMode){
     if($isAdmin-or$identity.User.Value-eq$ParentSid){throw 'Child token is not an independent standard user.'}
     $manifest=Get-Content (Join-Path $WorkDirectory 'fixture-manifest.json') -Raw|ConvertFrom-Json
     foreach($f in @($manifest.Baseline,$manifest.Candidate)){if((Get-FileHash $f.Path -Algorithm SHA256).Hash-ne$f.SHA256){throw 'Fixture hash changed.'};if((Product-State $f.ProductCode)-ne-1){throw 'Fixture initially registered.'}}
-    # Resolve the loaded child's profile, rather than inherited parent path variables.
-    $local=[Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)
-    $roaming=[Environment]::GetFolderPath([Environment+SpecialFolder]::ApplicationData)
-    $env:USERPROFILE=[Environment]::GetFolderPath([Environment+SpecialFolder]::UserProfile)
+    # This account is created with a fresh default Windows profile. Resolve its
+    # registered path by SID; shell known-folder expansion can inherit the parent
+    # USERPROFILE value when Start-Process supplies the parent's environment block.
+    $profileKey='Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\'+$identity.User.Value
+    $env:USERPROFILE=[Environment]::ExpandEnvironmentVariables([string](Get-ItemPropertyValue -LiteralPath $profileKey -Name ProfileImagePath))
+    $local=Join-Path $env:USERPROFILE 'AppData\Local'
+    $roaming=Join-Path $env:USERPROFILE 'AppData\Roaming'
     $env:LOCALAPPDATA=$local;$env:APPDATA=$roaming
     $env:TEMP=Join-Path $local 'Temp';$env:TMP=$env:TEMP
     [void][IO.Directory]::CreateDirectory($env:TEMP)
