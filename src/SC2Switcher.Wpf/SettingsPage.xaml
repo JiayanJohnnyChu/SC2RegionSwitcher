@@ -5,14 +5,11 @@
  </UserControl.Resources>
  <Grid>
   <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-  <Border BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1" Padding="28,19">
-   <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-    <TextBlock Text="{Binding Text[设置]}" Style="{StaticResource PageTitle}"/>
-    <TextBlock Grid.Column="1" Text="{Binding Text[界面与安装]}" Style="{StaticResource Eyebrow}" VerticalAlignment="Center" Margin="16,0,0,0"/>
-   </Grid>
+  <Border BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1" Padding="{DynamicResource PageHeaderPadding}">
+   <TextBlock Text="{Binding Text[设置]}" Style="{StaticResource PageTitle}" FontSize="{DynamicResource PageTitleSize}"/>
   </Border>
   <ScrollViewer x:Name="FormScroll" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
-   <StackPanel Margin="28,20,28,6">
+   <StackPanel Margin="{DynamicResource PageBodyMargin}">
     <TextBlock Text="{Binding Notice}" Foreground="{StaticResource Muted}" FontSize="12" Margin="0,0,0,18" Visibility="{Binding NoticeVisibility}"/>
     <TextBlock Text="{Binding Text[界面]}" Style="{StaticResource Eyebrow}" Margin="0,0,0,12"/>
     <Grid>
@@ -55,7 +52,7 @@
     </Expander>
    </StackPanel>
   </ScrollViewer>
-  <Border Grid.Row="2" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="28,15,28,20">
+  <Border Grid.Row="2" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="{DynamicResource PageFooterPadding}">
    <StackPanel>
     <TextBlock Text="{Binding Message}" Foreground="{Binding MessageColor}" FontSize="12" Margin="0,0,0,12" MaxHeight="72" TextTrimming="CharacterEllipsis" ToolTip="{Binding Message}" AutomationProperties.LiveSetting="Polite" Visibility="{Binding MessageVisibility}"/>
     <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>

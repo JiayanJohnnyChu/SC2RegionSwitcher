@@ -1,6 +1,6 @@
 # English-first interface
 
-This is the working UI revision of SC2 Region Switcher 3.3.0. The design uses a shared grid, deliberate type hierarchy, distinct China/Global colors and a neutral Sand surface. It remains a native WPF application.
+This is the working UI revision of SC2 Region Switcher 3.4.0. The design uses a shared grid, deliberate type hierarchy, distinct China/Global colors and a neutral Sand surface. It remains a native WPF application.
 
 ## Language policy
 
@@ -25,12 +25,12 @@ Settings and reference pages share the same paper surface, typography, separator
 | China identity | Tomato 11 `#D13415` |
 | Global identity | Indigo 9 `#3E63DD` |
 | Selected region text | Opaque white `#FFFFFF` |
-| Standard window | 760 × 650 DIP |
+| Standard window | 760 × 620 DIP |
 | Minimum window | 520 × 560 DIP |
 | Body / supporting text | 13–14 / 11–12 DIP |
-| Page / destination title | 30 / 28 DIP; main heading reduces to 26 at narrow widths |
+| Page / destination title | 30 / 24 DIP; main heading reduces to 26 at narrow widths |
 | Input / primary action height | 40 / 46 DIP |
-| Content margins | 32 DIP normally, 22 on the compact main view, 28 on forms |
+| Content margins | 32 DIP normally, 22 on the compact main view, 32 on forms, reducing to 22 in compact windows |
 
 The compact main layout retains both destinations, all three Global login regions and the primary action. Forms and reference content may scroll; their bottom actions remain fixed. Do not replace wrapping with whole-window scaling.
 
@@ -61,4 +61,4 @@ The existing `--ui-report <absolute-json-path>` diagnostics write layout facts a
 
 Launch the generated **EXE** for DPI validation so its application manifest is used. Starting the DLL through the dotnet host can produce valid layout renders but does not establish the executable's PerMonitorV2 behavior. A self-rendered image also does not prove that external window capture works.
 
-Keep raw images and logs under `artifacts/validation/english-first-ui`. Refer to `VALIDATION.md` for the tested scope and outstanding checks. This UI revision is not an installer upgrade or a release.
+Keep raw images and logs under `artifacts/validation/english-first-ui`. Refer to `VALIDATION.md` for the tested scope and outstanding checks. Installer and release validation are recorded separately from UI rendering.

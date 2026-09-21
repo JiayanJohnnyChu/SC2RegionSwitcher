@@ -2,7 +2,7 @@
 
 ## 项目入口
 
-- 阅读 `README.md` 和 `docs/HANDOFF.md`，沿用当前 3.3.0 WPF 基线。
+- 阅读 `README.md` 和 `docs/HANDOFF.md`，当前开发版本为 3.4.0 WPF；3.3.0 原件仅为历史安装基线。
 - 应用在 `src/SC2Switcher.Wpf`，隔离测试在 `tests/SC2Switcher.Tests`。
 - 在 Windows 上使用固定的 .NET 10.0.401 SDK；首次执行 `scripts/Setup.ps1`。`scripts/Build.ps1`、`scripts/Test.ps1`、`scripts/Package.ps1` 自动选择项目 SDK。
 - 测试是控制台回归程序，不是 `dotnet test` 测试适配器。以脚本退出结果和 `TOTAL … PASSED` 为准。
@@ -21,7 +21,7 @@
 
 - 目录结构、资源引用或构建脚本变更后，执行构建与隔离回归；打包逻辑变更后检查包内文件。
 - 不把构建成功、进程存在或区域配置记录扩大为在线登录成功。
-- 新构建 MSI 的身份与原基线不同；安装验证结果不能自动沿用。构建器固定于 3.3.0，版本升级需同步检查安装规则。
+- 新构建 MSI 的身份与原基线不同；安装验证结果不能自动沿用。每个分发版本递增三段数值版本，已标记版本只能提升原候选文件，不能重建替换。
 - 提交前运行 `scripts/Check-Repository.ps1`，打包后运行 `scripts/Test-Package.ps1 -ReleaseDirectory <目录>`。
 - GitHub 已完成首次远程 CI；后续按对应提交的 Actions 结果确认。发布工作流只创建预发布草稿，不能把自动构建等同于已公开发布。
 - Git 提交、推送和发布按用户当前任务授权执行；不要将源码上传等同于软件正式发布。

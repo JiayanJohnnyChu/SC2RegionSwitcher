@@ -1,5 +1,5 @@
 <Window x:Class="Sc2Wpf.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
- Title="{Binding Text[星际争霸 II · 双服切换]}" Width="760" Height="650" MinWidth="520" MinHeight="560" WindowStartupLocation="CenterScreen"
+ Title="{Binding Text[星际争霸 II · 双服切换]}" Width="760" Height="620" MinWidth="520" MinHeight="560" WindowStartupLocation="CenterScreen"
  Background="{StaticResource Paper}" Foreground="{StaticResource Ink}" FontFamily="{Binding UiFontFamily}" FontSize="14"
  UseLayoutRounding="True" SnapsToDevicePixels="True" TextOptions.TextFormattingMode="Display" Icon="switcher.ico">
  <Grid x:Name="Root" Background="{StaticResource Paper}">
@@ -16,9 +16,9 @@
   <ScrollViewer x:Name="MainScroll" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
    <Grid x:Name="Workspace" Margin="32,26,32,26">
     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-    <Grid x:Name="Intro" Margin="0,0,0,28">
+    <Grid x:Name="Intro" Margin="0,0,0,20">
      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-     <StackPanel VerticalAlignment="Center" Margin="0,0,16,0"><TextBlock Text="STARCRAFT II" Style="{StaticResource Eyebrow}" Margin="0,0,0,3"/><TextBlock x:Name="HeroTitle" Text="{Binding Text[切换区域]}" Style="{StaticResource PageTitle}"/></StackPanel>
+     <StackPanel VerticalAlignment="Center" Margin="0,0,16,0"><TextBlock x:Name="HeroTitle" Text="{Binding Text[切换区域]}" Style="{StaticResource PageTitle}"/></StackPanel>
      <Border x:Name="CurrentMarker" Grid.Column="1" Style="{StaticResource CurrentRegionRule}" BorderThickness="2,0,0,0" Padding="18,2,0,2" VerticalAlignment="Center" Width="170">
       <StackPanel><TextBlock Text="{Binding Text[当前配置]}" Style="{StaticResource Eyebrow}" Margin="0,0,0,5"/><TextBlock Text="{Binding CurrentRegion}" FontSize="15" FontWeight="SemiBold" ToolTip="{Binding Text[读取自战网本地配置，不包含账号登录状态。]}"/><TextBlock Text="{Binding Text[战网本地配置]}" FontSize="11" Foreground="{StaticResource Muted}" Margin="0,4,0,0"/></StackPanel>
      </Border>

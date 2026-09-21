@@ -1,6 +1,6 @@
 # SC2 Region Switcher
 
-用于 Windows 的《星际争霸 II》国服／国际服切换器，采用 C#、WPF 和 .NET 10。当前基线为 **3.3.0 预览版**。
+用于 Windows 的《星际争霸 II》国服／国际服切换器，采用 C#、WPF 和 .NET 10。当前开发版本为 **3.4.0 预览版**。
 
 程序使用一套 Battle.net 和两套独立游戏目录，切换 Battle.net 登录区域并同步共享游戏语言设置。国服使用简体中文，国际服使用英文；界面采用 English-first 设计，新用户默认英文，可在独立设置页选择简体中文。已有语言偏好继续生效。账号登录、游戏安装、更新和游戏启动仍由官方战网完成。
 
@@ -57,6 +57,6 @@ SC2RegionSwitcher/
 
 本地 `artifacts/baseline/3.3.0` 保留此前已测试安装包的原件和校验值。新构建输出位于 `artifacts/packages/<本次构建>/release`，包含 MSI、ZIP、SHA-256 校验文件和无本机路径的发布清单。其安装测试结论须单独记录。`artifacts` 和 `.tools` 整体不纳入 Git。
 
-仓库位于 [JiayanJohnnyChu/SC2RegionSwitcher](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher)，当前为私有。首次 GitHub CI 已通过 Windows 构建、52 项隔离回归和包内容检查，并上传预览构建产物；详细记录见 [验证范围](docs/VALIDATION.md)。推送版本标签时，发布工作流配置为创建 **Draft / Pre-release**，供维护者核对后手动发布；该标签发布流程尚未实际触发。
+仓库位于 [JiayanJohnnyChu/SC2RegionSwitcher](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher)，当前为私有。CI 检查 Windows 构建、隔离回归及包内容，并生成候选文件。完成实测后，使用候选 CI 运行编号和版本标签创建 **Draft / Pre-release**；发布流程沿用候选原文件，不重新构建。详细流程见 [预发布说明](docs/GITHUB-RELEASE.md)，实际通过范围见 [验证记录](docs/VALIDATION.md)。
 
 本项目尚未公开发布，也尚未确定开源许可证。本目录整理不代表已授予某种开源许可。现有安装包未签名，跨电脑兼容性与完整升级流程仍待验证。详见 [验证范围](docs/VALIDATION.md)。

@@ -1,54 +1,60 @@
 [CmdletBinding()]
-param([Parameter(Mandatory)][string]$ReleaseDirectory)
+param([Parameter(Mandatory)][string]$ReleaseDirectory,[string]$ExpectedVersion,[string]$ExpectedSourceCommit,[string]$ExpectedMsiSHA256,[string]$ExpectedZipSHA256)
 $ErrorActionPreference='Stop'
+function Require([bool]$ok,[string]$message){if(!$ok){throw $message}}
 $directory=[IO.Path]::GetFullPath($ReleaseDirectory)
-$manifest=Get-Content -LiteralPath (Join-Path $directory 'release-manifest.json') -Raw | ConvertFrom-Json
-if($manifest.SchemaVersion -ne 1 -or $manifest.Version -ne '3.3.0'){throw 'Unsupported release manifest.'}
-$expected=@('SC2Switcher-3.3.0-current-user.msi','SC2Switcher-3.3.0-win-x64-preview.zip','SHA256SUMS.txt','release-manifest.json')
-$actual=@(Get-ChildItem -LiteralPath $directory -File | ForEach-Object Name)
-if((@($actual | Sort-Object) -join '|') -ne (@($expected | Sort-Object) -join '|')){throw 'Unexpected release payload.'}
-if(@($manifest.Files).Count -ne 2){throw 'Manifest must describe exactly two packages.'}
+$manifestPath=Join-Path $directory 'release-manifest.json'
+$manifest=Get-Content -Raw -LiteralPath $manifestPath|ConvertFrom-Json
+Require ($manifest.SchemaVersion -eq 2) 'Unsupported release manifest schema.'
+$version=[string]$manifest.Version
+Require ($version -match '^(\d+)\.(\d+)\.(\d+)$') 'Version must be a three-part numeric MSI version.'
+Require ([int]$Matches[1]-le 255 -and [int]$Matches[2]-le 255 -and [int]$Matches[3]-le 65535) 'Version exceeds MSI limits.'
+if($ExpectedVersion){Require ($version-eq$ExpectedVersion) 'Release version does not match the expected version.'}
+Require ([string]$manifest.SourceCommit -match '^[0-9a-fA-F]{40}$') 'SourceCommit must be a full commit hash.'
+if($ExpectedSourceCommit){Require ([string]$manifest.SourceCommit-ieq$ExpectedSourceCommit) 'SourceCommit does not match the expected commit.'}
+Require ($manifest.WorkingTreeDirty-is[bool]) 'WorkingTreeDirty must be Boolean.'
+foreach($field in 'CiRunId','CiRunAttempt'){Require ($null-eq$manifest.$field -or [string]$manifest.$field-match '^\d+$') "$field must be null or a numeric string."}
+$msiName="SC2Switcher-$version-current-user.msi";$zipName="SC2Switcher-$version-win-x64-preview.zip"
+$expected=@($msiName,$zipName,'SHA256SUMS.txt','release-manifest.json')
+$actual=@(Get-ChildItem -LiteralPath $directory -File|ForEach-Object Name)
+Require (@(Get-ChildItem -LiteralPath $directory -Directory -Force).Count-eq0) 'Release payload must not contain subdirectories.'
+Require ((@($actual|Sort-Object)-join'|')-eq(@($expected|Sort-Object)-join'|')) 'Unexpected release payload.'
+Require (@($manifest.Files).Count-eq2) 'Manifest must describe exactly two packages.'
+$hashes=@{}
 foreach($entry in $manifest.Files){
-    if($entry.Name -notin $expected[0..1]){throw 'Unexpected file in release manifest.'}
-    if((Get-FileHash -LiteralPath (Join-Path $directory $entry.Name)).Hash -ne $entry.SHA256){throw "Package hash mismatch: $($entry.Name)"}
+ Require ($entry.Name-in@($msiName,$zipName) -and !$hashes.ContainsKey([string]$entry.Name)) 'Unexpected or duplicate manifest package.'
+ $item=Get-Item -LiteralPath (Join-Path $directory $entry.Name);$hash=(Get-FileHash $item.FullName -Algorithm SHA256).Hash
+ Require ([int64]$entry.Bytes-eq$item.Length) "Package size mismatch: $($entry.Name)"
+ Require ($entry.SHA256-eq$hash) "Package hash mismatch: $($entry.Name)";$hashes[[string]$entry.Name]=$hash
 }
-$sumLines=@(Get-Content -LiteralPath (Join-Path $directory 'SHA256SUMS.txt'))
-if($sumLines.Count -ne 3){throw 'Expected checksums for both packages and the manifest.'}
-$sumNames=@()
-foreach($line in $sumLines){
-    if($line -notmatch '^([a-fA-F0-9]{64})  ([^/\\]+)$'){throw 'Invalid SHA256SUMS entry.'}
-    $hash=$Matches[1];$name=$Matches[2]
-    if($name -notin $expected -or $name -eq 'SHA256SUMS.txt'){throw 'Unexpected checksum filename.'}
-    if((Get-FileHash -LiteralPath (Join-Path $directory $name)).Hash -ne $hash){throw "Checksum mismatch: $name"}
-    $sumNames+=$name
-}
-if(@($sumNames | Select-Object -Unique).Count -ne 3){throw 'Duplicate checksum entry.'}
+if($ExpectedMsiSHA256){Require ($hashes[$msiName]-eq$ExpectedMsiSHA256) 'MSI hash does not match the expected candidate.'}
+if($ExpectedZipSHA256){Require ($hashes[$zipName]-eq$ExpectedZipSHA256) 'ZIP hash does not match the expected candidate.'}
+$lines=@(Get-Content -LiteralPath (Join-Path $directory 'SHA256SUMS.txt'));Require ($lines.Count-eq3) 'Expected three checksum entries.';$names=@()
+foreach($line in $lines){Require ($line-match'^([0-9a-fA-F]{64})  ([^/\\]+)$') 'Invalid checksum entry.';$name=$Matches[2];Require ($name-in$expected -and $name-ne'SHA256SUMS.txt') 'Unexpected checksum filename.';Require ((Get-FileHash (Join-Path $directory $name)).Hash-eq$Matches[1]) "Checksum mismatch: $name";$names+=$name}
+Require (@($names|Select-Object -Unique).Count-eq3) 'Duplicate checksum entry.'
+
 Add-Type -AssemblyName System.IO.Compression.FileSystem
-$zip=[IO.Compression.ZipFile]::OpenRead((Join-Path $directory $expected[1]))
-try {
-    $entries=@($zip.Entries | ForEach-Object FullName | Sort-Object)
-    $zipExpected=@('README.md','SC2Switcher.Wpf.exe','SC2Switcher.Wpf.dll','SC2Switcher.Wpf.deps.json','SC2Switcher.Wpf.runtimeconfig.json') | Sort-Object
-    if(($entries -join '|') -ne ($zipExpected -join '|')){throw 'Portable ZIP contains unexpected files.'}
-} finally {$zip.Dispose()}
-$installer=New-Object -ComObject WindowsInstaller.Installer
-$database=$installer.OpenDatabase((Join-Path $directory $expected[0]),0)
-function Read-MsiColumn([string]$Query){
-    $view=$database.OpenView($Query)
-    try {
-        [void]$view.Execute()
-        while($row=$view.Fetch()){
-            try {$row.StringData(1)} finally {[Runtime.InteropServices.Marshal]::FinalReleaseComObject($row) | Out-Null}
-        }
-    } finally {[void]$view.Close();[Runtime.InteropServices.Marshal]::FinalReleaseComObject($view) | Out-Null}
-}
-try {
-    $msiFiles=@(Read-MsiColumn 'SELECT `File` FROM `File`')
-    $shortcuts=@(Read-MsiColumn 'SELECT `Shortcut` FROM `Shortcut`')
-    $actions=@(Read-MsiColumn 'SELECT `Type` FROM `CustomAction`')
-    $version=@(Read-MsiColumn "SELECT ``Value`` FROM ``Property`` WHERE ``Property`` = 'ProductVersion'")
-    if($msiFiles.Count -ne 4 -or $shortcuts.Count -ne 1 -or $actions.Count -ne 1 -or $actions[0] -ne '51' -or $version[0] -ne $manifest.Version){throw 'MSI structure does not match the release contract.'}
-} finally {
-    [Runtime.InteropServices.Marshal]::FinalReleaseComObject($database) | Out-Null
-    [Runtime.InteropServices.Marshal]::FinalReleaseComObject($installer) | Out-Null
-}
-Write-Output 'Release package checks passed: hashes, ZIP payload, MSI version, four files and one shortcut. MSI was not installed.'
+$runtime=@('SC2Switcher.Wpf.exe','SC2Switcher.Wpf.dll','SC2Switcher.Wpf.deps.json','SC2Switcher.Wpf.runtimeconfig.json')
+$zipPath=Join-Path $directory $zipName;$zip=[IO.Compression.ZipFile]::OpenRead($zipPath);$zipExpected=@('README.md')+$runtime;$zipExpected=@($zipExpected|Sort-Object)
+try{Require ((@($zip.Entries.FullName|Sort-Object)-join'|')-eq($zipExpected-join'|')) 'Portable ZIP contains unexpected files.'}finally{$zip.Dispose()}
+
+$installer=New-Object -ComObject WindowsInstaller.Installer;$db=$installer.OpenDatabase((Join-Path $directory $msiName),0)
+function Rows([string]$sql,[int]$count){$view=$db.OpenView($sql);try{[void]$view.Execute();while($row=$view.Fetch()){try{$values=@(for($i=1;$i-le$count;$i++){$row.StringData($i)});Write-Output -NoEnumerate $values}finally{[Runtime.InteropServices.Marshal]::FinalReleaseComObject($row)|Out-Null}}}finally{[void]$view.Close();[Runtime.InteropServices.Marshal]::FinalReleaseComObject($view)|Out-Null}}
+function Map($rows){$m=@{};foreach($row in $rows){$m[[string]$row[0]]=[string]$row[1]};$m}
+try{
+ $props=Map @(Rows 'SELECT `Property`,`Value` FROM `Property`' 2)
+ $sha=[Security.Cryptography.SHA256]::Create();try{$identityBytes=$sha.ComputeHash([Text.Encoding]::UTF8.GetBytes("SC2RegionSwitcher/per-user/x64/product/$version"))}finally{$sha.Dispose()};$expectedProduct='{'+([guid]::new([byte[]]$identityBytes[0..15])).ToString().ToUpperInvariant()+'}'
+ Require ($props.ProductVersion-eq$version -and $props.ProductCode-eq$expectedProduct -and $props.UpgradeCode-eq'{4A67EAD9-86CA-450C-ABDC-5D6C1E4A4CCD}' -and $props.MSIINSTALLPERUSER-eq'1' -and $props.SecureCustomProperties-eq'OLDPRODUCTS;NEWERPRODUCTS' -and $props.MSIRESTARTMANAGERCONTROL-eq'Disable') 'MSI identity, version, context or upgrade properties are incorrect.'
+ $dirs=Map @(Rows 'SELECT `Directory`,`DefaultDir` FROM `Directory`' 2);$legacy=@(Rows "SELECT ``Directory``,``Directory_Parent``,``DefaultDir`` FROM ``Directory`` WHERE ``Directory``='LegacyInstallDir'" 3);Require ($dirs.INSTALLDIR-eq'app' -and $dirs.LegacyInstallDir-eq'3.3.0' -and $legacy.Count-eq1 -and $legacy[0][1]-eq'ProductRoot' -and !$dirs.ContainsKey('DesktopFolder')) 'MSI install, legacy cleanup or shortcut directory is incorrect.'
+ $components=@(Rows 'SELECT `Component`,`ComponentId`,`Directory_`,`Attributes`,`KeyPath` FROM `Component`' 5);Require ($components.Count-eq3) 'Expected exactly three components.';$cm=@{};foreach($r in $components){$cm[[string]$r[0]]=$r};Require (@($cm.Keys|Where-Object{$_-notin@('AppRegistration','Application','StartMenu')}).Count-eq0) 'Unexpected component set.';Require ($cm.Application[1]-eq'{9543F8B1-925C-4250-B5B6-E513266751F0}' -and $cm.StartMenu[1]-eq'{95AD008A-E416-4E6A-8E52-0D0A0FCA3B94}' -and $cm.AppRegistration[1]-eq'{D2F017E8-3B57-4DD8-BD70-456D91E101D1}') 'Stable component identities changed.';Require ($cm.Application[2]-eq'INSTALLDIR' -and $cm.Application[4]-eq'AppExe') 'Application key path is incorrect.'
+ $files=@(Rows 'SELECT `File`,`Component_`,`FileName`,`FileSize` FROM `File`' 4);Require ($files.Count-eq4 -and @($files|Where-Object{$_[1]-ne'Application'}).Count-eq0) 'MSI runtime file component is incorrect.';$fileIds=@{};foreach($f in $files){$fileIds[($f[2]-split'\|')[-1]]=$f[0]};Require ((@($fileIds.Keys|Sort-Object)-join'|')-eq(@($runtime|Sort-Object)-join'|')) 'MSI runtime file set is incorrect.'
+ $short=@(Rows 'SELECT `Shortcut`,`Directory_`,`Name`,`Component_`,`Target` FROM `Shortcut`' 5);Require ($short.Count-eq1 -and $short[0][1]-eq'MenuGroup' -and $short[0][3]-eq'StartMenu' -and $short[0][4]-eq'[#AppExe]') 'Start menu shortcut contract is incorrect.'
+ $reg=@(Rows 'SELECT `Registry`,`Root`,`Key`,`Name`,`Value`,`Component_` FROM `Registry`' 6);Require (@($reg|Where-Object{$_[0]-eq$cm.StartMenu[4] -and $_[1]-eq'1' -and $_[5]-eq'StartMenu'}).Count-eq1) 'StartMenu HKCU key path is missing.';Require (@($reg|Where-Object{$_[0]-eq$cm.AppRegistration[4] -and $_[1]-eq'1' -and $_[2]-eq'Software\Microsoft\Windows\CurrentVersion\App Paths\SC2Switcher.Wpf.exe' -and $_[4]-eq'[#AppExe]' -and $_[5]-eq'AppRegistration'}).Count-eq1) 'App Paths registration is incorrect.'
+ $remove=@(Rows 'SELECT `FileKey`,`Component_`,`FileName`,`DirProperty`,`InstallMode` FROM `RemoveFile`' 5);Require ($remove.Count-eq4) 'Unexpected RemoveFile rule count.';$rm=@{};foreach($r in $remove){Require ([string]::IsNullOrEmpty($r[2])) 'RemoveFile must not use a file name or wildcard.';$rm[[string]$r[0]]=$r};Require ($rm.RemoveLegacyApplicationFolder[1]-eq'Application' -and $rm.RemoveLegacyApplicationFolder[3]-eq'LegacyInstallDir' -and $rm.RemoveLegacyApplicationFolder[4]-eq'1') 'Legacy cleanup must remove only the known empty 3.3.0 directory.';Require ($rm.RemoveMenuGroup[1]-eq'StartMenu' -and $rm.RemoveMenuGroup[3]-eq'MenuGroup' -and $rm.RemoveMenuGroup[4]-eq'2' -and $rm.RemoveApplicationFolder[1]-eq'Application' -and $rm.RemoveApplicationFolder[3]-eq'INSTALLDIR' -and $rm.RemoveApplicationFolder[4]-eq'2' -and $rm.RemoveProductFolder[1]-eq'Application' -and $rm.RemoveProductFolder[3]-eq'ProductRoot' -and $rm.RemoveProductFolder[4]-eq'2') 'Uninstall folder cleanup rules are incorrect.'
+ $upgrade=@(Rows 'SELECT `UpgradeCode`,`VersionMin`,`VersionMax`,`Attributes`,`ActionProperty` FROM `Upgrade`' 5);Require ($upgrade.Count-eq2) 'Expected two upgrade rules.';$um=@{};foreach($r in $upgrade){$um[[string]$r[4]]=$r};Require ($um.OLDPRODUCTS[0]-eq$props.UpgradeCode -and $um.OLDPRODUCTS[1]-eq'3.3.0' -and $um.OLDPRODUCTS[2]-eq$version -and ([int]$um.OLDPRODUCTS[3] -band 256)-ne0 -and ([int]$um.OLDPRODUCTS[3] -band 512)-eq0) 'OLDPRODUCTS rule is incorrect.';Require ($um.NEWERPRODUCTS[0]-eq$props.UpgradeCode -and $um.NEWERPRODUCTS[1]-eq$version -and [string]::IsNullOrEmpty($um.NEWERPRODUCTS[2]) -and ([int]$um.NEWERPRODUCTS[3] -band 2)-ne0 -and ([int]$um.NEWERPRODUCTS[3] -band 256)-eq0) 'NEWERPRODUCTS rule is incorrect.'
+ $ca=Map @(Rows 'SELECT `Action`,`Type` FROM `CustomAction`' 2);Require ($ca.Count-eq2 -and $ca.SetInstallLocation-eq'51' -and $ca.RejectNewerProduct-eq'19') 'Custom action contract is incorrect.';$seq=Map @(Rows 'SELECT `Action`,`Sequence` FROM `InstallExecuteSequence`' 2);Require ($seq.FindRelatedProducts-eq'200' -and $seq.RejectNewerProduct-eq'210' -and $seq.LaunchConditions-eq'400' -and $seq.InstallInitialize-eq'1500' -and $seq.RemoveExistingProducts-eq'1510' -and $seq.ProcessComponents-eq'1600') 'Upgrade action sequence is incorrect.';$cond=Map @(Rows 'SELECT `Action`,`Condition` FROM `InstallExecuteSequence`' 2);Require ($cond.RejectNewerProduct-eq'NEWERPRODUCTS') 'Newer-product condition is incorrect.';$launch=@(Rows 'SELECT `Condition`,`Description` FROM `LaunchCondition`' 2);Require ($launch.Count-eq1 -and $launch[0][0]-eq'NOT ALLUSERS') 'Per-machine launch condition is missing.'
+ $v=$db.OpenView("SELECT ``Data`` FROM ``_Streams`` WHERE ``Name``='app.cab'");try{[void]$v.Execute();$row=$v.Fetch();Require ($null-ne$row) 'Embedded cabinet is missing.';try{$raw=[string]$row.ReadStream(1,[int]$row.DataSize(1),1);$cab=[byte[]]::new($raw.Length);for($i=0;$i-lt$raw.Length;$i++){$cab[$i]=[byte][int]$raw[$i]}}finally{[Runtime.InteropServices.Marshal]::FinalReleaseComObject($row)|Out-Null}}finally{[void]$v.Close();[Runtime.InteropServices.Marshal]::FinalReleaseComObject($v)|Out-Null}
+}finally{[Runtime.InteropServices.Marshal]::FinalReleaseComObject($db)|Out-Null;[Runtime.InteropServices.Marshal]::FinalReleaseComObject($installer)|Out-Null}
+$tempRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath());$temp=Join-Path $tempRoot ('sc2-package-'+[guid]::NewGuid().ToString('N'))
+try{$cabDir=Join-Path $temp 'cab';$zipDir=Join-Path $temp 'zip';[IO.Directory]::CreateDirectory($cabDir)|Out-Null;[IO.Directory]::CreateDirectory($zipDir)|Out-Null;$cabPath=Join-Path $temp 'app.cab';[IO.File]::WriteAllBytes($cabPath,$cab);& "$env:WINDIR\System32\expand.exe" '-F:*' $cabPath $cabDir|Out-Null;Require ($LASTEXITCODE-eq0) 'Embedded cabinet extraction failed.';[IO.Compression.ZipFile]::ExtractToDirectory($zipPath,$zipDir);foreach($file in $runtime){Require ((Get-FileHash (Join-Path $zipDir $file)).Hash-eq(Get-FileHash (Join-Path $cabDir $fileIds[$file])).Hash) "ZIP and MSI bytes differ: $file"}}finally{if(Test-Path -LiteralPath $temp){$item=Get-Item -LiteralPath $temp -Force;$resolved=[IO.Path]::GetFullPath($item.FullName);$rootPrefix=$tempRoot.TrimEnd('\')+'\';Require ($resolved.StartsWith($rootPrefix,[StringComparison]::OrdinalIgnoreCase) -and $item.Name.StartsWith('sc2-package-',[StringComparison]::Ordinal) -and ($item.Attributes-band[IO.FileAttributes]::ReparsePoint)-eq0) 'Refusing to remove an unexpected temporary directory.';Remove-Item -LiteralPath $resolved -Recurse -Force}}
+Write-Output "Release package checks passed for ${version}: provenance, hashes, ZIP/MSI identity, upgrade rules, components and shortcut. MSI was not installed."

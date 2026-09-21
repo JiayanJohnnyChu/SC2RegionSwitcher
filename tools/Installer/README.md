@@ -1,19 +1,27 @@
-# 当前用户 MSI 构建器
+# Current-user MSI
 
-推荐从项目根目录执行 `scripts/Package.ps1`。该脚本先发布 WPF，再生成 ZIP、MSI 和校验值，不自动安装。
+Run `scripts/Package.ps1` to publish the app and build packages without installing them. To package existing published files, run `tools/Installer/Build-CurrentUserMsi.ps1 -AppDirectory <directory> -OutputDirectory <empty-directory>`.
 
-如只需封装已有运行文件：
+The builder uses Windows Installer COM and makecab. It reads the three-field application version through `scripts/Release-Common.ps1`, checks the executable manifest and runtime file versions, and creates four runtime files, one Start menu shortcut and a current-user uninstall entry. The .NET 10 Desktop Runtime x64 must already be available.
 
-```powershell
-.\tools\Installer\Build-CurrentUserMsi.ps1 `
-  -AppDirectory 'C:\Build\PublishedApp' `
-  -OutputDirectory 'C:\Build\NewMsi'
-```
+## Installation and upgrades
 
-输入目录必须包含四个 3.3.0 运行文件，输出目录必须为空。默认读取 `artifacts/publish/win-x64` 和 `assets/icon/switcher.ico`，输出到 `artifacts/packages/msi`。构建器使用 Windows 自带的 Windows Installer COM 与 `makecab.exe`，不下载依赖。
+Starting with 3.4.0, files live in `%LOCALAPPDATA%\Programs\SC2RegionSwitcher\app`. Profiles, interface preferences, backups and recovery journals remain under `%LOCALAPPDATA%\SC2RegionSwitcherV2` and are never MSI resources.
 
-安装范围为当前用户。程序放入 `%LOCALAPPDATA%\Programs\SC2RegionSwitcher\3.3.0`，创建一个 **SC2 Region Switcher** 开始菜单入口，并登记卸载信息。没有桌面入口、游戏文件或用户配置；不捆绑 .NET Desktop Runtime。唯一自定义操作是 Type 51 属性赋值，没有可执行或脚本自定义操作。
+The stable UpgradeCode identifies the product family. Each numerical version has a different, deterministic ProductCode. Each newly built MSI has its own PackageCode. The three components own application files, the Start menu shortcut, and HKCU App Paths separately. Their GUIDs remain stable while their resource identities remain compatible.
 
-本构建器固定于 3.3.0，ProductCode、ComponentCode 和文件版本均固定，每次生成新 PackageCode。升级开发需要设计并验证组件规则和版本处理，不能只修改 MSI 文件名。当前没有自动升级流程；不要强行修复不同来源的同版本重建包，也不要降低 Windows Installer 安全策略。
+The Upgrade table finds 3.3.0 and later lower versions. RemoveExistingProducts runs immediately after InstallInitialize, before ProcessComponents, so the upgrade participates in rollback. A Type 19 message rejects a detected newer version. A Type 51 action assigns the displayed install location. Neither action executes application code or a script. ALLUSERS installation is rejected; upgrades remain in the current-user context. Restart Manager automatic application shutdown is disabled.
 
-本机安装验证对应 `artifacts/baseline/3.3.0` 中的原件。新打包文件只表示构建成功，安装测试须另外记录。测试新包时应先正常退出应用、卸载旧包，再安装；卸载设计上保留用户配置。
+Close the switcher before installation. Do not force a reinstall, suppress file-in-use errors, or change Windows Installer security policy. The same original MSI may be run again for normal maintenance.
+
+## Version and release rules
+
+Every distributed preview increments the three-field MSI ProductVersion. A suffix such as preview.2 is not an MSI version increase. Once a version is tagged or distributed, promote its original candidate bytes; do not rebuild or replace that version.
+
+The original 3.3.0 package contains no downgrade protection. A newer package cannot retrofit that old file. Do not run the old package over a newer installation. To return to it deliberately, uninstall the newer version first and preserve user settings.
+
+## Validation
+
+Run `scripts/Test-Package.ps1 -ReleaseDirectory <directory>` and `scripts/Test-ReleaseGuards.ps1 -ReleaseDirectory <directory>`. These validate content and rejection cases; they do not install the product. The separate lifecycle lab uses copies with isolated product, directory, shortcut and registry identities. Its failure injection must never target the production product family.
+
+Real upgrade results belong to an exact MSI hash. Local rebuilds and CI builds cannot share an installation pass merely because their source or version matches.

@@ -1,79 +1,36 @@
-# 接入 GitHub 与预发布
+# GitHub candidate and draft release workflow
 
-## 已准备的内容
+The repository is private: [JiayanJohnnyChu/SC2RegionSwitcher](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher). The existing repository-local author and credential manager are used. Credentials and local user settings are never stored in source control.
 
-- Git 仓库，主分支 `main`，目标为 `JiayanJohnnyChu/SC2RegionSwitcher` 私有仓库。
-- 固定 .NET SDK 10.0.401 的本地准备脚本和 GitHub Actions 配置。
-- Windows 构建、52 项隔离回归、源码内容检查、ZIP／MSI 结构及 SHA-256 校验。
-- 提交和 PR 自动检查；版本标签触发的 Draft / Pre-release 工作流。
-- Issue、PR 模板，版本记录和 3.3.0 预览版发布说明。
+## Build a candidate
 
-GitHub 凭据由本机凭据管理工具或 GitHub Actions 管理，不保存在项目中。源码提交不会创建公开 Release；远程构建结果应以仓库 Actions 中对应提交的运行记录为准。
+1. Complete repository, workflow, build, regression and package checks.
+2. Commit and push to main. CI runs on Windows using the pinned SDK, tests the source and packages, and uploads `SC2RegionSwitcher-win-x64-preview`.
+3. Record the successful run ID and full source commit. Download that exact artifact before installation or game testing.
+4. Verify `SHA256SUMS.txt` and `release-manifest.json`. Schema 2 records Version, SourceCommit, WorkingTreeDirty, CiRunId, CiRunAttempt and both package hashes. A release candidate must come from a clean main-branch CI run.
+5. Perform the required desktop, upgrade and game checks against those downloaded files. Keep raw evidence under ignored artifacts directories. Record any blocked checks explicitly.
 
-## 首次连接时需要确定
+The candidate contains exactly four release files: MSI, portable ZIP, release-manifest.json and SHA256SUMS.txt. The ZIP contains README.md and four runtime files.
 
-1. Git 提交作者姓名和邮箱，可使用 GitHub 提供的 noreply 地址。
-2. GitHub 仓库所有者、名称以及公开／私有可见性。
-3. 源码许可证。尚未替用户选择许可证或添加许可文件，应在公开发布前明确。
+## Promote original files
 
-准备工作不要求将个人访问令牌写入项目。Git 推送使用用户正常的 GitHub 登录和凭据管理；Actions 使用 GitHub 提供的临时 GITHUB_TOKEN。[自动令牌认证说明](https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication)。
+For the 3.4.0 candidate, create `v3.4.0-preview.1` at the tested source commit and push the tag. A tag alone no longer creates a release.
 
-## 首次提交与推送
+Run the **Promote tested candidate to draft prerelease** workflow with:
 
-新开发环境可按以下示例配置。占位符需要替换为自己的信息，不要覆盖其他开发者的作者身份。
+- `version_tag`: the existing tag, for example `v3.4.0-preview.1`.
+- `candidate_run_id`: the successful main CI run that generated the files actually tested.
 
-```powershell
-git config user.name "YOUR_NAME"
-git config user.email "YOUR_EMAIL"
-.\scripts\Check-Repository.ps1
-.\scripts\Check-Workflows.ps1
-.\scripts\Build.ps1
-.\scripts\Test.ps1
-git add .
-git diff --cached --stat
-git commit -m "Prepare WPF 3.3.0 preview"
-```
+The workflow checks out the tag, verifies the candidate's repository, workflow, event, branch, commit and run attempt, and downloads the existing artifact. It does not build or repackage. It refuses another release or draft with the same numerical version, creates Draft + Pre-release, then downloads all four attachments and checks their hashes against the original candidate.
 
-在 GitHub 创建空仓库，不额外生成 README、许可证或 gitignore，随后添加地址并推送：
+The source's version-specific release notes describe changes and limits. Append actual test results, the source commit, candidate run and package hashes to the draft after verification. If a test is blocked, retain the draft and name the missing test rather than reporting it as passed.
 
-```powershell
-git remote add origin https://github.com/JiayanJohnnyChu/SC2RegionSwitcher.git
-git push -u origin main
-```
+## Version policy
 
-`ci.yml` 在 main 推送、PR 和手动触发时运行。默认只有仓库读取权限，上传的是 `release` 子目录中的四个文件，不包括 SDK、构建中间文件、用户配置或本地安装记录。
+Windows Installer compares three numerical fields. Every later distributed preview must increase that number; changing only preview.1 to preview.2 is insufficient. Package refuses a numerical version that already has a local version tag, and CI fetches tags before packaging. Promotion independently refuses an existing draft/release for the version.
 
-## 生成预发布草稿
+The original 3.3.0 MSI has no downgrade protection. The new upgrade implementation removes it when upgrading, but cannot prevent someone from deliberately running that legacy package later.
 
-确认远程 CI 成功，并完成需要的实机检查后，在待发布提交上创建版本标签：
+## Boundaries
 
-```powershell
-git tag -a v3.3.0-preview.1 -m "3.3.0 preview 1"
-git push origin v3.3.0-preview.1
-```
-
-`release.yml` 会重跑检查，确认标签与应用版本匹配，生成并校验以下文件：
-
-- `SC2Switcher-3.3.0-current-user.msi`
-- `SC2Switcher-3.3.0-win-x64-preview.zip`
-- `release-manifest.json`
-- `SHA256SUMS.txt`
-
-工作流通过 GitHub CLI 创建 **Draft / Pre-release**，不会直接公开发布，也不会自动覆盖同名 Release。核对附件和说明后，由维护者在 GitHub 中发布草稿。只有该 job 申请 `contents: write`；本地没有保存长期 token。[GitHub CLI release create](https://cli.github.com/manual/gh_release_create)。
-
-## 发布边界
-
-当前仍为未签名预览版，MSI 构建器限定 3.3.0。改版时必须同时处理安装版本、组件规则、发布说明和升级验证，不能只改标签。CI 校验安装包内容但不安装程序，不模拟账号登录，也不启动游戏。
-
-正常卸载与重新安装曾在本机基线包上验证；新 CI 包的安装、升级与在线切换结果需单独记录。D 盘离线时可以继续开发与自动测试，实机双服验证需要恢复真实安装目录。
-
-## 本地文件与 Git 范围
-
-`.tools`、`artifacts`、`bin`、`obj`、运行时配置和打包文件均由 .gitignore 排除。Check-Repository 是补充检查，不能代替发布前对变更内容的阅读。可以用以下命令检查本次提交范围：
-
-```powershell
-git status --short
-git ls-files --cached --others --exclude-standard
-```
-
-Action 引用固定到官方仓库的具体提交，更新由 Dependabot 提出。SDK 官方下载地址与校验值在 `eng/dotnet-sdk.json` 中集中维护。[setup-dotnet](https://github.com/actions/setup-dotnet)、[upload-artifact](https://github.com/actions/upload-artifact)。
+The repository remains private and no open-source license has been selected. Packages are unsigned and depend on .NET 10 Desktop Runtime x64. Publishing the draft or changing repository visibility is a separate decision. Installer, desktop and online checks are distinct from CI build success. A new source commit or rebuilt MSI requires a new assessment of the affected tests.

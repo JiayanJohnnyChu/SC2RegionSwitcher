@@ -82,7 +82,7 @@ public partial class MainWindow {
         }
         foreach(string language in new[]{"en-US","zh-CN"}) {
             UiText.SetLanguage(language);
-            Width=760;Height=650;
+            Width=760;Height=620;
             model.Initialize("EU","EU");model.SetReady(true);
             model.Status("本地安装检查通过","切换将重启战网，需先退出游戏并完成更新。");
             await Snapshot("main-global");
@@ -96,7 +96,7 @@ public partial class MainWindow {
             model.Status("正在打开目标战网","正在核对战网区域。完成后恢复操作。","working");await Snapshot("busy-confirm");
             model.SetBusy(false);
             model.Status("操作未完成","检测到游戏文件变化或监测中断。需等待更新、安装或修复结束后重新检查。","error");await Snapshot("error-compact");
-            Width=760;Height=650;
+            Width=760;Height=620;
             StatusDetails_Click(this,new RoutedEventArgs());await Snapshot("error-details");CloseSheet();
             model.Status("已打开外服战网","区域配置已核对；账号登录与游戏启动需在战网中完成。");await Snapshot("success");
             OpenSettings();await Snapshot("settings");
@@ -107,7 +107,7 @@ public partial class MainWindow {
             Width=520;Height=560;await Snapshot("settings-compact");
             ((Expander)settingsPage.FindName("Advanced")).IsExpanded=true;
             ((FrameworkElement)settingsPage.FindName("VariablesField")).BringIntoView();await Snapshot("settings-advanced");
-            CloseSheet();Width=760;Height=650;
+            CloseSheet();Width=760;Height=620;
             Details_Click(this,new RoutedEventArgs());await Snapshot("installations");CloseSheet();
             Help_Click(this,new RoutedEventArgs());await Snapshot("help");CloseSheet();
         }

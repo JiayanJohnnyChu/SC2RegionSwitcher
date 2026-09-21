@@ -46,4 +46,4 @@
 
 ## 安装结构
 
-当前用户 MSI 安装到 `%LOCALAPPDATA%\Programs\SC2RegionSwitcher\3.3.0`，提供一个 **SC2 Region Switcher** 开始菜单入口并登记卸载信息。卸载保留用户配置。MSI 不捆绑 .NET 运行环境；当前构建器尚未实现完整的版本升级方案。
+3.4.0 当前用户 MSI 安装到稳定目录 `%LOCALAPPDATA%\Programs\SC2RegionSwitcher\app`，提供一个 **SC2 Region Switcher** 开始菜单入口并登记卸载信息。通过 major upgrade 移除同一产品族的旧版本；文件、菜单和 App Paths 分开管理。卸载保留用户配置。MSI 不捆绑 .NET 运行环境；详细规则和原始 3.3.0 的降级限制见安装器说明。
