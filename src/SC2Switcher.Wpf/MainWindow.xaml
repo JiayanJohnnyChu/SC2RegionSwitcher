@@ -29,7 +29,7 @@
       <StackPanel><TextBlock Text="CN" Style="{StaticResource DestinationMeta}" Margin="0,0,0,10"/><TextBlock Text="{Binding Text[国服]}" Style="{StaticResource DestinationTitle}"/><TextBlock Text="{Binding Text[简体中文]}" Style="{StaticResource DestinationDetail}" Margin="0,5,0,0"/></StackPanel>
      </RadioButton>
      <RadioButton x:Name="GlobalCard" Tag="Global" Grid.Column="2" GroupName="Server" Style="{StaticResource ServerRow}" IsChecked="{Binding IsGlobal}" IsEnabled="{Binding IsIdle}" AutomationProperties.Name="{Binding Text[切换目标：外服，英文]}">
-      <StackPanel><TextBlock Text="{Binding Text[国际服]}" Style="{StaticResource DestinationMeta}" Margin="0,0,0,10"/><TextBlock Text="{Binding Text[外服]}" Style="{StaticResource DestinationTitle}"/><TextBlock Text="{Binding Text[英文]}" Style="{StaticResource DestinationDetail}" Margin="0,5,0,0"/></StackPanel>
+      <StackPanel><TextBlock Text="{Binding Region}" ToolTip="{Binding Text[外服登录区域]}" Style="{StaticResource DestinationMeta}" Margin="0,0,0,10"/><TextBlock Text="{Binding Text[外服]}" Style="{StaticResource DestinationTitle}"/><TextBlock Text="{Binding Text[英文]}" Style="{StaticResource DestinationDetail}" Margin="0,5,0,0"/></StackPanel>
      </RadioButton>
     </Grid>
     <Grid x:Name="RegionRow" Grid.Row="2" Margin="0,22,0,0">

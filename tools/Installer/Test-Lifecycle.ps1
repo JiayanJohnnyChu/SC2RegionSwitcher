@@ -124,6 +124,7 @@ function New-FixtureMsi([string]$Source, [string]$Destination, [string]$Role, [s
         Set-MsiValue $opened.Database Shortcut Description Shortcut StartMenu 'Isolated SC2 Region Switcher installer test fixture'
         Set-MsiValue $opened.Database Registry Key Registry AppPath $fixtureAppPathKey
         Set-MsiValue $opened.Database Registry Key Registry MenuMarker $fixtureMarkerKey
+        Set-MsiValue $opened.Database Registry Key Registry ApplicationMarker $fixtureMarkerKey
         if ($ExplicitShortcutTargetFixture) {
             Set-MsiValue $opened.Database Shortcut Target Shortcut StartMenu '[INSTALLDIR]SC2Switcher.Wpf.exe'
             Set-MsiValue $opened.Database Registry Value Registry AppPath '[INSTALLDIR]SC2Switcher.Wpf.exe'
@@ -332,7 +333,7 @@ foreach ($fixture in $fixtures) {
     foreach ($row in $directories) { if ($row.C2 -match '(^|\|)SC2RegionSwitcher$' -or $row.C2 -match '(^|\|)SC2 Region Switcher$') { throw "Fixture $($fixture.Role) retains a production directory." } }
     foreach ($row in $registry) { if ($row.C2 -eq $production.AppPathKey -or $row.C2 -eq $production.MarkerKey -or $row.C2 -like 'Software\SC2RegionSwitcher\*') { throw "Fixture $($fixture.Role) retains a production registry resource." } }
     if ($shortcutMap.StartMenu -match '(^|\|)SC2 Region Switcher$') { throw "Fixture $($fixture.Role) retains the production shortcut." }
-    foreach ($row in $components) { if ($row.C2 -in @('{9543F8B1-925C-4250-B5B6-E513266751F0}','{95AD008A-E416-4E6A-8E52-0D0A0FCA3B94}','{D2F017E8-3B57-4DD8-BD70-456D91E101D1}')) { throw "Fixture $($fixture.Role) retains a production component GUID." } }
+    foreach ($row in $components) { if ($row.C2 -in @('{9543F8B1-925C-4250-B5B6-E513266751F0}','{6AAC927A-CAEB-4A06-B4F4-AF6F4EBE5DC6}','{95AD008A-E416-4E6A-8E52-0D0A0FCA3B94}','{D2F017E8-3B57-4DD8-BD70-456D91E101D1}')) { throw "Fixture $($fixture.Role) retains a production component GUID." } }
 }
 if ($fixtureUpgrade -eq $production.UpgradeCode) { throw 'Fixture UpgradeCode overlaps production.' }
 

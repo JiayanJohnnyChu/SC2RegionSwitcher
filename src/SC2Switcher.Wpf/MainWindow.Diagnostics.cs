@@ -27,7 +27,7 @@ public partial class MainWindow {
     static object DestinationAppearance(RadioButton button) {
         var tile=button.Template.FindName("Tile",button) as Border;
         var text=((Panel)button.Content).Children.OfType<TextBlock>().ToArray();
-        return new {Selected=button.IsChecked,Enabled=button.IsEnabled,Background=BrushValue(tile?.Background),
+        return new {Selected=button.IsChecked,Enabled=button.IsEnabled,RegionLabel=text[0].Text,Background=BrushValue(tile?.Background),
             Foreground=BrushValue(button.Foreground),LabelForeground=BrushValue(text[0].Foreground),
             DetailForeground=BrushValue(text[^1].Foreground),LabelOpacity=text[0].Opacity,DetailOpacity=text[^1].Opacity,TileOpacity=tile?.Opacity};
     }
@@ -41,7 +41,7 @@ public partial class MainWindow {
         bool? targetsVisible=sheet==null?Fits(ChinaCard,MainScroll)&&Fits(GlobalCard,MainScroll)&&Fits(RegionRow,MainScroll):null;
         var formScroll=settingsPage?.FindName("FormScroll") as ScrollViewer;
         Json.Write(path,new {
-            Framework="WPF",Design="Swiss modernism / English first / Radix regions",Version=typeof(MainWindow).Assembly.GetName().Version.ToString(3),
+            Framework="WPF",Design="Grid layout / Radix palette",Version=typeof(MainWindow).Assembly.GetName().Version.ToString(3),
             SyntheticState=exportingDesignStates,Page=settingsPage!=null?"settings":sheet!=null?"reference":"switcher",
             UiLanguage=UiText.Language,WindowTitle=Title,WindowVisible=IsVisible,WindowState=WindowState.ToString(),UserCancellationAvailable=false,CommitStarted=model.IsCommitStarted,
             Runtime=Environment.Version.ToString(),DpiX=dpi.PixelsPerInchX,DpiY=dpi.PixelsPerInchY,

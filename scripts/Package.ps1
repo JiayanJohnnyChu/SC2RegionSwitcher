@@ -24,7 +24,9 @@ $portable=Join-Path $packageRoot 'portable'
 New-Item -ItemType Directory -Path $portable -Force | Out-Null
 $files=@('SC2Switcher.Wpf.exe','SC2Switcher.Wpf.dll','SC2Switcher.Wpf.deps.json','SC2Switcher.Wpf.runtimeconfig.json')
 foreach($file in $files){Copy-Item -LiteralPath (Join-Path $projectRoot "artifacts\publish\win-x64\$file") -Destination $portable}
-Copy-Item -LiteralPath (Join-Path $projectRoot 'docs\SETUP.zh-CN.md') -Destination (Join-Path $portable 'README.md')
+foreach($readme in @('README.md','README.zh-CN.md')){
+    Copy-Item -LiteralPath (Join-Path $projectRoot "docs\portable\$readme") -Destination (Join-Path $portable $readme)
+}
 $archive=Join-Path $packageRoot "SC2Switcher-$version-win-x64-preview.zip"
 Compress-Archive -LiteralPath @(Get-ChildItem -LiteralPath $portable -File | ForEach-Object FullName) -DestinationPath $archive
 & (Join-Path $projectRoot 'tools\Installer\Build-CurrentUserMsi.ps1') -AppDirectory $portable -OutputDirectory (Join-Path $packageRoot 'msi')

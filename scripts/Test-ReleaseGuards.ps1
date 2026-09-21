@@ -7,11 +7,28 @@ if(!$ExpectedSourceCommit){$ExpectedSourceCommit=(& git -C $projectRoot rev-pars
 function Check($dir,$version=$ExpectedVersion,$commit=$ExpectedSourceCommit){& $checker -ReleaseDirectory $dir -ExpectedVersion $version -ExpectedSourceCommit $commit|Out-Null}
 function Reject($name,[scriptblock]$change,$version=$ExpectedVersion,$commit=$ExpectedSourceCommit){$case=Join-Path $root $name;Copy-Item -LiteralPath $source -Destination $case -Recurse;& $change $case;try{Check $case $version $commit}catch{Write-Output "PASS rejected $name";return};throw "Accepted invalid release case: $name"}
 function Refresh-ManifestChecksum($case){$manifest=Join-Path $case 'release-manifest.json';$hash=(Get-FileHash -LiteralPath $manifest -Algorithm SHA256).Hash.ToLowerInvariant();$sum=Join-Path $case 'SHA256SUMS.txt';$lines=@(Get-Content -LiteralPath $sum|Where-Object{$_-notmatch'  release-manifest\.json$'});$lines+=($hash+'  release-manifest.json');$lines|Set-Content -LiteralPath $sum -Encoding ascii}
+function Refresh-PackageMetadata($case,[string]$packageName){
+ $manifestPath=Join-Path $case 'release-manifest.json';$manifest=Get-Content -Raw -LiteralPath $manifestPath|ConvertFrom-Json;$package=Join-Path $case $packageName;$entry=@($manifest.Files|Where-Object Name -eq $packageName)
+ if($entry.Count-ne1){throw "Cannot refresh missing package metadata: $packageName"}
+ $item=Get-Item -LiteralPath $package;$entry[0].Bytes=$item.Length;$entry[0].SHA256=(Get-FileHash -LiteralPath $package -Algorithm SHA256).Hash
+ $manifest|ConvertTo-Json -Depth 6|Set-Content -LiteralPath $manifestPath -Encoding utf8
+ $sum=Join-Path $case 'SHA256SUMS.txt';$lines=@(Get-Content -LiteralPath $sum|Where-Object{$_-notmatch('  '+[regex]::Escape($packageName)+'$')-and$_-notmatch'  release-manifest\.json$'})
+ $lines+=(($entry[0].SHA256.ToLowerInvariant())+'  '+$packageName);$lines+=((Get-FileHash -LiteralPath $manifestPath -Algorithm SHA256).Hash.ToLowerInvariant()+'  release-manifest.json');$lines|Set-Content -LiteralPath $sum -Encoding ascii
+}
+function Reject-ApplicationFileKeyPath($case){
+ $manifest=Get-Content -Raw -LiteralPath (Join-Path $case 'release-manifest.json')|ConvertFrom-Json;$msiName=@($manifest.Files|Where-Object Name -Like '*.msi')[0].Name;$msi=Join-Path $case $msiName
+ $installer=New-Object -ComObject WindowsInstaller.Installer;$database=$installer.OpenDatabase($msi,1)
+ try{$view=$database.OpenView("UPDATE ``Component`` SET ``Attributes``=256, ``KeyPath``='AppExe' WHERE ``Component``='Application'");try{[void]$view.Execute()}finally{[void]$view.Close();[Runtime.InteropServices.Marshal]::FinalReleaseComObject($view)|Out-Null};[void]$database.Commit()}finally{[Runtime.InteropServices.Marshal]::FinalReleaseComObject($database)|Out-Null;[Runtime.InteropServices.Marshal]::FinalReleaseComObject($installer)|Out-Null}
+ Refresh-PackageMetadata $case $msiName
+ try{Check $case}catch{if($_.Exception.Message-ne'Component key path or attributes are incorrect.'){throw "Application file-key-path case was rejected for the wrong reason: $($_.Exception.Message)"};Write-Output 'PASS rejected application-file-key-path';return}
+ throw 'Accepted invalid release case: application-file-key-path'
+}
 Check $source
 $root=Join-Path $projectRoot ('artifacts\release-guard-tests\'+(Get-Date -Format yyyyMMdd-HHmmss)+'-'+[guid]::NewGuid().ToString('N').Substring(0,8));New-Item -ItemType Directory -Path $root -Force|Out-Null
 Reject 'tampered-zip' {param($case)$m=Get-Content -Raw (Join-Path $case release-manifest.json)|ConvertFrom-Json;$p=Join-Path $case (@($m.Files|Where-Object Name -Like '*.zip')[0].Name);[IO.File]::AppendAllText($p,'tamper')}
 Reject 'wrong-expected-version' {param($case)} '9.9.9' $ExpectedSourceCommit
 Reject 'wrong-expected-source' {param($case)} $ExpectedVersion ('0'*40)
 Reject 'manifest-version-mismatch' {param($case)$p=Join-Path $case release-manifest.json;$m=Get-Content -Raw $p|ConvertFrom-Json;$m.Version='9.9.9';$m|ConvertTo-Json -Depth 6|Set-Content -LiteralPath $p -Encoding utf8;Refresh-ManifestChecksum $case}
-Write-Output 'Release guard negative tests passed: tampering, version mismatch and source mismatch were rejected.'
+if([version]$ExpectedVersion-ge[version]'3.4.1'){$case=Join-Path $root 'application-file-key-path';Copy-Item -LiteralPath $source -Destination $case -Recurse;Reject-ApplicationFileKeyPath $case}
+Write-Output 'Release guard negative tests passed: tampering, version mismatch, source mismatch and current component rules were enforced.'
 Write-Output "Evidence retained: $root"

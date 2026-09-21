@@ -45,6 +45,10 @@ jobs:
         env:
           RELEASE_DIRECTORY: ${{ steps.package.outputs.release-directory }}
         run: .\scripts\Test-Package.ps1 -ReleaseDirectory $env:RELEASE_DIRECTORY
+      - name: Check Windows Installer schema
+        env:
+          RELEASE_DIRECTORY: ${{ steps.package.outputs.release-directory }}
+        run: .\scripts\Test-InstallerSchema.ps1 -ReleaseDirectory $env:RELEASE_DIRECTORY
       - name: Check release rejection cases
         env:
           RELEASE_DIRECTORY: ${{ steps.package.outputs.release-directory }}

@@ -45,25 +45,28 @@ function Insert([string]$Table,[string[]]$Columns,[object[]]$Values){
  }
  try{$view.Execute($record)}finally{$view.Close()}
 }
-Sql 'CREATE TABLE `Property` (`Property` CHAR(72) NOT NULL, `Value` CHAR(0) LOCALIZABLE PRIMARY KEY `Property`)'
+Sql 'CREATE TABLE `Property` (`Property` CHAR(72) NOT NULL, `Value` CHAR(0) NOT NULL LOCALIZABLE PRIMARY KEY `Property`)'
 Sql 'CREATE TABLE `Directory` (`Directory` CHAR(72) NOT NULL, `Directory_Parent` CHAR(72), `DefaultDir` CHAR(255) NOT NULL LOCALIZABLE PRIMARY KEY `Directory`)'
 Sql 'CREATE TABLE `Component` (`Component` CHAR(72) NOT NULL, `ComponentId` CHAR(38), `Directory_` CHAR(72) NOT NULL, `Attributes` SHORT NOT NULL, `Condition` CHAR(255), `KeyPath` CHAR(72) PRIMARY KEY `Component`)'
 Sql 'CREATE TABLE `Feature` (`Feature` CHAR(38) NOT NULL, `Feature_Parent` CHAR(38), `Title` CHAR(64) LOCALIZABLE, `Description` CHAR(255) LOCALIZABLE, `Display` SHORT, `Level` SHORT NOT NULL, `Directory_` CHAR(72), `Attributes` SHORT NOT NULL PRIMARY KEY `Feature`)'
 Sql 'CREATE TABLE `FeatureComponents` (`Feature_` CHAR(38) NOT NULL, `Component_` CHAR(72) NOT NULL PRIMARY KEY `Feature_`, `Component_`)'
-Sql 'CREATE TABLE `File` (`File` CHAR(72) NOT NULL, `Component_` CHAR(72) NOT NULL, `FileName` CHAR(255) NOT NULL LOCALIZABLE, `FileSize` LONG NOT NULL, `Version` CHAR(72), `Language` CHAR(20), `Attributes` SHORT, `Sequence` SHORT NOT NULL PRIMARY KEY `File`)'
-Sql 'CREATE TABLE `Media` (`DiskId` SHORT NOT NULL, `LastSequence` SHORT NOT NULL, `DiskPrompt` CHAR(64) LOCALIZABLE, `Cabinet` CHAR(255), `VolumeLabel` CHAR(32), `Source` CHAR(72) PRIMARY KEY `DiskId`)'
-Sql 'CREATE TABLE `Shortcut` (`Shortcut` CHAR(72) NOT NULL, `Directory_` CHAR(72) NOT NULL, `Name` CHAR(128) NOT NULL LOCALIZABLE, `Component_` CHAR(72) NOT NULL, `Target` CHAR(72) NOT NULL, `Arguments` CHAR(255), `Description` CHAR(255) LOCALIZABLE, `Hotkey` SHORT, `Icon_` CHAR(72), `IconIndex` SHORT, `ShowCmd` SHORT, `WkDir` CHAR(72) PRIMARY KEY `Shortcut`)'
+Sql 'CREATE TABLE `File` (`File` CHAR(72) NOT NULL, `Component_` CHAR(72) NOT NULL, `FileName` CHAR(255) NOT NULL LOCALIZABLE, `FileSize` LONG NOT NULL, `Version` CHAR(72), `Language` CHAR(20), `Attributes` SHORT, `Sequence` LONG NOT NULL PRIMARY KEY `File`)'
+Sql 'CREATE TABLE `Media` (`DiskId` SHORT NOT NULL, `LastSequence` LONG NOT NULL, `DiskPrompt` CHAR(64) LOCALIZABLE, `Cabinet` CHAR(255), `VolumeLabel` CHAR(32), `Source` CHAR(72) PRIMARY KEY `DiskId`)'
+Sql 'CREATE TABLE `Shortcut` (`Shortcut` CHAR(72) NOT NULL, `Directory_` CHAR(72) NOT NULL, `Name` CHAR(128) NOT NULL LOCALIZABLE, `Component_` CHAR(72) NOT NULL, `Target` CHAR(72) NOT NULL, `Arguments` CHAR(255), `Description` CHAR(255) LOCALIZABLE, `Hotkey` SHORT, `Icon_` CHAR(72), `IconIndex` SHORT, `ShowCmd` SHORT, `WkDir` CHAR(72), `DisplayResourceDLL` CHAR(255), `DisplayResourceId` SHORT, `DescriptionResourceDLL` CHAR(255), `DescriptionResourceId` SHORT PRIMARY KEY `Shortcut`)'
 Sql 'CREATE TABLE `Icon` (`Name` CHAR(72) NOT NULL, `Data` OBJECT NOT NULL PRIMARY KEY `Name`)'
 Sql 'CREATE TABLE `Registry` (`Registry` CHAR(72) NOT NULL, `Root` SHORT NOT NULL, `Key` CHAR(255) NOT NULL LOCALIZABLE, `Name` CHAR(255) LOCALIZABLE, `Value` CHAR(0) LOCALIZABLE, `Component_` CHAR(72) NOT NULL PRIMARY KEY `Registry`)'
 Sql 'CREATE TABLE `RemoveFile` (`FileKey` CHAR(72) NOT NULL, `Component_` CHAR(72) NOT NULL, `FileName` CHAR(255) LOCALIZABLE, `DirProperty` CHAR(72) NOT NULL, `InstallMode` SHORT NOT NULL PRIMARY KEY `FileKey`)'
 Sql 'CREATE TABLE `InstallExecuteSequence` (`Action` CHAR(72) NOT NULL, `Condition` CHAR(255), `Sequence` SHORT PRIMARY KEY `Action`)'
-Sql 'CREATE TABLE `CustomAction` (`Action` CHAR(72) NOT NULL, `Type` SHORT NOT NULL, `Source` CHAR(72), `Target` CHAR(0) PRIMARY KEY `Action`)'
+Sql 'CREATE TABLE `CustomAction` (`Action` CHAR(72) NOT NULL, `Type` SHORT NOT NULL, `Source` CHAR(72), `Target` CHAR(255), `ExtendedType` LONG PRIMARY KEY `Action`)'
 Sql 'CREATE TABLE `Upgrade` (`UpgradeCode` CHAR(38) NOT NULL, `VersionMin` CHAR(20), `VersionMax` CHAR(20), `Language` CHAR(255), `Attributes` LONG NOT NULL, `Remove` CHAR(255), `ActionProperty` CHAR(72) NOT NULL PRIMARY KEY `UpgradeCode`, `VersionMin`, `VersionMax`, `Language`, `Attributes`)'
-Sql 'CREATE TABLE `LaunchCondition` (`Condition` CHAR(255) NOT NULL, `Description` CHAR(255) LOCALIZABLE PRIMARY KEY `Condition`)'
+Sql 'CREATE TABLE `LaunchCondition` (`Condition` CHAR(255) NOT NULL, `Description` CHAR(255) NOT NULL LOCALIZABLE PRIMARY KEY `Condition`)'
+# Import standard column constraints so the finished database can run the ICE suite.
+# These describe database columns only and contain no application or user data.
+$database.Import((Join-Path $PSScriptRoot 'metadata'),'_Validation.idt')
 
 $productCode=$release.ProductCode
 $packageCode='{'+[guid]::NewGuid().ToString().ToUpperInvariant()+'}'
-$componentCodes=[ordered]@{Application='{9543F8B1-925C-4250-B5B6-E513266751F0}';StartMenu='{95AD008A-E416-4E6A-8E52-0D0A0FCA3B94}';AppRegistration='{D2F017E8-3B57-4DD8-BD70-456D91E101D1}'}
+$componentCodes=[ordered]@{Application='{6AAC927A-CAEB-4A06-B4F4-AF6F4EBE5DC6}';StartMenu='{95AD008A-E416-4E6A-8E52-0D0A0FCA3B94}';AppRegistration='{D2F017E8-3B57-4DD8-BD70-456D91E101D1}'}
 $properties=[ordered]@{
  ProductCode=$productCode;ProductVersion=$version;ProductLanguage='1033';ProductName='SC2 Region Switcher';Manufacturer='SC2 Region Switcher';
  UpgradeCode=$release.UpgradeCode;INSTALLLEVEL='1';MSIINSTALLPERUSER='1';ARPNOMODIFY='1';ARPNOREPAIR='1';ARPPRODUCTICON='SwitcherIcon';ARPCOMMENTS='StarCraft II CN and Global region switcher';
@@ -76,27 +79,32 @@ Insert Upgrade @('UpgradeCode','VersionMin','VersionMax','Language','Attributes'
 foreach($dir in @(
  @('TARGETDIR',$null,'SourceDir'),@('LocalAppDataFolder','TARGETDIR','.'),@('UserProgramsDir','LocalAppDataFolder','Programs'),
  @('ProductRoot','UserProgramsDir','SC2REG~1|SC2RegionSwitcher'),@('INSTALLDIR','ProductRoot','app'),
- @('LegacyInstallDir','ProductRoot','3.3.0'),
+ @('LegacyInstallDir','ProductRoot','V330|3.3.0'),
  @('ProgramMenuFolder','TARGETDIR','.'),@('MenuGroup','ProgramMenuFolder','SC2REG~1|SC2 Region Switcher')
 )){Insert Directory @('Directory','Directory_Parent','DefaultDir') $dir}
-Insert Component @('Component','ComponentId','Directory_','Attributes','Condition','KeyPath') @('Application',$componentCodes.Application,'INSTALLDIR',[int]256,$null,'AppExe')
+Insert Component @('Component','ComponentId','Directory_','Attributes','Condition','KeyPath') @('Application',$componentCodes.Application,'INSTALLDIR',[int]260,$null,'ApplicationMarker')
 Insert Component @('Component','ComponentId','Directory_','Attributes','Condition','KeyPath') @('StartMenu',$componentCodes.StartMenu,'MenuGroup',[int]260,$null,'MenuMarker')
 Insert Component @('Component','ComponentId','Directory_','Attributes','Condition','KeyPath') @('AppRegistration',$componentCodes.AppRegistration,'INSTALLDIR',[int]260,$null,'AppPath')
 Insert Feature @('Feature','Feature_Parent','Title','Description','Display','Level','Directory_','Attributes') @('MainFeature',$null,'SC2 Region Switcher','Application and one Start menu shortcut',[int]1,[int]1,'INSTALLDIR',[int]0)
 foreach($component in $componentCodes.Keys){Insert FeatureComponents @('Feature_','Component_') @('MainFeature',$component)}
 $sequence=1
 foreach($file in $files){
- Insert File @('File','Component_','FileName','FileSize','Version','Language','Attributes','Sequence') @($file.Id,'Application',($file.Short+'|'+$file.Name),[int](Get-Item -LiteralPath $file.Source).Length,$file.Version,$null,[int]512,[int]$sequence)
+ $language=if($file.Version){'0'}else{$null}
+ Insert File @('File','Component_','FileName','FileSize','Version','Language','Attributes','Sequence') @($file.Id,'Application',($file.Short+'|'+$file.Name),[int](Get-Item -LiteralPath $file.Source).Length,$file.Version,$language,[int]512,[int]$sequence)
  $sequence++
 }
 Insert Media @('DiskId','LastSequence','DiskPrompt','Cabinet','VolumeLabel','Source') @([int]1,[int]4,$null,'#app.cab',$null,$null)
 Insert Shortcut @('Shortcut','Directory_','Name','Component_','Target','Arguments','Description','Hotkey','Icon_','IconIndex','ShowCmd','WkDir') @('StartMenu','MenuGroup','SC2REG~1|SC2 Region Switcher','StartMenu','[INSTALLDIR]SC2Switcher.Wpf.exe',$null,'StarCraft II CN and Global region switcher',$null,'SwitcherIcon',[int]0,[int]1,'INSTALLDIR')
 Insert Registry @('Registry','Root','Key','Name','Value','Component_') @('AppPath',[int]1,'Software\Microsoft\Windows\CurrentVersion\App Paths\SC2Switcher.Wpf.exe',$null,'[INSTALLDIR]SC2Switcher.Wpf.exe','AppRegistration')
 Insert Registry @('Registry','Root','Key','Name','Value','Component_') @('MenuMarker',[int]1,'Software\SC2RegionSwitcher\Installer','StartMenu','#1','StartMenu')
+Insert Registry @('Registry','Root','Key','Name','Value','Component_') @('ApplicationMarker',[int]1,'Software\SC2RegionSwitcher\Installer','Application','#1','Application')
 Insert RemoveFile @('FileKey','Component_','FileName','DirProperty','InstallMode') @('RemoveMenuGroup','StartMenu',$null,'MenuGroup',[int]2)
 Insert RemoveFile @('FileKey','Component_','FileName','DirProperty','InstallMode') @('RemoveApplicationFolder','Application',$null,'INSTALLDIR',[int]2)
 Insert RemoveFile @('FileKey','Component_','FileName','DirProperty','InstallMode') @('RemoveLegacyApplicationFolder','Application',$null,'LegacyInstallDir',[int]1)
 Insert RemoveFile @('FileKey','Component_','FileName','DirProperty','InstallMode') @('RemoveProductFolder','Application',$null,'ProductRoot',[int]2)
+# ICE64 requires cleanup for each authored user-profile directory. A null FileName
+# removes this shared parent only when empty; it never removes another app's files.
+Insert RemoveFile @('FileKey','Component_','FileName','DirProperty','InstallMode') @('RemoveUserProgramsFolder','Application',$null,'UserProgramsDir',[int]2)
 Insert CustomAction @('Action','Type','Source','Target') @('SetInstallLocation',[int]51,'ARPINSTALLLOCATION','[INSTALLDIR]')
 Insert CustomAction @('Action','Type','Source','Target') @('RejectNewerProduct',[int]19,$null,'A newer version of SC2 Region Switcher is already installed. Uninstall it before installing an older release.')
 Insert InstallExecuteSequence @('Action','Condition','Sequence') @('RejectNewerProduct','NEWERPRODUCTS',[int]210)
@@ -121,7 +129,7 @@ $summary.Property(5)='Installer'
 $summary.Property(7)='x64;1033'
 $summary.Property(8)='SC2 Region Switcher'
 $summary.Property(9)=$packageCode
-$summary.Property(14)=200
+$summary.Property(14)=500
 $summary.Property(15)=10
 $summary.Property(18)='SC2 Region Switcher package builder'
 $summary.Persist();$database.Commit()
