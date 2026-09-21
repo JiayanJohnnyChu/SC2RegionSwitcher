@@ -2,6 +2,7 @@
 param(
     [Parameter(Mandatory)][string]$CandidateMsi,
     [string]$OutputDirectory,
+    [switch]$AdministrativeControl,
     [switch]$ChildMode,
     [string]$WorkDirectory,
     [string]$ParentSid,
@@ -28,13 +29,33 @@ function Run-Msi([string]$label,[string[]]$arguments,[int[]]$expected,[string]$l
 function File-Hashes([string]$dir){$m=[ordered]@{};foreach($n in $runtime){$p=Join-Path $dir $n;$m[$n]=if(Test-Path $p -PathType Leaf){(Get-FileHash $p -Algorithm SHA256).Hash}else{$null}};$m}
 function Reg-Default([string]$sub){$b=[Microsoft.Win32.RegistryKey]::OpenBaseKey([Microsoft.Win32.RegistryHive]::CurrentUser,[Microsoft.Win32.RegistryView]::Registry64);try{$k=$b.OpenSubKey($sub);if(!$k){return $null};try{[string]$k.GetValue($null)}finally{$k.Dispose()}}finally{$b.Dispose()}}
 function Reg-Named([string]$sub,[string]$name){$b=[Microsoft.Win32.RegistryKey]::OpenBaseKey([Microsoft.Win32.RegistryHive]::CurrentUser,[Microsoft.Win32.RegistryView]::Registry64);try{$k=$b.OpenSubKey($sub);if(!$k){return $null};try{[string]$k.GetValue($name)}finally{$k.Dispose()}}finally{$b.Dispose()}}
+function Reg-Key-Exists([string]$sub){$b=[Microsoft.Win32.RegistryKey]::OpenBaseKey([Microsoft.Win32.RegistryHive]::CurrentUser,[Microsoft.Win32.RegistryView]::Registry64);try{$k=$b.OpenSubKey($sub);if(!$k){return $false};$k.Dispose();$true}finally{$b.Dispose()}}
 function Link-Target([string]$path){if(!(Test-Path $path)){return $null};$w=New-Object -ComObject WScript.Shell;try{[string]$w.CreateShortcut($path).TargetPath}finally{[void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($w)}}
+function Get-NativeFaultEvidence([string[]]$logLines,[string]$appTarget){
+    $remove=@($logLines|Select-String -Pattern 'Action ended .*: RemoveExistingProducts\. Return value 1\.'|Select-Object -First 1)
+    $installFinalize=@($logLines|Select-String -Pattern 'Action ended .*: InstallFinalize\. Return value 3\.'|Where-Object{$remove-and$_.LineNumber-gt$remove.LineNumber}|Select-Object -First 1)
+    $candidateExe=Join-Path $appTarget 'SC2Switcher.Wpf.exe'
+    $copy=@($logLines|Select-String -Pattern 'Executing op: FileCopy\(.*DestName=SC2Switcher\.Wpf\.exe'|Where-Object{
+        $remove-and$installFinalize-and$_.LineNumber-gt$remove.LineNumber-and$_.LineNumber-lt$installFinalize.LineNumber-and$_.Line-notmatch 'SourceName=C:\\Config\.Msi\\'
+    }|Select-Object -First 1)
+    $copyTarget=@($logLines|Select-String -SimpleMatch ("File: $candidateExe;")|Where-Object{
+        $copy-and$installFinalize-and$_.LineNumber-gt$copy.LineNumber-and$_.LineNumber-lt$installFinalize.LineNumber
+    }|Select-Object -First 1)
+    $nativeError=@($logLines|Select-String -Pattern 'Error 1312\.'|Where-Object{
+        $copyTarget-and$installFinalize-and$_.LineNumber-gt$copyTarget.LineNumber-and$_.LineNumber-lt$installFinalize.LineNumber-and$_.Line.IndexOf($appTarget,[StringComparison]::OrdinalIgnoreCase)-ge0
+    }|Select-Object -First 1)
+    $rollback=@($logLines|Select-String -Pattern 'Executing op: RollbackInfo\('|Where-Object{
+        $installFinalize-and$_.LineNumber-gt$installFinalize.LineNumber
+    }|Select-Object -First 1)
+    [pscustomobject]@{Remove=$remove;InstallFinalize=$installFinalize;Copy=$copy;CopyTarget=$copyTarget;NativeError=$nativeError;Rollback=$rollback}
+}
 
 if($env:GITHUB_ACTIONS-ne'true'-or$env:RUNNER_ENVIRONMENT-ne'github-hosted'-or$env:CI-ne'true'){throw 'This script runs only on a GitHub-hosted Actions runner.'}
 if($ChildMode){
     if(!$WorkDirectory-or!$ParentSid-or!$BaselineFixture-or!$CandidateFixture){throw 'Child arguments missing.'}
     $identity=[Security.Principal.WindowsIdentity]::GetCurrent();$principal=[Security.Principal.WindowsPrincipal]::new($identity);$isAdmin=$principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-    if($isAdmin-or$identity.User.Value-eq$ParentSid){throw 'Child token is not an independent standard user.'}
+    $expectedAdministrator=[bool]$AdministrativeControl
+    if($isAdmin-ne$expectedAdministrator-or$identity.User.Value-eq$ParentSid){throw 'Child token does not match the requested independent test role.'}
     $manifest=Get-Content (Join-Path $WorkDirectory 'fixture-manifest.json') -Raw|ConvertFrom-Json
     foreach($f in @($manifest.Baseline,$manifest.Candidate)){if((Get-FileHash $f.Path -Algorithm SHA256).Hash-ne$f.SHA256){throw 'Fixture hash changed.'};if((Product-State $f.ProductCode)-ne-1){throw 'Fixture initially registered.'}}
     # This account is created with a fresh default Windows profile. Resolve its
@@ -51,13 +72,91 @@ if($ChildMode){
     try{
         [void](Run-Msi baseline-install @('/i',$BaselineFixture) @(0) $logs $steps);$oldHashes=File-Hashes $oldDir;if(@($oldHashes.Values|?{$null-ne$_}).Count-ne4){throw 'Baseline payload missing.'};$oldTarget=Join-Path $oldDir 'SC2Switcher.Wpf.exe';$before=[ordered]@{BaselineProductState=Product-State $manifest.Baseline.ProductCode;CandidateProductState=Product-State $manifest.Candidate.ProductCode;Hashes=$oldHashes;Shortcut=Link-Target $shortcut;AppPath=Reg-Default $reg;ApplicationMarker=Reg-Named $marker Application;StartMenuMarker=Reg-Named $marker StartMenu;Canary=(Get-FileHash $config).Hash};if($before.BaselineProductState-ne5-or$before.CandidateProductState-ne-1-or$before.Shortcut-ne$oldTarget-or$before.AppPath-ne$oldTarget-or$before.ApplicationMarker-ne'1'-or$before.StartMenuMarker-ne'1'-or$before.Canary-ne$canaryHash){throw 'Baseline state or entry-point proof failed.'}
         if(Test-Path $appTarget){throw 'Native collision target already exists.'};[IO.File]::WriteAllText($appTarget,'native-file-collision',[Text.UTF8Encoding]::new($false));$collisionHash=(Get-FileHash $appTarget).Hash
-        $exit=Run-Msi native-upgrade @('/i',$CandidateFixture) @(1603) $logs $steps;$log=Join-Path $logs 'native-upgrade.log';$remove=@(Select-String $log -Pattern 'Action ended .*: RemoveExistingProducts\. Return value 1\.'|Select -First 1);$installFinalize=@(Select-String $log -Pattern 'Action ended .*: InstallFinalize\. Return value 3\.'|Where-Object{$remove-and$_.LineNumber-gt$remove.LineNumber}|Select -First 1);$copy=@(Select-String $log -Pattern 'Executing op: FileCopy\('|Where-Object{$remove-and$installFinalize-and$_.LineNumber-gt$remove.LineNumber-and$_.LineNumber-lt$installFinalize.LineNumber}|Select -First 1);$installFilesFailed=@(Select-String $log -Pattern 'Action ended .*: InstallFiles\. Return value 3\.'|Where-Object{$remove-and$_.LineNumber-gt$remove.LineNumber}|Select -First 1);$error5=@(Select-String $log -Pattern 'Note: 1: 140[1-4].* 3: 5\s*$')
+        $exit=Run-Msi native-upgrade @('/i',$CandidateFixture) @(1603) $logs $steps
+        $log=Join-Path $logs 'native-upgrade.log'
+        $fault=Get-NativeFaultEvidence (Get-Content -LiteralPath $log) $appTarget
+        $error5=@(Select-String $log -Pattern 'Note: 1: 140[1-4].* 3: 5\s*$')
+        $rollbackSkipped=@(Select-String $log -SimpleMatch 'Error in rollback skipped.')
         $after=[ordered]@{BaselineProductState=Product-State $manifest.Baseline.ProductCode;CandidateProductState=Product-State $manifest.Candidate.ProductCode;Hashes=File-Hashes $oldDir;Shortcut=Link-Target $shortcut;AppPath=Reg-Default $reg;ApplicationMarker=Reg-Named $marker Application;StartMenuMarker=Reg-Named $marker StartMenu;Canary=(Get-FileHash $config).Hash}
         $restored=$after.BaselineProductState-eq5-and$after.CandidateProductState-eq-1-and(($after.Hashes|ConvertTo-Json -Compress)-eq($oldHashes|ConvertTo-Json -Compress))-and$after.Shortcut-eq$before.Shortcut-and$after.AppPath-eq$before.AppPath-and$after.ApplicationMarker-eq$before.ApplicationMarker-and$after.StartMenuMarker-eq$before.StartMenuMarker-and$after.Canary-eq$canaryHash
-        $testPass=$exit-eq1603-and[bool]$remove-and[bool]$copy-and[bool]$installFinalize-and$error5.Count-eq0-and$restored;$result=[ordered]@{Executed=$true;Pass=$testPass;Token=[ordered]@{Name=$identity.Name;SID=$identity.User.Value;ParentSID=$ParentSid;IsAdministrator=$isAdmin;DifferentSID=$identity.User.Value-ne$ParentSid};Expected1603=$exit-eq1603;RemoveExistingProductsSucceeded=[bool]$remove;RemoveExistingProductsLine=$(if($remove){$remove.LineNumber}else{$null});FileCopyBetweenRemovalAndFailure=[bool]$copy;FileCopyLine=$(if($copy){$copy.LineNumber}else{$null});InstallFilesFailed=[bool]$installFilesFailed;InstallFilesFailureLine=$(if($installFilesFailed){$installFilesFailed.LineNumber}else{$null});InstallFinalizeFailed=[bool]$installFinalize;InstallFinalizeFailureLine=$(if($installFinalize){$installFinalize.LineNumber}else{$null});MSIError5=$error5.Count;OldVersionRestored=$restored;Before=$before;After=$after;CollisionSHA256=$collisionHash;ConfigurationCanarySHA256=$canaryHash;Steps=$steps};if(!$testPass){$failure='Targeted rollback assertions failed.'}
+        $testPass=$exit-eq1603-and[bool]$fault.Remove-and[bool]$fault.Copy-and[bool]$fault.CopyTarget-and[bool]$fault.NativeError-and[bool]$fault.InstallFinalize-and[bool]$fault.Rollback-and$error5.Count-eq0-and$rollbackSkipped.Count-eq0-and$restored
+        $result=[ordered]@{
+            Executed=$true
+            Pass=$testPass
+            Token=[ordered]@{Name=$identity.Name;SID=$identity.User.Value;ParentSID=$ParentSid;IsAdministrator=$isAdmin;DifferentSID=$identity.User.Value-ne$ParentSid;AdministrativeControl=$expectedAdministrator;Role=$(if($expectedAdministrator){'administrative-control'}else{'standard-user'})}
+            Expected1603=$exit-eq1603
+            RemoveExistingProductsSucceeded=[bool]$fault.Remove
+            RemoveExistingProductsLine=$(if($fault.Remove){$fault.Remove.LineNumber}else{$null})
+            CandidateFileCopyBeforeFailure=[bool]$fault.Copy
+            CandidateFileCopyLine=$(if($fault.Copy){$fault.Copy.LineNumber}else{$null})
+            CandidateFileTargetConfirmed=[bool]$fault.CopyTarget
+            CandidateFileTargetLine=$(if($fault.CopyTarget){$fault.CopyTarget.LineNumber}else{$null})
+            NativeCollisionError1312=[bool]$fault.NativeError
+            NativeCollisionErrorLine=$(if($fault.NativeError){$fault.NativeError.LineNumber}else{$null})
+            InstallFinalizeFailed=[bool]$fault.InstallFinalize
+            InstallFinalizeFailureLine=$(if($fault.InstallFinalize){$fault.InstallFinalize.LineNumber}else{$null})
+            RollbackStarted=[bool]$fault.Rollback
+            RollbackLine=$(if($fault.Rollback){$fault.Rollback.LineNumber}else{$null})
+            MSIError5=$error5.Count
+            RollbackSkippedErrorCount=$rollbackSkipped.Count
+            RollbackSkippedErrorLines=@($rollbackSkipped|ForEach-Object{$_.Line})
+            OldVersionRestored=$restored
+            Before=$before
+            After=$after
+            CollisionSHA256=$collisionHash
+            ConfigurationCanarySHA256=$canaryHash
+            Steps=$steps
+        }
+        if(!$testPass){$failure='Targeted rollback assertions failed.'}
     }catch{$failure=$_.Exception.ToString()}finally{
         foreach($f in @($manifest.Candidate,$manifest.Baseline)){try{[void](Run-Msi "cleanup-$($f.Role)" @('/x',$f.Path) @(0,1605) $logs $cleanupSteps)}catch{$failure="MSI cleanup failed for $($f.Role): $($_.Exception.Message). $failure"}}
-        if(Test-Path $appTarget -PathType Leaf){$actualCollision=(Get-FileHash $appTarget -Algorithm SHA256).Hash;if(!$collisionHash-or$actualCollision-ne$collisionHash){$failure="Collision cleanup refused because bytes changed. $failure"}else{Remove-Item $appTarget -Force}};$canaryUnchanged=(Test-Path $config)-and(Get-FileHash $config -Algorithm SHA256).Hash-eq$canaryHash;if(Test-Path $config){Remove-Item $config -Force};$cleanupState=[ordered]@{BaselineProductState=Product-State $manifest.Baseline.ProductCode;CandidateProductState=Product-State $manifest.Candidate.ProductCode;CollisionAbsent=!(Test-Path $appTarget);CanaryUnchangedBeforeRemoval=$canaryUnchanged;CanaryRemoved=!(Test-Path $config);Steps=$cleanupSteps};$cleanupPass=$cleanupState.BaselineProductState-eq-1-and$cleanupState.CandidateProductState-eq-1-and$cleanupState.CollisionAbsent-and$cleanupState.CanaryUnchangedBeforeRemoval-and$cleanupState.CanaryRemoved;$cleanupState['Pass']=$cleanupPass;if(!$cleanupPass){$failure="Child cleanup invariants failed. $failure"};$report=[ordered]@{Completed=$true;Pass=($testPass-and$cleanupPass-and!$failure);Result=$result;Cleanup=$cleanupState;Failure=$failure;Steps=$steps};$report|ConvertTo-Json -Depth 10|Set-Content (Join-Path $WorkDirectory 'child-result.json') -Encoding utf8
+        if(Test-Path $appTarget -PathType Leaf){
+            $actualCollision=(Get-FileHash $appTarget -Algorithm SHA256).Hash
+            if(!$collisionHash-or$actualCollision-ne$collisionHash){$failure="Collision cleanup refused because bytes changed. $failure"}
+            else{Remove-Item -LiteralPath $appTarget -Force}
+        }
+        $canaryUnchanged=(Test-Path $config -PathType Leaf)-and(Get-FileHash $config -Algorithm SHA256).Hash-eq$canaryHash
+        if(Test-Path $config -PathType Leaf){
+            if(!$canaryUnchanged){$failure="Canary cleanup refused because bytes changed. $failure"}
+            else{Remove-Item -LiteralPath $config -Force}
+        }
+
+        $configRoot=Split-Path $config -Parent
+        $profileRoot=[IO.Path]::GetFullPath($env:USERPROFILE).TrimEnd('\')+'\'
+        foreach($directory in @($oldDir,$appTarget,$productRoot,$menu,$configRoot)){
+            $fullDirectory=[IO.Path]::GetFullPath($directory)
+            if(!$fullDirectory.StartsWith($profileRoot,[StringComparison]::OrdinalIgnoreCase)){throw 'Refusing QA directory cleanup outside the child profile.'}
+            if(Test-Path $fullDirectory -PathType Container){
+                $directoryItem=Get-Item -LiteralPath $fullDirectory -Force
+                if($directoryItem.Attributes-band[IO.FileAttributes]::ReparsePoint){throw "Refusing QA directory cleanup through a reparse point: $fullDirectory"}
+                if(@(Get-ChildItem -LiteralPath $fullDirectory -Force).Count-eq0){Remove-Item -LiteralPath $fullDirectory -Force}
+            }
+        }
+
+        $cleanupState=[ordered]@{
+            BaselineProductState=Product-State $manifest.Baseline.ProductCode
+            CandidateProductState=Product-State $manifest.Candidate.ProductCode
+            BaselinePayloadDirectoryAbsent=!(Test-Path $oldDir)
+            CandidatePayloadDirectoryAbsent=!(Test-Path $appTarget)
+            ProductRootAbsent=!(Test-Path $productRoot)
+            ShortcutAbsent=!(Test-Path $shortcut)
+            MenuDirectoryAbsent=!(Test-Path $menu)
+            AppPathAbsent=!(Reg-Key-Exists $reg)
+            AppPathValueAbsent=$null-eq(Reg-Default $reg)
+            MarkerKeyAbsent=!(Reg-Key-Exists $marker)
+            ApplicationMarkerAbsent=$null-eq(Reg-Named $marker Application)
+            StartMenuMarkerAbsent=$null-eq(Reg-Named $marker StartMenu)
+            CollisionAbsent=!(Test-Path $appTarget)
+            CanaryUnchangedBeforeRemoval=$canaryUnchanged
+            CanaryRemoved=!(Test-Path $config)
+            ConfigurationRootAbsent=!(Test-Path $configRoot)
+            Steps=$cleanupSteps
+        }
+        $cleanupPass=$cleanupState.BaselineProductState-eq-1-and$cleanupState.CandidateProductState-eq-1-and$cleanupState.BaselinePayloadDirectoryAbsent-and$cleanupState.CandidatePayloadDirectoryAbsent-and$cleanupState.ProductRootAbsent-and$cleanupState.ShortcutAbsent-and$cleanupState.MenuDirectoryAbsent-and$cleanupState.AppPathAbsent-and$cleanupState.AppPathValueAbsent-and$cleanupState.MarkerKeyAbsent-and$cleanupState.ApplicationMarkerAbsent-and$cleanupState.StartMenuMarkerAbsent-and$cleanupState.CollisionAbsent-and$cleanupState.CanaryUnchangedBeforeRemoval-and$cleanupState.CanaryRemoved-and$cleanupState.ConfigurationRootAbsent
+        $cleanupState['Pass']=$cleanupPass
+        if(!$cleanupPass){$failure="Child cleanup invariants failed. $failure"}
+        $report=[ordered]@{Completed=$true;Pass=($testPass-and$cleanupPass-and!$failure);Result=$result;Cleanup=$cleanupState;Failure=$failure;Steps=$steps}
+        $report|ConvertTo-Json -Depth 10|Set-Content (Join-Path $WorkDirectory 'child-result.json') -Encoding utf8
     }
     if($failure-or!$testPass-or!$cleanupPass){exit 1};exit 0
 }
@@ -68,13 +167,13 @@ $runId=[guid]::NewGuid().ToString('N').Substring(0,12);if(!$OutputDirectory){$Ou
 $runnerTemp=[IO.Path]::GetFullPath($env:RUNNER_TEMP);$work=Join-Path $runnerTemp "sc2-ci-rollback-$runId";$userName="sc2qa$($runId.Substring(0,8))";$user=$null;$userSid=$null;$passwordPlain=$null;$sourceHash=$null;$userRemoved=$false;$profileRemoved=$false;$workRemoved=$false;$parentCleanupErrors=[Collections.Generic.List[string]]::new()
 try{
     [void][IO.Directory]::CreateDirectory($work);$sourceCopy=Join-Path $work 'source.msi';Copy-Item $candidate $sourceCopy;$sourceHash=(Get-FileHash $candidate).Hash;if((Get-FileHash $sourceCopy).Hash-ne$sourceHash){throw 'Source copy mismatch.'};$token=$runId.ToUpperInvariant();$basePath=Join-Path $work 'baseline.msi';$newPath=Join-Path $work 'candidate.msi';$base=New-Fixture $sourceCopy $basePath baseline '3.3.999' $token;$new=New-Fixture $sourceCopy $newPath candidate '3.4.0' $token;$base.SHA256=(Get-FileHash $basePath).Hash;$new.SHA256=(Get-FileHash $newPath).Hash;Verify-Fixture $base $token;Verify-Fixture $new $token
-    $passwordPlain='A!a1'+[Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(36));$secure=ConvertTo-SecureString $passwordPlain -AsPlainText -Force;$user=New-LocalUser -Name $userName -Password $secure -PasswordNeverExpires -UserMayNotChangePassword -AccountNeverExpires;$userSid=$user.SID.Value;$usersGroup=Get-LocalGroup -SID 'S-1-5-32-545';Add-LocalGroupMember -Group $usersGroup.Name -Member $user -ErrorAction SilentlyContinue;$adminGroup=Get-LocalGroup -SID 'S-1-5-32-544';if((Get-LocalGroupMember -Group $adminGroup.Name -ErrorAction SilentlyContinue|Where-Object{$_.SID.Value-eq$userSid})){throw 'QA user unexpectedly belongs to Administrators.'};if(-not(Get-LocalGroupMember -Group $usersGroup.Name -ErrorAction SilentlyContinue|Where-Object{$_.SID.Value-eq$userSid})){throw 'QA user is not a member of the standard Users group.'}
+    $passwordPlain='A!a1'+[Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(36));$secure=ConvertTo-SecureString $passwordPlain -AsPlainText -Force;$user=New-LocalUser -Name $userName -Password $secure -PasswordNeverExpires -UserMayNotChangePassword -AccountNeverExpires;$userSid=$user.SID.Value;$usersGroup=Get-LocalGroup -SID 'S-1-5-32-545';Add-LocalGroupMember -Group $usersGroup.Name -Member $user -ErrorAction SilentlyContinue;$adminGroup=Get-LocalGroup -SID 'S-1-5-32-544';if($AdministrativeControl){Add-LocalGroupMember -Group $adminGroup.Name -Member $user};$administratorGroupMember=[bool](Get-LocalGroupMember -Group $adminGroup.Name -ErrorAction SilentlyContinue|Where-Object{$_.SID.Value-eq$userSid});if($administratorGroupMember-ne[bool]$AdministrativeControl){throw 'QA user administrator-group membership does not match the requested control role.'};if(-not(Get-LocalGroupMember -Group $usersGroup.Name -ErrorAction SilentlyContinue|Where-Object{$_.SID.Value-eq$userSid})){throw 'QA user is not a member of the standard Users group.'}
     $manifest=[ordered]@{Token=$token;Source=[ordered]@{Path=$candidate;SHA256=$sourceHash};BaselineNature='Simulated lower-version copy of the same corrected candidate payload; not an original 3.3 upgrade claim.';Baseline=$base;Candidate=$new};$manifest|ConvertTo-Json -Depth 6|Set-Content (Join-Path $work 'fixture-manifest.json') -Encoding utf8;Copy-Item $PSCommandPath (Join-Path $work 'Test-CiRollback.ps1')
     & icacls.exe $work /inheritance:r /grant:r "$userName`:(OI)(CI)M" /grant:r 'SYSTEM:(OI)(CI)F' /grant:r 'Administrators:(OI)(CI)F'|Out-Null;if($LASTEXITCODE){throw 'Failed to assign dedicated work directory ACL.'}
-    $credential=[Management.Automation.PSCredential]::new("$env:COMPUTERNAME\$userName",$secure);$stdout=Join-Path $work 'child.stdout.txt';$stderr=Join-Path $work 'child.stderr.txt';$pwsh=(Get-Process -Id $PID).Path;$quote={param([string]$value)'"'+$value.Replace('"','\"')+'"'};$childArguments=@('-NoProfile','-File',(& $quote (Join-Path $work 'Test-CiRollback.ps1')),'-ChildMode','-CandidateMsi',(& $quote $sourceCopy),'-WorkDirectory',(& $quote $work),'-ParentSid',$adminIdentity.User.Value,'-BaselineFixture',(& $quote $basePath),'-CandidateFixture',(& $quote $newPath));$process=Start-Process $pwsh -ArgumentList $childArguments -Credential $credential -LoadUserProfile -WorkingDirectory $work -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -Wait -PassThru
+    $credential=[Management.Automation.PSCredential]::new("$env:COMPUTERNAME\$userName",$secure);$stdout=Join-Path $work 'child.stdout.txt';$stderr=Join-Path $work 'child.stderr.txt';$pwsh=(Get-Process -Id $PID).Path;$quote={param([string]$value)'"'+$value.Replace('"','\"')+'"'};$childArguments=@('-NoProfile','-File',(& $quote (Join-Path $work 'Test-CiRollback.ps1')),'-ChildMode','-CandidateMsi',(& $quote $sourceCopy),'-WorkDirectory',(& $quote $work),'-ParentSid',$adminIdentity.User.Value,'-BaselineFixture',(& $quote $basePath),'-CandidateFixture',(& $quote $newPath));if($AdministrativeControl){$childArguments+='-AdministrativeControl'};$process=Start-Process $pwsh -ArgumentList $childArguments -Credential $credential -LoadUserProfile -WorkingDirectory $work -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -Wait -PassThru
     foreach($name in @('child-result.json','child.stdout.txt','child.stderr.txt','fixture-manifest.json','logs')){$p=Join-Path $work $name;if(Test-Path $p){Copy-Item $p $OutputDirectory -Recurse}}
-    $sourceUnchanged=(Get-FileHash $candidate).Hash-eq$sourceHash;$summary=[ordered]@{Executed=$true;ChildExitCode=$process.ExitCode;Parent=[ordered]@{Name=$adminIdentity.Name;SID=$adminIdentity.User.Value;IsAdministrator=$true};TestUser=[ordered]@{Name=$userName;SID=$userSid;AdministratorGroup=$false};SourceSHA256=$sourceHash;SourceUnchanged=$sourceUnchanged;Result=$(if(Test-Path (Join-Path $work 'child-result.json')){Get-Content (Join-Path $work 'child-result.json') -Raw|ConvertFrom-Json}else{$null})};$summary|ConvertTo-Json -Depth 12|Set-Content (Join-Path $OutputDirectory 'result.json') -Encoding utf8
-    if(!$sourceUnchanged-or$process.ExitCode-ne0-or$null-eq$summary.Result-or!$summary.Result.Pass-or!$summary.Result.Cleanup.Pass-or$null-eq$summary.Result.Result-or!$summary.Result.Result.Token.DifferentSID-or$summary.Result.Result.Token.IsAdministrator){throw 'Standard-user child did not complete with the required rollback, cleanup, token and source-integrity proof.'}
+    $sourceUnchanged=(Get-FileHash $candidate).Hash-eq$sourceHash;$expectedAdministrator=[bool]$AdministrativeControl;$role=if($expectedAdministrator){'administrative-control'}else{'standard-user'};$summary=[ordered]@{Executed=$true;AdministrativeControl=$expectedAdministrator;Role=$role;ChildExitCode=$process.ExitCode;Parent=[ordered]@{Name=$adminIdentity.Name;SID=$adminIdentity.User.Value;IsAdministrator=$true};TestUser=[ordered]@{Name=$userName;SID=$userSid;AdministratorGroup=$administratorGroupMember};SourceSHA256=$sourceHash;SourceUnchanged=$sourceUnchanged;Result=$(if(Test-Path (Join-Path $work 'child-result.json')){Get-Content (Join-Path $work 'child-result.json') -Raw|ConvertFrom-Json}else{$null})};$summary|ConvertTo-Json -Depth 12|Set-Content (Join-Path $OutputDirectory 'result.json') -Encoding utf8
+    if(!$sourceUnchanged-or$process.ExitCode-ne0-or$null-eq$summary.Result-or!$summary.Result.Pass-or!$summary.Result.Cleanup.Pass-or$null-eq$summary.Result.Result-or!$summary.Result.Result.Token.DifferentSID-or[bool]$summary.Result.Result.Token.IsAdministrator-ne$expectedAdministrator-or[bool]$summary.Result.Result.Token.AdministrativeControl-ne$expectedAdministrator-or$summary.Result.Result.Token.Role-ne$role){throw 'Child did not complete with the required rollback, cleanup, role, token and source-integrity proof.'}
 }finally{
     $passwordPlain=$null;try{if($user){Remove-LocalUser -Name $userName -ErrorAction SilentlyContinue;$userRemoved=$null-eq(Get-LocalUser -Name $userName -ErrorAction SilentlyContinue)}else{$userRemoved=$true}}catch{$parentCleanupErrors.Add("User cleanup: $($_.Exception.Message)")}
     try{if($userSid){$profile=Get-CimInstance Win32_UserProfile -Filter "SID='$userSid'" -ErrorAction SilentlyContinue;if($profile){$profilePath=[IO.Path]::GetFullPath($profile.LocalPath);$profilesRoot=[IO.Path]::GetFullPath((Join-Path $env:SystemDrive 'Users')).TrimEnd('\')+'\';if($profile.SID-ne$userSid-or$profilePath-eq[IO.Path]::GetFullPath($env:USERPROFILE)-or!$profilePath.StartsWith($profilesRoot,[StringComparison]::OrdinalIgnoreCase)){throw 'Refusing unexpected QA profile cleanup target.'};$profile|Remove-CimInstance -ErrorAction SilentlyContinue};$profileRemoved=$null-eq(Get-CimInstance Win32_UserProfile -Filter "SID='$userSid'" -ErrorAction SilentlyContinue)}else{$profileRemoved=$true}}catch{$parentCleanupErrors.Add("Profile cleanup: $($_.Exception.Message)")}

@@ -1,4 +1,5 @@
-name: Isolated ordinary-user installer recovery
+name: Isolated installer recovery
+run-name: '${{ inputs.privilege_context }} recovery for candidate ${{ inputs.candidate_run_id }}'
 
 on:
   workflow_dispatch:
@@ -7,17 +8,25 @@ on:
         description: 'Successful main CI run whose original MSI will be checked'
         required: true
         type: string
+      privilege_context:
+        description: 'Standard user acceptance or a separate administrative diagnostic control'
+        required: true
+        type: choice
+        default: standard-user
+        options:
+          - standard-user
+          - administrative-control
 
 permissions:
   contents: read
   actions: read
 
 concurrency:
-  group: installer-recovery-${{ inputs.candidate_run_id }}
+  group: installer-recovery-${{ inputs.candidate_run_id }}-${{ inputs.privilege_context }}
   cancel-in-progress: false
 
 jobs:
-  ordinary-user-recovery:
+  isolated-recovery:
     runs-on: windows-11-arm
     timeout-minutes: 15
     defaults:
@@ -45,6 +54,7 @@ jobs:
         env:
           CANDIDATE_SOURCE: ${{ steps.candidate.outputs.source-commit }}
           WORKFLOW_SOURCE: ${{ github.sha }}
+          PRIVILEGE_CONTEXT: ${{ inputs.privilege_context }}
         run: |
           $ErrorActionPreference='Stop'
           $os=Get-CimInstance Win32_OperatingSystem
@@ -60,6 +70,7 @@ jobs:
             InstallerVersion=[Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $env:WINDIR 'System32\msi.dll')).FileVersion
             CandidateSource=$env:CANDIDATE_SOURCE
             WorkflowSource=$env:WORKFLOW_SOURCE
+            PrivilegeContext=$env:PRIVILEGE_CONTEXT
             Scope='MSI recovery on a Windows client; not native x64 application or game coverage.'
           } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $directory 'environment.json') -Encoding utf8
           if($os.ProductType -ne 1){throw 'Recovery requires a Windows client; Windows Server restricts unmanaged installations.'}
@@ -76,11 +87,14 @@ jobs:
           .\scripts\Test-Package.ps1 -ReleaseDirectory $destination -ExpectedSourceCommit $env:CANDIDATE_SOURCE
           $manifest=Get-Content -LiteralPath (Join-Path $destination 'release-manifest.json') -Raw | ConvertFrom-Json
           if([string]$manifest.CiRunId -ne $env:CANDIDATE_RUN_ID -or $manifest.WorkingTreeDirty){throw 'Candidate provenance mismatch.'}
-      - name: Check recovery as a fresh standard user
+      - name: Check recovery in the selected isolated context
+        env:
+          PRIVILEGE_CONTEXT: ${{ inputs.privilege_context }}
         run: |
           $directory=Join-Path $env:GITHUB_WORKSPACE 'artifacts\ci-rollback-input'
           $manifest=Get-Content -LiteralPath (Join-Path $directory 'release-manifest.json') -Raw | ConvertFrom-Json
-          .\tools\Installer\Test-CiRollback.ps1 -CandidateMsi (Join-Path $directory "SC2Switcher-$($manifest.Version)-current-user.msi")
+          $administrativeControl=$env:PRIVILEGE_CONTEXT -eq 'administrative-control'
+          .\tools\Installer\Test-CiRollback.ps1 -CandidateMsi (Join-Path $directory "SC2Switcher-$($manifest.Version)-current-user.msi") -AdministrativeControl:$administrativeControl
       - name: Upload isolated recovery evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
