@@ -90,11 +90,23 @@ jobs:
       - name: Check recovery in the selected isolated context
         env:
           PRIVILEGE_CONTEXT: ${{ inputs.privilege_context }}
+          WORKFLOW_SOURCE: ${{ github.sha }}
         run: |
+          $ErrorActionPreference='Stop'
           $directory=Join-Path $env:GITHUB_WORKSPACE 'artifacts\ci-rollback-input'
           $manifest=Get-Content -LiteralPath (Join-Path $directory 'release-manifest.json') -Raw | ConvertFrom-Json
+          $toolsDirectory=Join-Path $env:GITHUB_WORKSPACE 'artifacts\ci-recovery-tools'
+          [void][IO.Directory]::CreateDirectory($toolsDirectory)
+          $harness=Join-Path $toolsDirectory 'Test-CiRollback.ps1'
+          $content=git show "$($env:WORKFLOW_SOURCE):tools/Installer/Test-CiRollback.ps1"
+          if($LASTEXITCODE -ne 0){throw 'Cannot read the recovery harness from the workflow revision.'}
+          $content | Set-Content -LiteralPath $harness -Encoding utf8
+          [ordered]@{
+            SourceCommit=$env:WORKFLOW_SOURCE
+            SHA256=(Get-FileHash -LiteralPath $harness).Hash
+          } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $env:GITHUB_WORKSPACE 'artifacts\ci-installer-rollback\harness.json') -Encoding utf8
           $administrativeControl=$env:PRIVILEGE_CONTEXT -eq 'administrative-control'
-          .\tools\Installer\Test-CiRollback.ps1 -CandidateMsi (Join-Path $directory "SC2Switcher-$($manifest.Version)-current-user.msi") -AdministrativeControl:$administrativeControl
+          & $harness -CandidateMsi (Join-Path $directory "SC2Switcher-$($manifest.Version)-current-user.msi") -AdministrativeControl:$administrativeControl
       - name: Upload isolated recovery evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
