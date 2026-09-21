@@ -2,16 +2,16 @@
 
 # SC2 Region Switcher — portable package
 
-Requirements: Windows x64, Microsoft .NET 10 Desktop Runtime x64, Battle.net, and separate China and Global StarCraft II installations. The China installation uses Chinese game data; the Global installation uses English game data.
+Requires Windows x64, Microsoft .NET 10 Desktop Runtime x64, one Battle.net app, and separate China and Global StarCraft II installations. China uses Simplified Chinese text and speech; Global uses English.
 
-1. Extract the archive into a folder. Keep the four application files together.
+1. Extract the archive into its own directory, keeping the four application files together.
 2. Run `SC2Switcher.Wpf.exe`.
-3. Open **Settings** and select the Battle.net executable, both game installation folders, and the shared StarCraft II `Variables.txt` file.
-4. Select a destination and, for Global, a Battle.net login region. Start the switch after closing StarCraft II. Complete any required account login in Battle.net.
-5. Select the actual StarCraft II game server in Battle.net before launching the game. The switcher's EU, US and KR labels indicate Battle.net login regions.
+3. In **Settings**, choose the folder containing `Battle.net.exe`, both game installation folders, and the actual shared `Variables.txt` file under Advanced. Select **Save & check**.
+4. Close StarCraft II and its editor, and wait for Battle.net downloads or updates to finish. Select a destination and, for Global, a Battle.net login region. Start the switch and complete any required login in Battle.net.
+5. Select the actual StarCraft II game server in Battle.net before launching the game. The switcher's EU, US and KR labels identify login regions.
 
-The interface supports English and Simplified Chinese. Interface language is selected in Settings and is independent of game language.
+Choose English or Simplified Chinese in Settings. Interface language is independent of game language. There is no cancellation control during a switch.
 
-Configuration and backups are stored in `%LOCALAPPDATA%\SC2RegionSwitcherV2`. Moving the application folder does not move these settings. This portable package does not create a Start menu shortcut or a Windows uninstall entry.
+Configuration and backups are stored in `%LOCALAPPDATA%\SC2RegionSwitcherV2`. Moving the application folder does not move these settings. The portable package creates no Start menu shortcut or Windows uninstall entry.
 
-See the [configuration guide](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/blob/main/docs/SETUP.md) for installation paths and operating details.
+This is an unsigned preview. See the [setup guide](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/blob/main/docs/SETUP.md) and [validation record](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/blob/main/docs/VALIDATION.md) for operating details and tested scope. Repository access is required while the repository is private.

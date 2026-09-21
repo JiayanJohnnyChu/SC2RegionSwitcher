@@ -1,29 +1,48 @@
+[简体中文](README.zh-CN.md)
+
 # Current-user MSI
 
-Run `scripts/Package.ps1` to publish the app and build packages without installing them. To package existing published files, run `tools/Installer/Build-CurrentUserMsi.ps1 -AppDirectory <directory> -OutputDirectory <empty-directory>`.
+`scripts/Package.ps1` publishes the application and builds its packages without installing them. To package existing published files, use:
 
-The builder uses Windows Installer COM and makecab. It reads the three-field application version through `scripts/Release-Common.ps1`, checks the executable manifest and runtime file versions, and creates four runtime files, one Start menu shortcut and a current-user uninstall entry. The .NET 10 Desktop Runtime x64 must already be available.
+```powershell
+.\tools\Installer\Build-CurrentUserMsi.ps1 -AppDirectory <directory> -OutputDirectory <empty-directory>
+```
 
-## Installation and upgrades
+The builder uses Windows Installer COM and `makecab`. It reads the three-part application version through `scripts/Release-Common.ps1`, checks the executable manifest and runtime versions, and packages four runtime files. Installation creates one Start menu shortcut and a current-user uninstall entry. Microsoft .NET 10 Desktop Runtime x64 is a separate dependency.
 
-Starting with 3.4.0, files live in `%LOCALAPPDATA%\Programs\SC2RegionSwitcher\app`. Profiles, interface preferences, backups and recovery journals remain under `%LOCALAPPDATA%\SC2RegionSwitcherV2` and are never MSI resources.
+## Resource ownership
 
-The stable UpgradeCode identifies the product family. Each numerical version has a different, deterministic ProductCode. Each newly built MSI has its own PackageCode. The three components own application files, the Start menu shortcut, and HKCU App Paths separately. Their GUIDs remain stable while their resource identities remain compatible.
+Since 3.4.0, application files use `%LOCALAPPDATA%\Programs\SC2RegionSwitcher\app`. Profiles, preferences, backups and recovery journals use `%LOCALAPPDATA%\SC2RegionSwitcherV2`; they are outside MSI ownership and survive uninstall.
 
-The Upgrade table finds 3.3.0 and later lower versions. RemoveExistingProducts runs immediately after InstallInitialize, before ProcessComponents, so the upgrade participates in rollback. A Type 19 message rejects a detected newer version. A Type 51 action assigns the displayed install location. Neither action executes application code or a script. ALLUSERS installation is rejected; upgrades remain in the current-user context. Restart Manager automatic application shutdown is disabled.
+The stable UpgradeCode identifies the product family. Each numerical version has a distinct deterministic ProductCode, and each newly built MSI has a new PackageCode. Three components separately own application files, the Start menu shortcut and HKCU App Paths.
 
-Close the switcher before installation. Do not force a reinstall, suppress file-in-use errors, or change Windows Installer security policy. The same original MSI may be run again for normal maintenance.
+In 3.4.1, the application component uses an HKCU marker as its key path to satisfy ICE38 for user-profile resources. The key-path change introduces a new component GUID. The shortcut and App Paths component identities are retained. Component GUIDs remain stable while resource identities remain compatible.
 
-## Version and release rules
+## Upgrade sequence
 
-Every distributed preview increments the three-field MSI ProductVersion. A suffix such as preview.2 is not an MSI version increase. Once a version is tagged or distributed, promote its original candidate bytes; do not rebuild or replace that version.
+The Upgrade table detects lower versions from 3.3.0 onward. `RemoveExistingProducts` runs immediately after `InstallInitialize`, before `ProcessComponents`, placing old-product removal within the rollback transaction. A Type 19 action rejects a detected newer version; a Type 51 action sets the displayed install location. Neither runs application code or a script.
 
-The original 3.3.0 package contains no downgrade protection. A newer package cannot retrofit that old file. Do not run the old package over a newer installation. To return to it deliberately, uninstall the newer version first and preserve user settings.
+The package rejects ALLUSERS and stays in the current-user context. Restart Manager automatic shutdown is disabled, so the switcher should be closed before installation. The same original MSI supports ordinary maintenance invocation.
 
-## Validation
+This sequence describes authoring intent. Failed-upgrade recovery has not passed acceptance in the standard-user test environment. See [validation status](../../docs/VALIDATION-3.4.1.md).
 
-Run `scripts/Test-Package.ps1 -ReleaseDirectory <directory>` and `scripts/Test-ReleaseGuards.ps1 -ReleaseDirectory <directory>`. These validate content and rejection cases; they do not install the product. The separate lifecycle lab uses copies with isolated product, directory, shortcut and registry identities. Its failure injection must never target the production product family.
+## Schema and validation
 
-Real upgrade results belong to an exact MSI hash. Local rebuilds and CI builds cannot share an installation pass merely because their source or version matches.
+The database uses standard MSI column definitions and imports constraints from [metadata/_Validation.idt](metadata/_Validation.idt). The [metadata notice](metadata/README.md) describes its source and license. `scripts/Setup-InstallerTools.ps1` prepares pinned, hash-verified WiX 3.14.1 validation tools in `.tools/` without installing them system-wide.
 
-On the current test host, a deterministic failure after InstallExecute produced access-denied errors while Windows Installer rolled back its own registry data. The previous product was not automatically restored. The isolated test's normal uninstall/reinstall recovery worked, but automatic recovery is not marked passed. Do not change system registry ACLs or Installer security policy to make the test pass. Resolve this on an appropriate clean test environment before public release.
+| Check | Scope |
+| --- | --- |
+| `scripts/Test-Package.ps1 -ReleaseDirectory <directory>` | Package files, content and hashes |
+| `scripts/Test-ReleaseGuards.ps1 -ReleaseDirectory <directory>` | Release rejection cases |
+| `scripts/Test-InstallerSchema.ps1 -ReleaseDirectory <directory>` | Independent standard ICE suite |
+| Isolated lifecycle/recovery tests | Actual installation behavior using separate product, directory, shortcut and registry identities |
+
+No ICE is suppressed. The recorded result has zero errors and four ICE91 warnings about hypothetical per-machine use of files in fixed per-user directories. The script rejects other warnings, checks the candidate hash and confirms validation did not alter the MSI. These checks do not install the product.
+
+Actual installation results identify the tested MSI hash. Local and CI builds need separate evidence even when they share a source version. The dedicated CI recovery test is designed to exercise native file-copy failure after old-product removal. Its latest run was blocked during baseline installation by runner policy; see the validation status for the recorded scope.
+
+## Version policy
+
+Every distributed preview increments the three-part ProductVersion. Preview suffixes do not change the MSI version. Preserve original candidate files once a version is tagged or distributed. The original 3.3.0 MSI has no downgrade protection; uninstall a newer application before deliberately returning to that package.
+
+See the [release workflow](../../docs/GITHUB-RELEASE.md) for provenance and promotion requirements.

@@ -1,62 +1,52 @@
+[简体中文](README.zh-CN.md)
+
 # SC2 Region Switcher
 
-用于 Windows 的《星际争霸 II》国服／国际服切换器，采用 C#、WPF 和 .NET 10。当前开发版本为 **3.4.0 预览版**。
+A Windows x64 application for switching between separate China and Global installations of StarCraft II. It uses one official Battle.net desktop app, changes its login region, and updates the shared game-language settings. China uses Simplified Chinese (`zhCN`); Global uses English (`enUS`). The interface supports English and Simplified Chinese, with its own language setting.
 
-程序使用一套 Battle.net 和两套独立游戏目录，切换 Battle.net 登录区域并同步共享游戏语言设置。国服使用简体中文，国际服使用英文；界面采用 English-first 设计，新用户默认英文，可在独立设置页选择简体中文。已有语言偏好继续生效。账号登录、游戏安装、更新和游戏启动仍由官方战网完成。
+The application is written in C# with WPF and .NET 10. Account login, game installation, updates, game-server selection and game startup take place in Battle.net. The Global labels **EU**, **US** and **KR** identify Battle.net login regions; they do not establish which game server is selected.
 
-## 使用与开发入口
+**Current status: 3.4.1 development preview.** Installer recovery after a failed upgrade has not passed acceptance testing. Version 3.4.1 is not a release candidate; the earlier 3.4.0 candidate remains an unpublished private draft. Packages are unsigned and require **Microsoft .NET 10 Desktop Runtime x64**. See the [validation record](docs/VALIDATION.md) for the tested scope.
 
-- 普通用户：[环境配置与使用指南](docs/SETUP.zh-CN.md)。运行需要 .NET 10 Desktop Runtime（Windows x64）。
-- 后续开发：[开发与构建](docs/DEVELOPMENT.md)、[架构说明](docs/ARCHITECTURE.md)。构建需要 Windows x64 和 .NET 10 SDK。
-- 界面维护：[English-first UI design](docs/UI-DESIGN.md)。英文文案与布局先行，中英文资源和状态同步维护。
-- 接续当前工作：[项目交接记录](docs/HANDOFF.md)、[验证范围与发布待办](docs/VALIDATION.md)。
-- 安装包维护：[当前用户 MSI 构建说明](tools/Installer/README.md)。
-- 接入 GitHub：[首次提交、自动检查与预发布流程](docs/GITHUB-RELEASE.md)。
+## Documentation
 
-本目录是后续开发的项目根目录，可以直接作为 Project 文件夹使用，也可以整体复制到其他工作位置。打开 `SC2RegionSwitcher.slnx` 可加载应用、隔离测试和图标生成工具。源码不依赖原对话工作区的绝对路径。
+| Task | Guide |
+| --- | --- |
+| Prepare installations, configure paths and switch regions | [Setup and use](docs/SETUP.md) |
+| Build and test the source | [Development](docs/DEVELOPMENT.md) |
+| Understand the switching and configuration logic | [Architecture](docs/ARCHITECTURE.md) |
+| Maintain the interface and translations | [Interface design](docs/UI-DESIGN.md) |
+| Review current work and validation | [Development status](docs/HANDOFF.md), [3.4.1 validation](docs/VALIDATION-3.4.1.md) |
+| Maintain MSI packages | [Installer](tools/Installer/README.md) |
+| Prepare a candidate and draft release | [Release workflow](docs/GITHUB-RELEASE.md) |
+| Review version changes | [Changelog](CHANGELOG.md) |
 
-## 目录
+## Build
 
-```text
-SC2RegionSwitcher/
-├── SC2RegionSwitcher.slnx
-├── global.json
-├── NuGet.Config
-├── .github/                  自动检查、预发布工作流与协作模板
-├── eng/                      SDK 下载版本与校验信息
-├── src/SC2Switcher.Wpf/       WPF 应用、切换逻辑、设置及双语资源
-├── tests/SC2Switcher.Tests/   隔离回归测试
-├── tools/
-│   ├── Installer/            当前用户 MSI 构建器
-│   └── IconGenerator/        图标 SVG、PNG、ICO 生成工具
-├── assets/icon/              应用图标及矢量原稿
-├── scripts/                  构建、测试、发布文件与打包入口
-├── docs/                     用户指南、技术说明和开发交接
-└── artifacts/                本地构建、测试和安装包；Git 忽略
-```
-
-## 快速构建
-
-在项目根目录的 PowerShell 中执行：
+Run these commands in PowerShell from the project directory:
 
 ```powershell
 .\scripts\Setup.ps1
-.\scripts\Setup-WorkflowTools.ps1
-.\scripts\Check-Repository.ps1
-.\scripts\Check-Workflows.ps1
 .\scripts\Build.ps1
 .\scripts\Test.ps1
 .\scripts\Package.ps1
 ```
 
-首次执行 Setup 会将经过 SHA-512 核验的 SDK 准备到 Git 忽略的 `.tools/dotnet` 中；重复运行会复用现有版本。其他脚本自动选择项目 SDK，无需手动指定旧工作区路径。已经安装对应版本 SDK 的 CI 环境也可以直接构建。
+`global.json` pins SDK **10.0.401**. Setup downloads and verifies the SDK into the ignored `.tools/dotnet` directory; the other scripts use it automatically. The project has no third-party NuGet dependencies. The regression runner uses simulated installations and does not start Battle.net or the game. Packaging produces a framework-dependent MSI and portable ZIP without installing them. Additional repository, workflow and package checks are described in the development guide.
 
-测试使用临时模拟安装，不启动战网或游戏。打包生成便携 ZIP 和当前用户 MSI，**不会自动安装**。`global.json` 固定 SDK **10.0.401**，本地与 GitHub Actions 使用相同版本。当前没有第三方 NuGet 包，`NuGet.Config` 清空包源。普通用户只需 Desktop Runtime，不需要 SDK。
+## Project layout
 
-## 安装包与状态
+| Path | Contents |
+| --- | --- |
+| `SC2RegionSwitcher.slnx` | Application, regression runner and icon tool |
+| `src/SC2Switcher.Wpf/` | WPF interface, switching logic, configuration and language resources |
+| `tests/SC2Switcher.Tests/` | Isolated regression tests |
+| `tools/Installer/` | Current-user MSI builder and validation support |
+| `tools/IconGenerator/`, `assets/icon/` | Icon generator and application artwork |
+| `scripts/`, `eng/`, `.github/` | Build commands, pinned tool metadata and CI workflows |
+| `docs/` | User and maintainer documentation |
+| `artifacts/`, `.tools/` | Ignored build outputs, evidence and local tools |
 
-本地 `artifacts/baseline/3.3.0` 保留此前已测试安装包的原件和校验值。新构建输出位于 `artifacts/packages/<本次构建>/release`，包含 MSI、ZIP、SHA-256 校验文件和无本机路径的发布清单。其安装测试结论须单独记录。`artifacts` 和 `.tools` 整体不纳入 Git。
+MSI installations use `%LOCALAPPDATA%\Programs\SC2RegionSwitcher\app` and create one **SC2 Region Switcher** Start menu entry. Configuration and backups are stored separately in `%LOCALAPPDATA%\SC2RegionSwitcherV2` and are retained on uninstall.
 
-仓库位于 [JiayanJohnnyChu/SC2RegionSwitcher](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher)，当前为私有。CI 检查 Windows 构建、隔离回归及包内容，并生成候选文件。完成实测后，使用候选 CI 运行编号和版本标签创建 **Draft / Pre-release**；发布流程沿用候选原文件，不重新构建。详细流程见 [预发布说明](docs/GITHUB-RELEASE.md)，实际通过范围见 [验证记录](docs/VALIDATION.md)。
-
-本项目尚未公开发布，也尚未确定开源许可证。本目录整理不代表已授予某种开源许可。现有安装包未签名，跨电脑兼容性与完整升级流程仍待验证。详见 [验证范围](docs/VALIDATION.md)。
+The [repository](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher) is private. No application license has been selected. Third-party notices apply only to the materials they identify.

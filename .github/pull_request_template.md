@@ -1,10 +1,13 @@
-## 变更
+[简体中文模板](pull_request_template.zh-CN.md)
 
-说明具体问题和修改后的行为。
+## Change
 
-## 验证
+Describe the problem and the resulting behavior.
 
-- 构建与隔离回归结果：
-- 如影响界面、安装器或切换流程，说明额外验证和未验证范围：
+## Validation
 
-请勿附带真实账号配置、游戏设置、个人路径或未脱敏日志。
+- Build and isolated regression results:
+- Additional checks for interface, installer or switching changes:
+- Remaining unverified scope:
+
+Exclude real account configuration, game settings, personal paths and unredacted logs.

@@ -1,36 +1,38 @@
-# GitHub candidate and draft release workflow
+[简体中文](GITHUB-RELEASE.zh-CN.md)
 
-The repository is private: [JiayanJohnnyChu/SC2RegionSwitcher](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher). The existing repository-local author and credential manager are used. Credentials and local user settings are never stored in source control.
+# Candidate and draft release workflow
 
-## Build a candidate
+The [repository](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher) is private. The active version is 3.4.1; the original 3.4.0 candidate is retained as an unpublished draft. See [current status](HANDOFF.md) for outstanding acceptance work.
+
+## Build and identify a candidate
 
 1. Complete repository, workflow, build, regression and package checks.
-2. Commit and push to main. CI runs on Windows using the pinned SDK, tests the source and packages, and uploads `SC2RegionSwitcher-win-x64-preview`.
-3. Record the successful run ID and full source commit. Download that exact artifact before installation or game testing.
-4. Verify `SHA256SUMS.txt` and `release-manifest.json`. Schema 2 records Version, SourceCommit, WorkingTreeDirty, CiRunId, CiRunAttempt and both package hashes. A release candidate must come from a clean main-branch CI run.
-5. Perform the required desktop, upgrade and game checks against those downloaded files. Keep raw evidence under ignored artifacts directories. Record any blocked checks explicitly.
+2. Commit and push to `main`. Windows CI uses the pinned SDK and uploads `SC2RegionSwitcher-win-x64-preview` after its checks pass.
+3. Record the successful run ID and full source commit. Download that run's original artifact for installation and game tests.
+4. Verify `SHA256SUMS.txt` and `release-manifest.json`. Schema 2 records the version, source commit, working-tree state, CI run ID, run attempt and package hashes. An accepted candidate comes from a clean `main` CI run.
+5. Test the required desktop, installation and online behavior against those files. Record completed and blocked checks separately; retain raw evidence under ignored `artifacts/` directories.
 
-The candidate contains exactly four release files: MSI, portable ZIP, release-manifest.json and SHA256SUMS.txt. The ZIP contains README.md and four runtime files.
+The release payload has exactly four files: MSI, portable ZIP, `release-manifest.json` and `SHA256SUMS.txt`. The current ZIP contains four runtime files and the English and Chinese README files. Earlier candidates retain their original contents.
 
-## Promote original files
+## Promote the original artifact
 
-For the 3.4.0 candidate, create `v3.4.0-preview.1` at the tested source commit and push the tag. A tag alone no longer creates a release.
+After acceptance, create a matching tag at the tested source commit, such as `v3.4.1-preview.1`. A tag alone does not create a release. Run **Promote tested candidate to draft prerelease** with:
 
-Run the **Promote tested candidate to draft prerelease** workflow with:
+- `version_tag`: the existing tag at the tested commit.
+- `candidate_run_id`: the successful `main` CI run that generated the tested files.
 
-- `version_tag`: the existing tag, for example `v3.4.0-preview.1`.
-- `candidate_run_id`: the successful main CI run that generated the files actually tested.
+The workflow verifies the source repository, workflow, event, branch, commit and run attempt, then downloads the original artifact. It neither builds nor repackages. It rejects another release or draft with the same numerical version, creates a draft prerelease, and downloads the four attachments to compare their hashes with the candidate.
 
-The workflow checks out the tag, verifies the candidate's repository, workflow, event, branch, commit and run attempt, and downloads the existing artifact. It does not build or repackage. It refuses another release or draft with the same numerical version, creates Draft + Pre-release, then downloads all four attachments and checks their hashes against the original candidate.
+The version-specific release notes describe changes and limits. Add the actual validation results, source commit, CI run and package hashes to the draft. Keep the draft on hold while acceptance checks remain incomplete.
 
-The source's version-specific release notes describe changes and limits. Append actual test results, the source commit, candidate run and package hashes to the draft after verification. If a test is blocked, retain the draft and name the missing test rather than reporting it as passed.
+## Version identity
 
-## Version policy
+Windows Installer compares three numerical fields. Each distributed preview therefore increments that version; changing only `preview.1` to `preview.2` is insufficient. Each numerical version has a new ProductCode; the product-family UpgradeCode remains stable.
 
-Windows Installer compares three numerical fields. Every later distributed preview must increase that number; changing only preview.1 to preview.2 is insufficient. Package refuses a numerical version that already has a local version tag, and CI fetches tags before packaging. Promotion independently refuses an existing draft/release for the version.
+Package creation rejects a numerical version that already has a local version tag; CI fetches tags before packaging. Promotion also rejects an existing draft or release for that version. The distributed 3.4.0 candidate must not be rebuilt, retagged or replaced.
 
-The original 3.3.0 MSI has no downgrade protection. The new upgrade implementation removes it when upgrading, but cannot prevent someone from deliberately running that legacy package later.
+The original 3.3.0 MSI lacks downgrade protection. Later packages cannot add protection to that already distributed file.
 
-## Boundaries
+## Release scope
 
-The repository remains private and no open-source license has been selected. Packages are unsigned and depend on .NET 10 Desktop Runtime x64. Publishing the draft or changing repository visibility is a separate decision. Installer, desktop and online checks are distinct from CI build success. A new source commit or rebuilt MSI requires a new assessment of the affected tests.
+Packages are unsigned and depend on .NET 10 Desktop Runtime x64. No application license has been selected. Creating a draft does not publish it or change repository visibility. Build success alone does not establish installation, recovery or online operation. A new source revision or rebuilt MSI requires reassessment of affected checks.

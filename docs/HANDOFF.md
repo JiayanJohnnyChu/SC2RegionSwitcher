@@ -1,52 +1,34 @@
-# 项目交接记录
+[简体中文](HANDOFF.zh-CN.md)
 
-整理日期：2026-09-21。当前开发版本：WPF 3.4.0 预览版。下文保留 3.3.0 整理和先前 UI 迭代的历史记录。
+# Development status
 
-## 本目录的地位
+Updated 2026-09-22. The active version is **3.4.1 development preview**.
 
-此目录为后续开发的独立入口，文件夹名不含日期或版本号。加入 Project 时选中整个 `SC2RegionSwitcher` 文件夹。可以整体搬到其他磁盘或工作目录；无需把历史对话目录加入新项目。
+## Current work
 
-旧工作区中的 `SC2Switcher-v2`、`SC2Switcher-WPF`、`SC2Switcher-WPF-3.2`、`SC2Switcher-WPF-3.3` 是历史交付快照，不再作为新修改的主目录。本次采用复制整理，未删除它们。真实用户设置、旧桌面启动器备份、截图、安装诊断与临时 SDK 继续留在原位置。
+The Global card now shows the selected Battle.net login region, EU, US or KR. Current configuration and selected destination remain separate. The switch engine and configuration transactions are unchanged.
 
-`artifacts/baseline/3.3.0` 只保存已验证 MSI 和 ZIP 的原件及校验记录，方便对照或恢复。它被 Git 忽略，项目源码可以在没有这个目录的情况下构建。
+Local checks passed compilation with no warnings or errors, 52 isolated regressions, package-content checks, five release rejection cases and the independent ICE suite. Basic English and Chinese UI checks passed at 200% scaling. These results do not establish installation-failure recovery or a final CI candidate. See [3.4.1 validation](VALIDATION-3.4.1.md).
 
-## 已确定的产品选择
+The original 3.4.0 candidate remains an unpublished private draft. Its complete four-scale DPI matrix and China → Europe → China online roundtrip apply to that candidate only. See [historical validation](VALIDATION.md).
 
-- 原生 WPF 前端，现代主义布局，说明文字保持客观。
-- 简体中文与英文界面，语言切换放在独立设置页，偏好独立保存。
-- 国服使用简体中文游戏数据，国际服使用英文；两套独立游戏目录。
-- 安装目录在设置页中可配置，使用 Windows 原生目录／文件选择器。
-- 不提供用户取消入口；选错目标后等待结束，再重新切换。
-- 开始菜单提供一个入口，国服／外服在同一窗口选择，不创建三个桌面入口。
+## Remaining acceptance work
 
-## 本次整理的变更
+1. Complete the standard-user installer recovery check and resolve any failure.
+2. Produce a clean final CI candidate, verify its provenance and hashes, and test the required installation lifecycle against those exact files.
+3. Reassess UI and online coverage for the final changes; repeat affected checks before promotion.
+4. Keep multi-display, cross-computer and signing limits explicit in the release notes.
 
-应用和测试代码、双语资源及图标内容沿用 3.3.0；只调整项目引用、资源位置、安装器默认路径，并补充解决方案、构建入口和文档。新建 `artifacts` 收纳自动生成内容。没有重新安装应用，也没有改变真实战网或游戏设置。
+Development [CI run 35663508108](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35663508108) passed for commit `68d5d31f823de5992eb331b7bf07803557b80bc5`. The separate [standard-user recovery run 35663705665](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35663705665) was blocked by the Windows Server runner policy during baseline installation (error 1625). It never reached the rollback scenario. Test-resource cleanup checks passed, and the input MSI hash remained unchanged. These development runs precede the final documentation revision and do not identify a final release candidate.
 
-新目录下的测试结论见 [VALIDATION.md](VALIDATION.md)。重新构建包与原基线包身份不同，不能称为已完成原基线的全部真实测试。
+## Release constraints
 
-## 建议的后续顺序
+The repository is private and no application license has been selected. Packages are unsigned, framework-dependent MSI and ZIP distributions. Every distributed preview increments the three-part version; the distributed 3.4.0 candidate must retain its original files. Promotion copies the tested CI artifacts without rebuilding. The original 3.3.0 MSI has no downgrade protection.
 
-1. 最终安装版本的国服→外服→返回完整实测；如登录过期，需要用户自行登录。
-2. 干净 Windows 用户或测试机上的首次配置、缺少运行环境和不同路径验证。
-3. 100%、150%、200% 缩放以及多显示器切换验证。
-4. 设计并测试安装升级流程，包括失败恢复及配置保留。
-5. 指定 GitHub 仓库、提交作者及许可证，运行远程 CI 并决定代码签名。
+## Maintainer references
 
-2026-09-21 已初始化本地 Git main 分支，并补充固定版本 SDK、自动构建／测试／打包入口及 GitHub 工作流。随后用户授权首次提交，目标为 JiayanJohnnyChu/SC2RegionSwitcher 私有仓库；源码许可证与软件公开发布仍待确定。后续按 [GitHub 接入说明](GITHUB-RELEASE.md) 操作。
-
-本地开发默认选用项目 `.tools/dotnet`，已不依赖旧工作区 SDK 路径。首次 GitHub 远程 CI 已通过，记录见 [VALIDATION.md](VALIDATION.md)。源码已进入私有仓库，尚未触发版本标签发布或创建公开 Release。
-
-## 后续界面改版：English first
-
-2026-09-21，按用户新的设计要求，以瑞士排版的网格、文字层级和受控色块重新组织主页面、设置和参考页面。默认窗口为 760 × 650 DIP，最小窗口保持 520 × 560 DIP。主页面的两个目标并列，当前配置独立呈现；设置页统一了路径输入、语言选择和滚动控件。
-
-英文为主要设计与开发语言，简体中文完整适配。新用户默认英文；已有偏好保留。中文使用 Microsoft YaHei UI 并调整大标题字重，英文使用 Segoe UI。`Core.cs` 和 `ConfigurationStore.cs` 的切换与配置事务未更改。
-
-此改版属于当前工作树的 UI 预览，未替换旧 MSI 基线，也未自动上传或发布。样式、文案和诊断变化见 [UI-DESIGN.md](UI-DESIGN.md)；自动回归与实际交互证据分别记录，设计状态截图不代表两服在线验证。
-
-随后按用户确认的配色方案，将两服身份色分别设为 Radix Tomato 11 与 Indigo 9，共用 Sand 中性色。颜色资源集中在 `Palette.xaml`。当前配置标记独立绑定 `CurrentLoginRegion`，选中目标不改变当前配置；按钮、焦点、设置及进度保留中性设计。最新验证见 `VALIDATION.md` 的“双服配色实现”。
-
-## 3.4.0 候选准备
-
-当前成果先以 2cca07a 单独提交，GitHub CI 35644370416 成功。3.4.0 收紧主页面至 760 × 620 DIP，统一设置和参考页面边距，降低目标标题字号。安装器迁至稳定 app 目录，采用当前用户 major upgrade 并分离三个组件。发布流程改为手动提供版本标签和成功 CI 运行编号，提升原候选文件，不再按标签重新打包。真实安装、DPI 和游戏验证需按候选哈希记录；没有可用第二块显示器时不声称完成多屏测试。
+- [Development commands](DEVELOPMENT.md)
+- [Architecture](ARCHITECTURE.md)
+- [Installer](../tools/Installer/README.md)
+- [Candidate promotion](GITHUB-RELEASE.md)
+- [Interface design](UI-DESIGN.md)

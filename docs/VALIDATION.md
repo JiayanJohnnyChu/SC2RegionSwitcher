@@ -1,108 +1,50 @@
-# 验证范围
+[简体中文](VALIDATION.zh-CN.md)
 
-记录日期：2026-09-21。不同构建和环境的证据分别记录，不能相互替代。
+# Validation record
 
-## 3.4.0 开发检查与候选验证
+Updated 2026-09-22. Results apply to the identified revision and package hashes. Compilation, package structure, installation, interface rendering and online use are recorded separately.
 
-- 先前 English-first 与双服配色成果已提交为 `2cca07ad1698ec81e552f48679da1b31958a5fed`，对应 [GitHub CI 35644370416](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35644370416) 成功。
-- 3.4.0 本地 Release 编译零警告零错误，52 项隔离回归通过。核心切换和配置事务源码未改变。
-- 760 × 620 标准窗口及 520 × 560 最小窗口的 33 份双语模拟状态报告，在 192 DPI 环境中主操作均完整可见，无绑定错误；独立视觉检查涵盖主页面、设置、紧凑窗口及参考页面。
-- 本机显示设置当前为 200%，只检测到一块活动显示器。多显示器迁移不能在该配置下验证。
-- 新安装器、四档实际缩放与双服往返的验证按最终 CI 候选哈希另外记录。发布工作流提升原候选文件而不重建；草稿说明中的维护者验证记录是该附件的实际测试范围。
+## 3.4.1 development preview
 
-本地准备证据位于 `artifacts/validation/3.4.0`。下文保留以前各轮检查的历史范围，不将旧安装包的结论自动转移至新附件。
+Local compilation, 52 regressions, package-content validation, five release rejection cases, independent ICE validation and basic bilingual UI checks have passed. Installation-failure recovery has not passed acceptance testing. This version is not a promoted candidate. Detailed scope is in [3.4.1 validation](VALIDATION-3.4.1.md).
 
-候选 `b3c37fce22da78db7e6865df37818eb30f5708dc` 的 [CI 35649099018](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35649099018) 通过。其 MSI 原件派生的独立产品族测试通过干净安装、同一 MSI 再次运行、卸载／重装、3.3.0 直接升级、占用旧 EXE 时升级以及阻止安装到较高版本之上；文件、快捷方式、App Paths 和隔离配置哨兵均核对。故障注入的自动恢复未通过：日志出现 Windows Installer 在用户注册表回滚期间的 system error 5，随后报告跳过回滚操作。正常卸载、重装恢复了测试安装。总体状态保持 `failed-scenarios`，没有修改系统 ACL 或安全策略。
+The full DPI matrix and online roundtrip below belong to 3.4.0, not 3.4.1.
 
-同轮额外测试复现了历史手工入口残留：预先手工创建指向旧目录的普通链接和 App Paths 后，安装升级日志虽指向新目录，手工资源仍保持旧值。后续迁移修正及最终候选的实际通过范围在草稿维护者验证记录中单独列出。
+## 3.4.0 candidate
 
-本机最终安装采用上述 CI 原件（MSI SHA-256 `73344512F949FC4ECB851279618E0F63D1B88BD5577AC5C7BEA558D19CC59C9A`）。已识别的历史手工入口按原始哈希备份迁移后，重新恢复原版 3.3.0 并执行直接升级，返回 0。安装后的四个运行文件与候选一致，旧产品和旧程序目录已移除，开始菜单与 Windows 应用目录各保留一个入口且指向稳定 app 目录。13 份用户配置与备份文件哈希不变。现场记录在 `artifacts/validation/3.4.0/final-installed-state.json`；这不抹去故障注入的自动恢复失败。
+Source commit `b3c37fce22da78db7e6865df37818eb30f5708dc` passed [CI run 35649099018](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35649099018). The tested MSI SHA-256 is:
 
-## 原 3.3.0 基线
+```text
+73344512F949FC4ECB851279618E0F63D1B88BD5577AC5C7BEA558D19CC59C9A
+```
 
-- Release 编译 0 警告、0 错误；隔离回归 52 / 52 通过。
-- 本机实际设置页验证涵盖路径选择、保存、重启持久化、无效配置保护、未保存编辑保护、中英文切换和 200% DPI 最小窗口操作。
-- 当前用户 MSI 正常安装、卸载、重新安装成功；用户配置保持不变。
-- Windows 应用目录登记了唯一入口，通过登记快捷方式激活后进程来自安装目录。
-- 先前版本曾验证两服在线主界面；最终 3.3.0 安装版未重跑完整双服往返在线测试。
+This candidate remains an unpublished private draft.
 
-外部整窗捕获曾出现空白，而应用自渲染与控件交互有正常证据；原因未确定。开始菜单搜索浮层未能被自动化工具可靠定位。两者未记为完整视觉验证通过。
+| Area | Verified scope |
+| --- | --- |
+| Build and regressions | Release compilation with zero warnings/errors; all 52 isolated regressions passed. |
+| Packages | Four-file release payload, manifest provenance, hashes, ZIP/MSI runtime-file identity, upgrade tables, current-user components and one Start menu shortcut. |
+| Normal installation lifecycle | Clean installation, repeated invocation of the same MSI, uninstall/reinstall, direct upgrade from the original 3.3.0 package, an occupied-executable case, and rejection when a higher product-family version was present. |
+| Direct 3.3.0 upgrade | One application registration and one Start menu entry remained. The four installed runtime files matched the candidate. The old product and versioned application directory were removed; thirteen existing state and backup files retained their hashes. |
+| DPI and localization | 100%, 125%, 150% and 200% groups reported 96, 120, 144 and 192 DPI. Each group contained 33 synthetic reports and one actual local-window report. Primary actions, destinations and regions remained visible; no WPF binding or layout error was recorded. |
+| Online use | One China → Europe → China roundtrip reached the corresponding official game main interfaces, with normal game exits. |
 
-## 独立项目整理验证
+### Limits and unresolved checks
 
-新目录使用 .NET SDK 10.0.401 完成以下验证：
+Failure tests did not fully restore the previous installation in the standard-user test environment. Installation recovery therefore remains an unresolved release gate, separate from the application's game-language transaction recovery.
 
-- 解决方案 Release 编译通过，0 警告、0 错误。
-- 隔离回归 52 / 52 通过。
-- Publish 与 Package 脚本成功生成运行文件、便携 ZIP 和当前用户 MSI。
-- ZIP 恰好包含 README 和四个运行文件，没有个人配置；WPF 资源包中保留 `switcher.ico`。
-- MSI 包含四个文件、一个快捷方式，唯一自定义操作为 Type 51 属性赋值，没有可执行自定义操作。
-- 从项目目录以外调用 Build、Test、Package 仍成功，验证脚本不依赖终端当前目录。
-- 应用、测试和图标的 17 个文件与原基线哈希一致，见 `SOURCE-BASELINE.json`；项目引用和安装器默认路径按新结构调整。
-- 文档本地链接有效；可提交源文件中未发现本机用户名、旧工作区路径或真实用户配置文件。
+Manual shortcuts or App Paths entries from earlier manual deployments can point to retired directories outside MSI ownership. Their migration is separate from a clean MSI-to-MSI upgrade.
 
-验证仅操作新项目的源码与隔离产物，不启动真实战网／游戏，也不安装新 MSI。详细摘要见 `artifacts/validation/summary.json`，日志在同目录。验证使用新的 ASCII 项目路径，尚未扩展至含 Unicode 字符的构建路径；新安装包尚未继承原基线的实际安装验证。
+The DPI tests used one active display. Multi-display movement, other computers and different system-policy environments remain unverified. Packages are unsigned.
 
-## GitHub 开发环境准备验证
+## Earlier records
 
-2026-09-21 已完成项目内 SDK 10.0.401 的 SHA-512 校验与准备，以及 actionlint 1.7.12 的 SHA-256 校验与准备。本地 Git main 分支已初始化，按用户要求没有创建提交或关联远程。
+The original 3.3.0 package used a versioned application directory and had no major-upgrade or downgrade-protection design.
 
-- 调用者未提供 `-DotNet` 或额外环境变量，普通沙箱中的 Build 通过，0 警告、0 错误；隔离回归仍为 52 / 52。
-- SDK 与 NuGet 状态隔离到项目 `.tools` / `artifacts` 后，不再需要读取个人 AppData 的 SDK／NuGet 配置。工具调用结束后 APPDATA 恢复原值。
-- `v3.3.0-preview.1` 打包成功，发布目录的四个文件、SHA-256、ZIP 和 MSI 契约检查通过，未安装 MSI。
-- 不匹配的 `v9.9.9` 标签在构建前被拒；篡改校验和的包副本被拒，原件不变。
-- 两份工作流通过 actionlint 语法与表达式检查，PowerShell 脚本通过解析检查；另已进行独立静态审查。
-- Setup 与 Setup-WorkflowTools 的重复调用复用已准备工具；源码检查和个人配置排除检查通过。
+The preceding interface/localization revision, commit `2cca07ad1698ec81e552f48679da1b31958a5fed`, passed [CI run 35644370416](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35644370416). The initial remote CI record is commit `5886efa9bf49312a84b59ac7e98ddc4dda6100f1`, [run 35629504891](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35629504891), covering build, regressions and package checks without MSI installation.
 
-本轮验证发现并修复了 NuGet 用户配置枚举和 MSI 检查中 COM 返回值混入结果的两处脚本问题。原始失败与成功日志均保留于 `artifacts/validation/github-preparation`。这不改变应用切换逻辑，也不构成 GitHub 托管运行或新 MSI 实机安装的通过结论。
+## Evidence interpretation
 
-## 首次 GitHub 远程 CI
+Raw candidates, screenshots, logs and configuration fixtures remain under ignored `artifacts/` directories. Shared records retain source revisions, CI links, package hashes and conclusions.
 
-2026-09-21，私有仓库 `JiayanJohnnyChu/SC2RegionSwitcher` 的初始提交 `5886efa9bf49312a84b59ac7e98ddc4dda6100f1` 完成 [首次 GitHub Actions 运行](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35629504891)，结论为 success。
-
-- Windows 托管 runner 完成工作流检查、固定 SDK 安装和源码检查。
-- Release 编译 0 警告、0 错误；实际日志确认隔离回归 52 / 52。
-- ZIP／MSI 生成、哈希与包内容检查全部通过，MSI 未安装。
-- 已上传 `SC2RegionSwitcher-win-x64-preview` 构建产物，包含安装包、便携包、发布清单和校验文件。
-
-该结果对应明确的提交与运行记录，不替代后续提交的 CI。没有推送版本标签或创建 Release；双服在线与安装升级验证边界保持不变。
-
-## 尚未完成
-
-- 最终安装版本完整双服往返在线测试。
-- 跨电脑、干净用户和不同系统策略环境。
-- 多种缩放比例、多显示器及外部完整像素验证。
-- 缺失运行环境的安装体验和完整安装升级矩阵。
-- 代码签名、公开仓库许可与正式发布。
-- 版本标签触发的草稿 Release 流程及其附件核验。
-
-原始截图、用户路径、安装现场数据与恢复备份保留在原工作区，不放入公开源码。新验证日志放在 Git 忽略的 `artifacts/validation` 和 `artifacts/tests` 中。
-
-## English-first UI 开发改版
-
-2026-09-21，对主页面、设置和参考页面进行了 WPF 布局与控件样式重做。新用户默认英文，已有中英文偏好保留；中文字体与大标题字重单独适配。`Core.cs` 与 `ConfigurationStore.cs` 的切换和配置事务逻辑未修改。
-
-- 独立回归为 52 / 52；已有语言偏好用例已扩展到缺失、损坏、不支持语言的英文回退，以及合法中文偏好保留，各分支核对游戏语言文件未变。
-- 英文与中文各 177 个资源键，集合一致；英文资源中未发现遗漏的中文文案。
-- `final-2` 的 28 个双语设计状态及一个启动报告，均确认主操作完整可见；主页面的两目标及三个区域在默认与最小窗口中均完整可见，无须滚动。设置表单和参考内容按需滚动。
-- 矩阵使用模拟路径、版本和流程阶段，记录 `SyntheticState=true`。这些图片是 WPF 自渲染结果，不能证明对应的安装、账号登录或游戏在线状态。
-- 本机独立测试配置下启动 EXE，窗口报告为 192 DPI（200%）、PerMonitorV2=true。通过 dotnet 启动 DLL 的矩阵报告为 PerMonitorV2=false，两类记录不混用。
-- 字体修改后的截图位于 `artifacts/validation/english-first-ui/final-2`；隔离回归记录在同级 `regression`，桌面输入测试记录在 `live-desktop`。
-
-最终交付构建另在 `artifacts/validation/english-first-ui/delivery` 记录：52 项回归再次通过；由 Publish 产出的 EXE 导出 29 个窗口报告，全部为 PerMonitorV2=true，主操作完整可见，主页面无滚动，未记录 WPF 绑定错误。该目录的 `matrix` 图片对应交付文件，先前 `pass-1`、`final` 和 `final-2` 保留为迭代证据。
-
-实际桌面输入使用 `live-desktop/isolated-state`：鼠标展开语言下拉框，键盘 Up/Down + Enter 完成英→中→英，偏好最终保留 en-US；单独更改语言不触发路径未保存状态。编辑路径后，Back 和 Esc 均被未保存保护拦截，Discard changes 后正常退出。无效保存定位到对应字段且未生成错误目录配置。高级设置可展开并滚动到 Variables 字段；错误详情、帮助和安装详情可打开并通过 Esc 返回、恢复来源焦点。隔离进程已关闭；未点击实际切换或启动战网、游戏及安装程序。
-
-此改版的检查不扩大此前双服在线、跨显示器、其他缩放比例、安装升级或代码签名的验证范围。旧安装版和安装包基线未被覆盖。
-
-## 双服配色实现
-
-2026-09-21，按已选定的 Radix 配色，国服使用 Tomato 11（`#D13415`），外服使用 Indigo 9（`#3E63DD`），共享 Sand 中性色。区域色与操作状态色分开，当前配置色标只随实际读取的登录区域变化。
-
-- Release 编译零警告零错误；52 项隔离回归通过。已有当前／目标分离测试扩展到 `CurrentLoginRegion`，覆盖目标选择、区域偏好、界面语言及显式当前值更新。
-- Publish EXE 的 33 个窗口报告涵盖中英文、两服选中、两种当前配置、紧凑窗口及原有设置／错误／忙碌等状态。
-- 33 份报告均确认 PerMonitorV2=true、192 DPI、主操作完整可见；主页面目标与区域完整可见，无须滚动，未记录 WPF 绑定错误。
-- 直接读取已渲染 WPF 控件属性，核对选中背景、标题、辅助文字、文字及父容器透明度，确认实际使用的两组配色与不透明白字一致。
-- 同时核对当前配置标记，确认选中国服时已读取的外服配置仍保持蓝色，当前国服／目标外服时当前标记保持朱红。
-
-证据在 `artifacts/validation/radix-palette`，其中 `matrix` 是合成状态的 WPF 自渲染结果，`regression` 是隔离回归日志。此次未重新执行真实游戏切换，也未覆盖已安装版本；上一轮实际桌面交互结论仍按其原构建范围记录。
+Synthetic reports carry `SyntheticState=true`. They describe presentation states; a process launch or a local region record likewise does not establish an authenticated game session. Source changes and rebuilt packages require reassessment of the affected checks.

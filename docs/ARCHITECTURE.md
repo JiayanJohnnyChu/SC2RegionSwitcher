@@ -1,49 +1,51 @@
-# 技术结构
+[简体中文](ARCHITECTURE.zh-CN.md)
 
-## 应用与边界
+# Architecture
 
-应用为 C# / WPF / .NET 10 的 Windows x64 桌面程序，未采用浏览器前端。使用一套官方 Battle.net 桌面应用和两套独立的 SC2 安装目录。切换器不负责游戏下载、不替代官方账号认证，也不修改战网游戏安装数据库。
+SC2 Region Switcher is a C# / WPF / .NET 10 application for Windows x64. It coordinates one official Battle.net app and two independent StarCraft II installations. It does not modify Battle.net's game-installation database.
 
-界面可以选择国服或国际服，国际服登录区域包括欧洲、美洲和亚洲。该选择是 Battle.net 登录区域，不等于游戏内服务器或账号注册地区。区域确认依据战网本地记录，不能证明在线登录已经成功。
+## Source structure
 
-## 代码位置
+All application files below are in `src/SC2Switcher.Wpf`.
 
-| 文件 | 职责 |
+| File | Responsibility |
 | --- | --- |
-| `App.xaml.cs` | 启动、用户数据目录、配置加载及诊断参数。 |
-| `MainWindow.xaml` / `.cs` | 主界面、窗口交互和切换流程协调。 |
-| `MainWindow.Diagnostics.cs` | 窗口布局诊断及隔离的双语设计状态导出。 |
-| `MainViewModel.cs` | 当前区域、目标区域、阶段、忙碌状态与操作可用性。 |
-| `SettingsPage.xaml` / `.cs` | 安装目录、原生选择器、界面语言及未保存编辑处理。 |
-| `ConfigurationStore.cs` | 配置校验、迁移、备份、原子保存与并发变更保护。 |
-| `Core.cs` | 安装清单、文件活动检查、语言事务、战网适配和切换引擎。 |
-| `Localization.cs` / `Strings.*.json` | 双语界面和独立语言偏好。 |
-| `Palette.xaml` | 两服身份色、Sand 中性色和共用界面颜色资源。 |
-| `app.manifest` | Windows 应用清单与 DPI 感知设置。 |
+| `App.xaml.cs` | Startup, user data directory, configuration loading and diagnostic arguments |
+| `MainWindow.xaml`, `MainWindow.xaml.cs` | Main interface and operation coordination |
+| `MainWindow.Diagnostics.cs` | Layout reports and isolated synthetic presentation states |
+| `MainViewModel.cs` | Current region, selected destination, operation phase and action availability |
+| `SettingsPage.xaml`, `SettingsPage.xaml.cs` | Path editing, native pickers, language selection and unsaved changes |
+| `ConfigurationStore.cs` | Validation, migration, backups, atomic saving and concurrent-change protection |
+| `Core.cs` | Installation manifests, file-activity checks, language transactions, Battle.net adapter and switch engine |
+| `Localization.cs`, `Strings.*.json` | Interface language and translated resources |
+| `Palette.xaml`, `app.manifest` | Shared colors and Windows/DPI declarations |
 
-这些文件均位于 `src/SC2Switcher.Wpf`。为保持本轮目录整理的行为边界，未将既有核心进一步拆成新程序集。测试通过链接核心源文件并注入 `FakePlatform` 验证关键行为。
+The regression project links core source files and supplies `FakePlatform` implementations. It tests behavior against simulated installations without launching Battle.net.
 
-## 切换流程
+## Switch transaction
 
-1. 核对路径、两服安装分支、语言数据和游戏／编辑器状态。
-2. 通过战网退出参数请求正常退出，等待并重新检查安装状态。
-3. 对共享 `Variables.txt` 中的语言键执行带备份和哈希检查的修改。
-4. 使用战网区域参数打开目标区域，读取本地记录确认结果。
-5. 完成事务，或根据失败阶段和文件一致性条件执行恢复。
+1. Validate configured paths, installation branches, language data and game/editor state.
+2. Request a normal Battle.net exit, wait, and recheck the installations.
+3. Back up `Variables.txt` and atomically update its language keys, recording original and applied hashes.
+4. Launch Battle.net with the selected login-region argument and observe its local region record.
+5. Commit the transaction, or attempt recovery when the failure stage and file-consistency checks permit it.
 
-语言事务记录中包含原始与修改后的哈希，恢复时核对目标文件及对应关系。检测到更新活动或无法确认安装状态时停止切换。文件活动检查不等于官方更新状态接口，后续战网结构变化可能需要适配。
+At the start of a switch, an unfinished language transaction is recovered before new language changes are made. Recovery verifies journal paths, backup placement and file hashes before restoring the settings. Merely opening the app or rechecking installations does not perform recovery.
 
-用户界面不提供取消按钮，忙碌期间锁定相关设置。核心仍保留用于流程边界和测试的取消令牌：发出目标战网启动请求之后，后续取消不会作为回滚目标语言的依据。
+The interface has no cancellation control. The engine retains cancellation tokens for flow boundaries and tests; after the target Battle.net launch request is issued, later cancellation does not by itself cause language rollback. Relevant settings are locked while busy.
 
-## 用户状态与资源
+File-activity checks are observations of local files, not an official updater-status interface. Likewise, an observed login-region record confirms local configuration rather than account authentication or the selected game server.
 
-- `%LOCALAPPDATA%\SC2RegionSwitcherV2\profiles.json`：安装目录与区域、游戏语言规则。
-- 同目录 `ui-preferences.json`：简体中文或英文界面偏好。
-- 同目录的备份和待恢复记录：由事务与配置管理负责。
-- `assets/icon`：发布应用与安装器共用的图标。
+## Configuration and localization
 
-上述用户配置不随源代码或安装包分发。国服游戏默认 zhCN，国际服默认 enUS，界面语言与两者独立。新用户或无效的界面偏好回退到 en-US；有效的 zh-CN / en-US 偏好始终保留。界面先以英文建立布局和文案，再同步中文资源、字体和字重。
+State is stored under `%LOCALAPPDATA%\SC2RegionSwitcherV2`. `profiles.json` stores paths and game profiles; `ui-preferences.json` stores interface language. Configuration backups, language backups and pending recovery records share this data root. They are not package resources.
 
-## 安装结构
+China uses `zhCN` text and speech; Global uses `enUS`. Interface language is independent. Missing or invalid language preferences fall back to `en-US`; valid `en-US` and `zh-CN` preferences are retained. Both translation catalogs must have identical keys and matching format placeholders.
 
-3.4.0 当前用户 MSI 安装到稳定目录 `%LOCALAPPDATA%\Programs\SC2RegionSwitcher\app`，提供一个 **SC2 Region Switcher** 开始菜单入口并登记卸载信息。通过 major upgrade 移除同一产品族的旧版本；文件、菜单和 App Paths 分开管理。卸载保留用户配置。MSI 不捆绑 .NET 运行环境；详细规则和原始 3.3.0 的降级限制见安装器说明。
+The current Battle.net configuration and the selected destination are separate state. Global's EU/US/KR label reflects the selected login region. It does not set or verify the StarCraft II game server.
+
+## Installation
+
+Since 3.4.0, current-user MSI packages use `%LOCALAPPDATA%\Programs\SC2RegionSwitcher\app`, one Start menu entry and separate components for application files, the shortcut and App Paths. Major upgrades remove older products in the family. Uninstall preserves the separate user data directory. The package requires .NET 10 Desktop Runtime x64.
+
+Version 3.4.1 changes UI labels and installer authoring; `Core.cs` and `ConfigurationStore.cs` are unchanged. Installation-failure recovery remains a separate unresolved acceptance item. See [Installer](../tools/Installer/README.md) and [Validation](VALIDATION-3.4.1.md).
