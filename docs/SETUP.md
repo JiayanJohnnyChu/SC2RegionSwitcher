@@ -51,7 +51,7 @@ The advanced setting accepts the actual file location if Documents has been move
 
 ## 4. Switcher installation and extraction
 
-Preview distributions provide an MSI and a portable ZIP. GitHub's “Source code” archives contain source rather than a runnable application. Both package formats require the Desktop Runtime separately and are currently unsigned.
+The public [v3.4.2-preview.1 release](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1) provides an MSI and a portable ZIP. GitHub's “Source code” archives contain source rather than a runnable application. Both package formats require the Desktop Runtime separately and are currently unsigned.
 
 | Package | Use |
 | --- | --- |

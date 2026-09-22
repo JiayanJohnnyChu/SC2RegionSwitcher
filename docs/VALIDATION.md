@@ -6,7 +6,7 @@ Updated 2026-09-22. Results apply to the identified revision and package hashes.
 
 ## 3.4.2 preview
 
-Version 3.4.2 changes licensing and distribution contents. Local packaging and license-content verification passed. The existing CI results are associated with the candidate source commit in its release record. The scope and results are recorded in [3.4.2 validation](VALIDATION-3.4.2.md). Earlier installation, UI, DPI and online results retain their original version attribution.
+Version 3.4.2 changes licensing and distribution contents. Local packaging and license-content verification passed. [v3.4.2-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1) is a published public prerelease. CI and promotion passed, and anonymous downloads of its four assets matched the original hashes. The scope and results are recorded in [3.4.2 validation](VALIDATION-3.4.2.md). Earlier installation, UI, DPI and online results retain their original version attribution.
 
 ## 3.4.1 preview
 
@@ -22,7 +22,7 @@ Source commit `b3c37fce22da78db7e6865df37818eb30f5708dc` passed [CI run 35649099
 73344512F949FC4ECB851279618E0F63D1B88BD5577AC5C7BEA558D19CC59C9A
 ```
 
-This candidate remains an unpublished private draft.
+This historical candidate was retained as an unpublished private draft.
 
 | Area | Verified scope |
 | --- | --- |

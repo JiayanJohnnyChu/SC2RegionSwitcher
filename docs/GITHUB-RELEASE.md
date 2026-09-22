@@ -2,7 +2,7 @@
 
 # Candidate and draft release workflow
 
-The [repository](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher) is private. The active version is 3.4.2; original 3.4.1 preview artifacts remain immutable. Outstanding acceptance work is documented in [current status](HANDOFF.md).
+The [repository](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher) is public. [v3.4.2-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1) was published as a public prerelease on 22 September 2026. Original preview artifacts remain immutable. Release provenance is recorded in [3.4.2 validation](VALIDATION-3.4.2.md).
 
 ## Candidate generation and identification
 

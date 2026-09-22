@@ -2,11 +2,13 @@
 
 # SC2 Region Switcher
 
+**发布与下载：**[v3.4.2-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1) 于 2026 年 9 月 22 日公开预发布，提供 Windows x64 MSI 和便携 ZIP 包。
+
 SC2 Region Switcher 是用于 Windows x64 的《星际争霸 II》国服／国际服切换器。程序使用一套官方 Battle.net 桌面应用和两套独立游戏安装，切换战网登录区域，并同步共享的游戏语言设置。国服使用简体中文（`zhCN`），国际服使用英文（`enUS`）。界面支持英文和简体中文，语言可独立设置。
 
 程序采用 C#、WPF 和 .NET 10。账号登录、游戏安装、更新、游戏服务器选择及游戏启动均在战网中完成。国际服卡片上的 **EU**、**US** 和 **KR** 表示战网登录区域，不能据此确定当前选择的游戏服务器。
 
-**当前状态：3.4.2 预览版。** 本次修订为原创项目材料增加 MIT 许可，并在两种分发格式中提供第三方许可证与源码声明。本地许可内容与包验证已通过，应用行为不变。原始 3.4.1 预览文件保持不变。安装包未签名，运行需要 **Microsoft .NET 10 Desktop Runtime x64**。已验证范围见[验证记录](docs/VALIDATION.zh-CN.md)。
+**当前状态：3.4.2 公开预发布版。** 本次修订为原创项目材料增加 MIT 许可，并在两种分发格式中提供第三方许可证与源码声明。本地许可内容与包验证已通过，应用行为不变。原始 3.4.1 预览文件保持不变。安装包未签名，运行需要 **Microsoft .NET 10 Desktop Runtime x64**。已验证范围见[验证记录](docs/VALIDATION.zh-CN.md)。
 
 ## 文档入口
 
@@ -49,4 +51,4 @@ SC2 Region Switcher 是用于 Windows x64 的《星际争霸 II》国服／国�
 
 MSI 需要管理员批准，安装到 `%ProgramFiles%\SC2RegionSwitcher\app`（64 位 Program Files），创建一个所有用户共用的 **SC2 Region Switcher** 开始菜单入口。应用日常以普通用户权限运行。较早的当前用户预览版需先卸载，再安装此包；这项一次性迁移见[使用指南](docs/SETUP.zh-CN.md)。配置和备份另存于 `%LOCALAPPDATA%\SC2RegionSwitcherV2`，卸载时保留。
 
-项目原创代码、文档和图标采用 [MIT 许可证](LICENSE)，版权人为 Jiayan Chu，年份为 2026。[第三方声明](THIRD-PARTY-NOTICES.zh-CN.md)标明 Radix Colors 的 MIT 许可和 WiX 验证元数据的 MS-RL 许可。[仓库](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher)保持私有。
+项目原创代码、文档和图标采用 [MIT 许可证](LICENSE)，版权人为 Jiayan Chu，年份为 2026。[第三方声明](THIRD-PARTY-NOTICES.zh-CN.md)标明 Radix Colors 的 MIT 许可和 WiX 验证元数据的 MS-RL 许可。[仓库](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher)和发布附件可公开访问。

@@ -2,7 +2,7 @@
 
 # 候选包与发布草稿流程
 
-[仓库](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher)目前为私有。当前版本为 3.4.2，原始 3.4.1 预览制品保持不变。剩余验收工作见[当前状态](HANDOFF.zh-CN.md)。
+[仓库](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher)已公开。[v3.4.2-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1) 于 2026 年 9 月 22 日作为公开预发布版发布。原始预览制品保持不变，发布来源记录于 [3.4.2 验证](VALIDATION-3.4.2.zh-CN.md)。
 
 ## 候选生成与标识
 

@@ -51,7 +51,7 @@ StarCraft II\Variables.txt
 
 ## 4. 切换器安装与解压
 
-预览分发提供 MSI 和便携 ZIP。GitHub 的“Source code”压缩包是源码，不是可直接运行的应用。两种运行包都需另装 Desktop Runtime，目前均未签名。
+公开的 [v3.4.2-preview.1 发布页](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1)提供 MSI 和便携 ZIP。GitHub 的“Source code”压缩包是源码，不是可直接运行的应用。两种运行包都需另装 Desktop Runtime，目前均未签名。
 
 | 安装包 | 用途 |
 | --- | --- |

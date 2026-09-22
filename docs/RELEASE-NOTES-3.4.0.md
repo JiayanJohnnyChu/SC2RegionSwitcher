@@ -2,7 +2,7 @@
 
 # SC2 Region Switcher 3.4.0 Preview
 
-This candidate is retained as an unpublished private draft. Installation-failure recovery has not passed acceptance testing.
+This historical candidate was retained as an unpublished private draft. Its installation-failure recovery did not pass acceptance testing.
 
 ## Changes
 
@@ -23,4 +23,4 @@ The original 3.3.0 package has no downgrade protection. Earlier manually created
 
 The exact candidate identified in [Validation](VALIDATION.md) passed compilation, 52 regressions, package checks, normal installation lifecycle checks, the 100%/125%/150%/200% bilingual DPI matrix and one China → Europe → China online roundtrip with normal game exits.
 
-Failure-path testing did not fully restore the previous installation. This unresolved installer recovery result keeps the draft on hold; it is separate from the application's language transaction recovery. Multi-display movement, other computers and different system-policy environments remain unverified. The candidate's original files are retained unchanged.
+Failure-path testing did not fully restore the previous installation. This unresolved installer recovery result kept the historical draft on hold; it is separate from the application's language transaction recovery. Multi-display movement, other computers and different system-policy environments remain unverified. The candidate's original files are retained unchanged.

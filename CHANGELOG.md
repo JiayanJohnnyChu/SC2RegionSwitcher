@@ -2,7 +2,9 @@
 
 # Changelog
 
-## 3.4.2 — preview
+## 3.4.2 — public prerelease
+
+[v3.4.2-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1) was published on 22 September 2026.
 
 - Original project code, documentation and icons are licensed under MIT, copyright 2026 Jiayan Chu.
 - MSI and ZIP packages include the project license, bilingual notices, the Radix MIT license, and the WiX MS-RL license with its validation source.
@@ -21,7 +23,7 @@ The changes and scope are documented in [release notes](docs/RELEASE-NOTES-3.4.2
 
 The administrator-required installer has passed build, package and hosted lifecycle checks for the candidate identified in the validation record. The final CI candidate passed interactive UAC migration and subsequent ordinary-user launch; basic English and Simplified Chinese Settings UI checks passed with isolated configuration. The changes and evidence are documented in [release notes](docs/RELEASE-NOTES-3.4.1.md) and [validation](docs/VALIDATION-3.4.1.md).
 
-## 3.4.0 — private draft, on hold
+## 3.4.0 — historical private draft
 
 - The interface received revised typography, spacing, destination colors and page alignment.
 - The interface separated the current Battle.net configuration from the selected destination.

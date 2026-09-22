@@ -2,7 +2,7 @@
 
 # SC2 Region Switcher 3.4.1 preview
 
-The administrator-required MSI has passed build, package and hosted lifecycle checks for the candidate identified in the validation record. The final CI candidate passed interactive UAC migration and subsequent ordinary-user launch. Basic English and Simplified Chinese Settings UI checks passed with isolated configuration. Distribution remains private.
+The administrator-required MSI has passed build, package and hosted lifecycle checks for the candidate identified in the validation record. The final CI candidate passed interactive UAC migration and subsequent ordinary-user launch. Basic English and Simplified Chinese Settings UI checks passed with isolated configuration. This historical preview was distributed privately.
 
 ## Changes
 
@@ -20,4 +20,4 @@ The identified machine candidate passed hosted installation, maintenance, upgrad
 
 The complete DPI matrix and online roundtrip remain historical 3.4.0 results. The final installed application passed basic English and Simplified Chinese Settings UI checks with isolated configuration; no new full DPI matrix or online roundtrip is claimed. Multi-display movement and cross-computer behavior remain unverified.
 
-The original 3.4.0 files remain unchanged. Packages are unsigned and require Microsoft .NET 10 Desktop Runtime x64. The repository remains private. The original 3.4.1 package did not include a project license; licensing and distribution materials were added in 3.4.2. Installation and migration steps are in [Setup](SETUP.md).
+The original 3.4.0 files remain unchanged. Packages are unsigned and require Microsoft .NET 10 Desktop Runtime x64. The repository was private during the 3.4.1 evaluation. The original 3.4.1 package did not include a project license; licensing and distribution materials were added in 3.4.2. Installation and migration steps are in [Setup](SETUP.md).

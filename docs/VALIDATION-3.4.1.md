@@ -2,7 +2,7 @@
 
 # 3.4.1 validation status
 
-Recorded 2026-09-22. Version 3.4.1 is a private preview. The 3.4.0 private draft remains on hold.
+Historical record dated 2026-09-22. Version 3.4.1 was evaluated as a private preview; the 3.4.0 private draft was on hold at that time.
 
 ## Current machine installer
 
@@ -114,4 +114,4 @@ Raw packages and diagnostic records remain under ignored `artifacts/validation/3
 
 ## Release status
 
-The final candidate is identified and has passed local UAC migration and ordinary-user launch. Hosted lifecycle evidence applies to the earlier package specified above, with identical application source and MSI authoring. Basic English and Simplified Chinese Settings UI checks passed with isolated configuration. The original final CI files are retained for promotion without rebuilding; no public release is recorded.
+The final candidate is identified and has passed local UAC migration and ordinary-user launch. Hosted lifecycle evidence applies to the earlier package specified above, with identical application source and MSI authoring. Basic English and Simplified Chinese Settings UI checks passed with isolated configuration. The original final CI files were retained for promotion without rebuilding; this historical record predates the public 3.4.2 release.
