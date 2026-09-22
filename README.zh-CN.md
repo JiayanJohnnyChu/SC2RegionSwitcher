@@ -6,7 +6,7 @@
 
 程序采用 C#、WPF 和 .NET 10。账号登录、游戏安装、更新、游戏服务器选择及游戏启动均在战网中完成。国际服卡片上的 **EU**、**US** 和 **KR** 表示战网登录区域，不能据此确定当前选择的游戏服务器。
 
-**当前状态：3.4.1 开发预览版。** 升级失败后恢复旧安装的验收尚未通过。3.4.1 尚未成为发布候选；此前的 3.4.0 候选仍保留为未发布的私有草稿。安装包未签名，运行需要 **Microsoft .NET 10 Desktop Runtime x64**。已验证范围见[验证记录](docs/VALIDATION.zh-CN.md)。
+**当前状态：3.4.1 开发预览版。** 需管理员权限的全机 MSI 已通过本地构建与包检查，CI 生命周期验收仍待完成。3.4.1 尚未成为发布候选；此前的 3.4.0 候选仍保留为未发布的私有草稿。安装包未签名，运行需要 **Microsoft .NET 10 Desktop Runtime x64**。已验证范围见[验证记录](docs/VALIDATION.zh-CN.md)。
 
 ## 文档入口
 
@@ -41,12 +41,12 @@
 | `SC2RegionSwitcher.slnx` | 应用、回归程序及图标工具 |
 | `src/SC2Switcher.Wpf/` | WPF 界面、切换逻辑、配置及语言资源 |
 | `tests/SC2Switcher.Tests/` | 隔离回归测试 |
-| `tools/Installer/` | 当前用户 MSI 构建器及验证支持 |
+| `tools/Installer/` | 全机 MSI 构建器及验证支持 |
 | `tools/IconGenerator/`、`assets/icon/` | 图标生成器及应用图像资源 |
 | `scripts/`、`eng/`、`.github/` | 构建命令、固定工具版本信息及 CI 工作流 |
 | `docs/` | 用户与维护文档 |
 | `artifacts/`、`.tools/` | Git 忽略的构建输出、证据及本地工具 |
 
-MSI 安装目录为 `%LOCALAPPDATA%\Programs\SC2RegionSwitcher\app`，创建一个 **SC2 Region Switcher** 开始菜单入口。配置和备份另存于 `%LOCALAPPDATA%\SC2RegionSwitcherV2`，卸载时保留。
+MSI 需要管理员批准，安装到 `%ProgramFiles%\SC2RegionSwitcher\app`（64 位 Program Files），创建一个所有用户共用的 **SC2 Region Switcher** 开始菜单入口。应用日常以普通用户权限运行。较早的当前用户预览版需先卸载，再安装此包；这项一次性迁移见[使用指南](docs/SETUP.zh-CN.md)。配置和备份另存于 `%LOCALAPPDATA%\SC2RegionSwitcherV2`，卸载时保留。
 
 [仓库](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher)目前为私有，尚未选择应用许可证。第三方声明仅适用于其明确指明的材料。

@@ -1,6 +1,13 @@
 Table	Column	Nullable	MinValue	MaxValue	KeyTable	KeyColumn	Category	Set	Description
 s32	s32	s4	I4	I4	S255	I2	S32	S255	S255
 _Validation	Table	Column
+AppSearch	Property	N					UpperCase		Property receiving the search result.
+AppSearch	Signature_	N					Identifier		Signature shared by the locator tables.
+RegLocator	Signature_	N					Identifier		Primary key of the registry locator.
+RegLocator	Root	N	0	3					Registry root to search.
+RegLocator	Key	N					RegPath		Registry key to search.
+RegLocator	Name	Y					Formatted		Registry value name; null means the default value.
+RegLocator	Type	Y	0	18					Locator type and optional 64-bit flag.
 Component	Attributes	N							Remote execution option, one of irsEnum
 Component	Component	N					Identifier		Primary key used to identify a particular component record.
 Component	ComponentId	Y					Guid		A string GUID unique to this component, version, and language.

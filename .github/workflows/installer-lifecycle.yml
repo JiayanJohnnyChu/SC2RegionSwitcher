@@ -1,0 +1,101 @@
+name: Machine installer lifecycle
+run-name: 'Machine installer lifecycle for candidate ${{ inputs.candidate_run_id }}'
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_run_id:
+        description: 'Successful main CI run containing the exact candidate artifact'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: installer-lifecycle-${{ inputs.candidate_run_id }}
+  cancel-in-progress: false
+
+jobs:
+  machine-lifecycle:
+    runs-on: windows-11-arm
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Resolve successful candidate provenance
+        id: candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_RUN_ID: ${{ inputs.candidate_run_id }}
+        run: |
+          $ErrorActionPreference='Stop'
+          if($env:CANDIDATE_RUN_ID -notmatch '^\d+$'){throw 'Invalid candidate run ID.'}
+          $run=gh api "repos/$env:GITHUB_REPOSITORY/actions/runs/$env:CANDIDATE_RUN_ID" | ConvertFrom-Json
+          if($LASTEXITCODE -ne 0){throw 'Cannot read candidate run.'}
+          if($run.conclusion -ne 'success' -or $run.event -ne 'push' -or $run.head_branch -ne 'main' -or $run.path -ne '.github/workflows/ci.yml' -or $run.head_sha -notmatch '^[0-9a-f]{40}$'){
+            throw 'Expected a successful push-to-main run of ci.yml.'
+          }
+          "source-commit=$($run.head_sha)" | Add-Content -LiteralPath $env:GITHUB_OUTPUT
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.candidate.outputs.source-commit }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Download exact candidate artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_RUN_ID: ${{ inputs.candidate_run_id }}
+          CANDIDATE_SOURCE: ${{ steps.candidate.outputs.source-commit }}
+        run: |
+          $ErrorActionPreference='Stop'
+          $destination=Join-Path $env:GITHUB_WORKSPACE 'artifacts\machine-lifecycle-input'
+          gh run download $env:CANDIDATE_RUN_ID --repo $env:GITHUB_REPOSITORY --name SC2RegionSwitcher-win-x64-preview --dir $destination
+          if($LASTEXITCODE -ne 0){throw 'Cannot download the original candidate artifact.'}
+          .\scripts\Test-Package.ps1 -ReleaseDirectory $destination -ExpectedSourceCommit $env:CANDIDATE_SOURCE
+          $manifest=Get-Content -LiteralPath (Join-Path $destination 'release-manifest.json') -Raw|ConvertFrom-Json
+          if([string]$manifest.CiRunId-ne$env:CANDIDATE_RUN_ID-or$manifest.WorkingTreeDirty-or$manifest.InstallScope-ne'per-machine'-or!$manifest.RequiresAdministrator-or$manifest.ApplicationExecutionLevel-ne'asInvoker'){
+            throw 'Candidate provenance or installation contract mismatch.'
+          }
+      - name: Record harness and runner provenance
+        env:
+          CANDIDATE_SOURCE: ${{ steps.candidate.outputs.source-commit }}
+          WORKFLOW_SOURCE: ${{ github.sha }}
+          CANDIDATE_RUN_ID: ${{ inputs.candidate_run_id }}
+        run: |
+          $ErrorActionPreference='Stop'
+          $evidence=Join-Path $env:GITHUB_WORKSPACE 'artifacts\machine-installer-lifecycle'
+          $tools=Join-Path $env:GITHUB_WORKSPACE 'artifacts\machine-lifecycle-tools'
+          [void][IO.Directory]::CreateDirectory($evidence);[void][IO.Directory]::CreateDirectory($tools)
+          $harness=Join-Path $tools 'Test-MachineInstall.ps1'
+          $content=git show "$($env:WORKFLOW_SOURCE):tools/Installer/Test-MachineInstall.ps1"
+          if($LASTEXITCODE-ne0){throw 'Cannot read lifecycle harness from the workflow revision.'}
+          $content|Set-Content -LiteralPath $harness -Encoding utf8
+          $os=Get-CimInstance Win32_OperatingSystem
+          [ordered]@{
+            CandidateRunId=$env:CANDIDATE_RUN_ID;CandidateSource=$env:CANDIDATE_SOURCE;WorkflowSource=$env:WORKFLOW_SOURCE
+            HarnessSHA256=(Get-FileHash -LiteralPath $harness).Hash;OS=$os.Caption;Version=$os.Version;Build=$os.BuildNumber
+            ProductType=$os.ProductType;RunnerEnvironment=$env:RUNNER_ENVIRONMENT;RunnerArchitecture=$env:RUNNER_ARCH
+            InstallerVersion=[Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $env:WINDIR 'System32\msi.dll')).FileVersion
+          }|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $evidence 'provenance.json') -Encoding utf8
+      - name: Exercise exact package and isolated upgrade fixtures
+        env:
+          WORKFLOW_SOURCE: ${{ github.sha }}
+        run: |
+          $ErrorActionPreference='Stop'
+          $input=Join-Path $env:GITHUB_WORKSPACE 'artifacts\machine-lifecycle-input'
+          $manifest=Get-Content -LiteralPath (Join-Path $input 'release-manifest.json') -Raw|ConvertFrom-Json
+          $msi=Join-Path $input "SC2Switcher-$($manifest.Version)-x64.msi"
+          $zip=Join-Path $input "SC2Switcher-$($manifest.Version)-win-x64-preview.zip"
+          $harness=Join-Path $env:GITHUB_WORKSPACE 'artifacts\machine-lifecycle-tools\Test-MachineInstall.ps1'
+          & $harness -CandidateMsi $msi -PortableZip $zip -EvidenceDirectory (Join-Path $env:GITHUB_WORKSPACE 'artifacts\machine-installer-lifecycle')
+      - name: Upload lifecycle evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: SC2RegionSwitcher-machine-installer-lifecycle
+          path: artifacts/machine-installer-lifecycle/**
+          if-no-files-found: warn
+          retention-days: 14

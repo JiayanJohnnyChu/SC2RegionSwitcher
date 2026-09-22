@@ -46,6 +46,8 @@ The current Battle.net configuration and the selected destination are separate s
 
 ## Installation
 
-Since 3.4.0, current-user MSI packages use `%LOCALAPPDATA%\Programs\SC2RegionSwitcher\app`, one Start menu entry and separate components for application files, the shortcut and App Paths. Major upgrades remove older products in the family. Uninstall preserves the separate user data directory. The package requires .NET 10 Desktop Runtime x64.
+Version 3.4.1 adopts a per-machine MSI: `ALLUSERS=1`, `ProgramFiles64Folder\SC2RegionSwitcher\app`, HKLM App Paths and one common Start menu entry. Installation requires administrator approval. The application manifest remains `asInvoker`; configuration, preferences, backups and recovery records remain per user in `%LOCALAPPDATA%\SC2RegionSwitcherV2`, outside MSI ownership and preserved on uninstall.
 
-Version 3.4.1 changes UI labels and installer authoring; `Core.cs` and `ConfigurationStore.cs` are unchanged. Installation-failure recovery remains a separate unresolved acceptance item. See [Installer](../tools/Installer/README.md) and [Validation](VALIDATION-3.4.1.md).
+The product-family UpgradeCode is retained. Machine installation uses new ProductCode and component identities. Earlier current-user previews require a one-time uninstall/reinstall; subsequent machine versions use major upgrades in the same context. `RemoveExistingProducts` runs after `InstallInitialize`, before new files are installed.
+
+The switching engine and configuration transactions are unchanged. New-package lifecycle and recovery acceptance is pending. See [Installer](../tools/Installer/README.md) and [Validation](VALIDATION-3.4.1.md).

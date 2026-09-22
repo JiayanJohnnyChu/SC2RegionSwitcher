@@ -46,6 +46,8 @@ SC2 Region Switcher 是面向 Windows x64 的 C# / WPF / .NET 10 应用，协调
 
 ## 安装结构
 
-自 3.4.0 起，当前用户 MSI 使用 `%LOCALAPPDATA%\Programs\SC2RegionSwitcher\app`，创建单一开始菜单入口，应用文件、快捷方式和 App Paths 分别由独立组件管理。升级时替换同产品系列中的旧版本。卸载保留独立用户数据目录。运行需要 .NET 10 Desktop Runtime x64。
+3.4.1 采用全机 MSI：`ALLUSERS=1`、`ProgramFiles64Folder\SC2RegionSwitcher\app`、HKLM App Paths 和单一公共开始菜单入口。安装需要管理员批准。应用清单仍为 `asInvoker`；配置、偏好、备份和恢复记录仍按用户保存在 `%LOCALAPPDATA%\SC2RegionSwitcherV2`，不由 MSI 管理，卸载后保留。
 
-3.4.1 修改界面标签和安装器定义，`Core.cs` 与 `ConfigurationStore.cs` 未改。安装失败恢复是另一项尚未解决的验收要求。参阅[安装器说明](../tools/Installer/README.zh-CN.md)和[验证状态](VALIDATION-3.4.1.zh-CN.md)。
+产品族 UpgradeCode 保留。全机安装使用新的 ProductCode 和组件标识。此前的当前用户预览版需一次性卸载重装，后续全机版本在相同上下文中执行大版本升级。`RemoveExistingProducts` 位于 `InstallInitialize` 之后、新文件安装之前。
+
+切换引擎与配置事务未改。新包的生命周期与恢复验收尚未完成。参阅[安装器说明](../tools/Installer/README.zh-CN.md)和[验证状态](VALIDATION-3.4.1.zh-CN.md)。

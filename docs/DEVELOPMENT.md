@@ -32,7 +32,9 @@ The regression suite is a console program using `FakePlatform` and temporary ins
 
 Build outputs remain in each project's `bin/` and `obj/`. Publish writes to `artifacts/publish/win-x64/`. Test runs have separate directories in `artifacts/tests/`; packages are under `artifacts/packages/<build>/release`.
 
-The release directory contains exactly four files: MSI, portable ZIP, `release-manifest.json` and `SHA256SUMS.txt`. The current ZIP contains four runtime files plus `README.md` and `README.zh-CN.md`. Package scripts create files but do not install them. The manifest records the source commit, working-tree state and CI provenance. Local development packages are not accepted CI candidates.
+The release directory contains exactly four files: MSI, portable ZIP, `release-manifest.json` and `SHA256SUMS.txt`. The current ZIP contains four runtime files plus `README.md` and `README.zh-CN.md`. Package scripts create files but do not install them. The manifest records the source commit, working-tree state and CI provenance. Local development packages are not accepted CI candidates. The MSI is named `SC2Switcher-<version>-x64.msi` and uses the administrator-required machine scope; building it does not require installing it.
+
+The separate `installer-lifecycle.yml` workflow uses `tools/Installer/Test-MachineInstall.ps1` for isolated machine installation, maintenance, upgrades, rollback and removal. Its result must identify the input candidate and hash. The older recovery workflow is retained for historical current-user diagnostics. See [Installer](../tools/Installer/README.md) for the current scope and migration rules.
 
 ## Interface diagnostics
 

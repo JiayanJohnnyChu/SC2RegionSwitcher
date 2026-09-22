@@ -2,7 +2,7 @@
 
 # Setup and use
 
-SC2 Region Switcher uses one Battle.net desktop app and two independent StarCraft II installations. It changes the Battle.net login region and the language keys in the game's shared settings file. The current development version is 3.4.1; installer recovery acceptance is still incomplete. See [validation status](VALIDATION-3.4.1.md) before evaluating a preview.
+SC2 Region Switcher uses one Battle.net desktop app and two independent StarCraft II installations. It changes the Battle.net login region and the language keys in the game's shared settings file. The current development version is 3.4.1; the administrator-required MSI has passed local build and package checks; CI lifecycle acceptance is pending. See [validation status](VALIDATION-3.4.1.md) before evaluating a preview.
 
 ## 1. Requirements
 
@@ -55,10 +55,14 @@ Preview distributions provide an MSI and a portable ZIP. GitHub's “Source code
 
 | Package | Use |
 | --- | --- |
-| `SC2Switcher-<version>-current-user.msi` | Installs for the current user and creates one Start menu entry and an uninstall entry. |
+| `SC2Switcher-3.4.1-x64.msi` | Requires administrator approval, installs for all users and creates one shared Start menu entry and a machine-wide uninstall entry. |
 | `SC2Switcher-<version>-win-x64-preview.zip` | Extracts to an independent directory; no shortcut or uninstall entry is created. |
 
-Close the switcher before running an MSI. The application is installed under `%LOCALAPPDATA%\Programs\SC2RegionSwitcher\app`; open **SC2 Region Switcher** from Start. From 3.4.0 onward, the installer supports a major upgrade from the original 3.3.0 package or an earlier supported version in the same product family. User configuration is retained. Automatic recovery from an installation failure has not passed acceptance testing for the current preview. If installation fails, preserve the error details and configuration; use normal Windows uninstall/reinstall procedures when recovering the installation.
+Close the switcher, run the MSI and approve the Windows administrator prompt. It installs under `%ProgramFiles%\SC2RegionSwitcher\app` (64-bit Program Files). Open **SC2 Region Switcher** from Start normally; the application uses ordinary user permissions and each user keeps separate configuration. Administrator approval is required for installation and machine-wide maintenance.
+
+Earlier 3.3.0 and 3.4.0 current-user packages were internal previews. To migrate, sign in as the user who installed that preview, uninstall it through Windows Installed apps, then run the new MSI. Leave `%LOCALAPPDATA%\SC2RegionSwitcherV2` in place: configuration and backups are preserved and reused by the same user. This is a one-time uninstall/reinstall; Windows Installer cannot perform a major upgrade across user and machine contexts. The new installer checks the invoking user's old HKCU App Paths entry and blocks installation with removal instructions when it is present. It does not inventory other users' profiles.
+
+Later per-machine versions use MSI major upgrades within the same installation context. Acceptance of the new package's installation, maintenance and failed-upgrade recovery is still pending. If installation fails, retain the error details and configuration.
 
 The original 3.3.0 installer has no downgrade protection. Do not run it over a newer installation. Previously created manual shortcuts are outside MSI ownership; if one opens a retired version, verify its target and update or remove that specific shortcut.
 

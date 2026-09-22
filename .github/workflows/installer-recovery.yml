@@ -1,11 +1,11 @@
-name: Isolated installer recovery
+name: Historical per-user installer recovery
 run-name: '${{ inputs.privilege_context }} recovery for candidate ${{ inputs.candidate_run_id }}'
 
 on:
   workflow_dispatch:
     inputs:
       candidate_run_id:
-        description: 'Successful main CI run whose original MSI will be checked'
+        description: 'Historical per-user candidate CI run; use installer-lifecycle for machine packages'
         required: true
         type: string
       privilege_context:
@@ -86,6 +86,7 @@ jobs:
           if($LASTEXITCODE -ne 0){throw 'Cannot download the original candidate.'}
           .\scripts\Test-Package.ps1 -ReleaseDirectory $destination -ExpectedSourceCommit $env:CANDIDATE_SOURCE
           $manifest=Get-Content -LiteralPath (Join-Path $destination 'release-manifest.json') -Raw | ConvertFrom-Json
+          if($manifest.InstallScope -eq 'per-machine'){throw 'Use installer-lifecycle.yml for administrator installation candidates.'}
           if([string]$manifest.CiRunId -ne $env:CANDIDATE_RUN_ID -or $manifest.WorkingTreeDirty){throw 'Candidate provenance mismatch.'}
       - name: Check recovery in the selected isolated context
         env:

@@ -2,21 +2,22 @@
 
 # SC2 Region Switcher 3.4.1 development preview
 
-This revision is under validation. Installer recovery acceptance is incomplete, and no final release candidate has been promoted.
+The administrator-required MSI has passed local build and package checks; CI lifecycle acceptance is pending. Version 3.4.1 has not been tagged, distributed or promoted.
 
 ## Changes
 
-- The Global destination card shows EU, US or KR instead of INTERNATIONAL. These values identify the selected Battle.net login region. Current configuration remains separate; the actual StarCraft II server is selected in Battle.net.
-- The application MSI component uses an HKCU registry key path with a renewed component identity. The product-family UpgradeCode and stable application directory remain unchanged.
-- Corrected MSI column definitions, legacy-directory naming and language-neutral file metadata. Added standard validation metadata and an independent ICE check without suppressions.
-- Provided paired English and Simplified Chinese documentation, including two README files in the portable ZIP.
+- The Global destination card shows EU, US or KR instead of INTERNATIONAL, identifying the selected Battle.net login region. Current configuration remains separate; the actual game server is selected in Battle.net.
+- The MSI installs for all users in 64-bit Program Files, registers HKLM App Paths and creates one common Start menu entry. Installation requires administrator approval; the application runs with ordinary user permissions.
+- Earlier current-user previews require a one-time uninstall/reinstall. Later machine versions use MSI major upgrades. The product-family UpgradeCode is retained, with new product and component identities for machine scope.
+- Corrected MSI definitions and validation metadata, with independent ICE validation and isolated machine lifecycle checks.
+- Provided paired English and Simplified Chinese documentation, including both README files in the portable ZIP.
 
-The switching engine, configuration transactions and independent interface-language setting are unchanged.
+The switching engine, configuration transactions and independent interface-language setting are unchanged. Configuration and backups remain per user in `%LOCALAPPDATA%\SC2RegionSwitcherV2`, outside MSI ownership and preserved on uninstall.
 
 ## Validation and distribution
 
-Local compilation completed with zero warnings and errors; 52 isolated regressions, package checks and five release rejection cases passed. The independent ICE suite reported zero errors and four ICE91 warnings relating to hypothetical per-machine use of fixed per-user directories. Basic English and Chinese label checks passed at 200% scaling in the standard window.
+The new machine package requires its own CI provenance, hashes and lifecycle evidence. Earlier current-user package checks and the administrator recovery comparison do not establish acceptance of this package. See [3.4.1 validation](VALIDATION-3.4.1.md).
 
-The full online roundtrip and four-scale DPI results belong to 3.4.0. Installation-failure recovery remains unresolved for the current preview. See [3.4.1 validation](VALIDATION-3.4.1.md).
+The complete DPI matrix and online roundtrip remain historical 3.4.0 results. Follow-up UI checks cover the changed labels; no new full online roundtrip is claimed. Multi-display movement and cross-computer behavior remain unverified.
 
-The original 3.4.0 files remain unchanged. Version 3.4.1 uses a new three-part MSI version and requires its own CI provenance, package hashes and installation evidence. Packages remain unsigned and require Microsoft .NET 10 Desktop Runtime x64. Configuration instructions are in [Setup](SETUP.md).
+The original 3.4.0 files remain unchanged. Packages are unsigned and require Microsoft .NET 10 Desktop Runtime x64. The repository remains private; no application license has been selected. Installation and migration steps are in [Setup](SETUP.md).

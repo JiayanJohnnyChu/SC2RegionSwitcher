@@ -5,7 +5,7 @@ $projectRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $directory=[IO.Path]::GetFullPath($ReleaseDirectory)
 $release=Get-Content -LiteralPath (Join-Path $directory 'release-manifest.json') -Raw | ConvertFrom-Json
 if([string]$release.Version -notmatch '^\d+\.\d+\.\d+$'){throw 'Invalid release version.'}
-$msi=Join-Path $directory "SC2Switcher-$($release.Version)-current-user.msi"
+$msi=Join-Path $directory (@($release.Files | Where-Object Name -like '*.msi')[0].Name)
 $before=(Get-FileHash -LiteralPath $msi -Algorithm SHA256).Hash
 & (Join-Path $PSScriptRoot 'Setup-InstallerTools.ps1')
 $validator=Join-Path $projectRoot '.tools\wix-validation'
@@ -24,7 +24,5 @@ $result=[ordered]@{
 $result | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $output 'result.json') -Encoding utf8
 if(!$result.OriginalUnchanged){throw 'Schema validation altered the candidate MSI.'}
 if($exitCode -ne 0 -or $result.IceErrors.Count){throw "Windows Installer schema validation failed. See $output"}
-# ICE91 describes a hypothetical per-machine install; ALLUSERS is explicitly
-# rejected by this package. Keep the messages in evidence, with no ICE suppression.
-if(@($warnings | Where-Object {$_ -notmatch '\bICE91:'}).Count){throw "Unexpected installer validation warning. See $output"}
-Write-Output "Windows Installer ICE validation passed with no errors or suppressions. $($warnings.Count) fixed-per-user ICE91 warnings recorded in $output."
+if($warnings.Count){throw "Unexpected installer validation warning. See $output"}
+Write-Output "Windows Installer ICE validation passed with no errors, warnings or suppressions. Evidence: $output"

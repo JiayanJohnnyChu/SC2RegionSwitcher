@@ -10,7 +10,7 @@ The [repository](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher) is privat
 2. Commit and push to `main`. Windows CI uses the pinned SDK and uploads `SC2RegionSwitcher-win-x64-preview` after its checks pass.
 3. Record the successful run ID and full source commit. Download that run's original artifact for installation and game tests.
 4. Verify `SHA256SUMS.txt` and `release-manifest.json`. Schema 2 records the version, source commit, working-tree state, CI run ID, run attempt and package hashes. An accepted candidate comes from a clean `main` CI run.
-5. Test the required desktop, installation and online behavior against those files. Record completed and blocked checks separately; retain raw evidence under ignored `artifacts/` directories.
+5. Test the machine installation lifecycle against those files, including upgrade recovery and old-preview detection. Perform basic launch and bilingual UI checks. Retain the completed 3.4.0 full UI/online round as historical coverage; repeat wider application tests only when a changed behavior requires them. Record completed and blocked checks separately under ignored `artifacts/` directories.
 
 The release payload has exactly four files: MSI, portable ZIP, `release-manifest.json` and `SHA256SUMS.txt`. The current ZIP contains four runtime files and the English and Chinese README files. Earlier candidates retain their original contents.
 
@@ -30,6 +30,8 @@ The version-specific release notes describe changes and limits. Add the actual v
 Windows Installer compares three numerical fields. Each distributed preview therefore increments that version; changing only `preview.1` to `preview.2` is insufficient. Each numerical version has a new ProductCode; the product-family UpgradeCode remains stable.
 
 Package creation rejects a numerical version that already has a local version tag; CI fetches tags before packaging. Promotion also rejects an existing draft or release for that version. The distributed 3.4.0 candidate must not be rebuilt, retagged or replaced.
+
+Version 3.4.1 is the first per-machine package. Earlier current-user previews require a one-time uninstall/reinstall; the retained UpgradeCode does not enable upgrades across contexts. See [Installer](../tools/Installer/README.md).
 
 The original 3.3.0 MSI lacks downgrade protection. Later packages cannot add protection to that already distributed file.
 

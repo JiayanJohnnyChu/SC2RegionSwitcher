@@ -29,8 +29,8 @@ foreach($readme in @('README.md','README.zh-CN.md')){
 }
 $archive=Join-Path $packageRoot "SC2Switcher-$version-win-x64-preview.zip"
 Compress-Archive -LiteralPath @(Get-ChildItem -LiteralPath $portable -File | ForEach-Object FullName) -DestinationPath $archive
-& (Join-Path $projectRoot 'tools\Installer\Build-CurrentUserMsi.ps1') -AppDirectory $portable -OutputDirectory (Join-Path $packageRoot 'msi')
-$msi=Join-Path $packageRoot "msi\SC2Switcher-$version-current-user.msi"
+& (Join-Path $projectRoot 'tools\Installer\Build-MachineMsi.ps1') -AppDirectory $portable -OutputDirectory (Join-Path $packageRoot 'msi')
+$msi=Join-Path $packageRoot "msi\SC2Switcher-$version-x64.msi"
 $manifest=[ordered]@{
     Version=$version;Status='Newly built; installation not tested';Runtime='Microsoft .NET 10 Desktop Runtime x64';Signed=$false
     Packages=@(@{File=[IO.Path]::GetFileName($archive);SHA256=(Get-FileHash -LiteralPath $archive).Hash},@{File='msi/'+[IO.Path]::GetFileName($msi);SHA256=(Get-FileHash -LiteralPath $msi).Hash})
@@ -42,6 +42,7 @@ Copy-Item -LiteralPath $archive,$msi -Destination $release
 $publicFiles=@(Get-ChildItem -LiteralPath $release -File | Sort-Object Name)
 $publicManifest=[ordered]@{
     SchemaVersion=2;Version=$version;Tag=$VersionTag;Status='Preview; installation testing recorded separately';Runtime='Microsoft .NET 10 Desktop Runtime x64';Signed=$false
+    InstallScope='per-machine';RequiresAdministrator=$true;ApplicationExecutionLevel='asInvoker'
     SourceCommit=$sourceCommit;WorkingTreeDirty=$dirty;CiRunId=$env:GITHUB_RUN_ID;CiRunAttempt=$env:GITHUB_RUN_ATTEMPT
     SdkVersion=(Get-Content -LiteralPath (Join-Path $projectRoot 'global.json') -Raw | ConvertFrom-Json).sdk.version
     Files=@($publicFiles | ForEach-Object {[ordered]@{Name=$_.Name;Bytes=$_.Length;SHA256=(Get-FileHash -LiteralPath $_.FullName).Hash}})

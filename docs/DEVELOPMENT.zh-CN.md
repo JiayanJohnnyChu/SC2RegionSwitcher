@@ -32,7 +32,9 @@ Setup 按 `eng/dotnet-sdk.json` 校验 Microsoft SDK 压缩包后才解压。`-A
 
 编译输出位于各项目的 `bin/` 和 `obj/`，发布文件位于 `artifacts/publish/win-x64/`。每次测试在 `artifacts/tests/` 下有独立目录，安装包位于 `artifacts/packages/<本次构建>/release`。
 
-发布目录恰有四个文件：MSI、便携 ZIP、`release-manifest.json` 和 `SHA256SUMS.txt`。当前 ZIP 包含四个运行文件及 `README.md`、`README.zh-CN.md`。打包脚本生成文件，不执行安装。清单记录源码提交、工作树状态及 CI 来源。本地开发包不属于已接受的 CI 候选。
+发布目录恰有四个文件：MSI、便携 ZIP、`release-manifest.json` 和 `SHA256SUMS.txt`。当前 ZIP 包含四个运行文件及 `README.md`、`README.zh-CN.md`。打包脚本生成文件，不执行安装。清单记录源码提交、工作树状态及 CI 来源。本地开发包不属于已接受的 CI 候选。MSI 文件名为 `SC2Switcher-<version>-x64.msi`，采用需要管理员权限的全机范围；构建时无需安装它。
+
+独立的 `installer-lifecycle.yml` 工作流通过 `tools/Installer/Test-MachineInstall.ps1` 隔离测试全机安装、维护、升级、回滚和移除，结果须标明输入候选及哈希。较早的恢复工作流保留用于历史当前用户设计诊断。当前范围与迁移规则见[安装器说明](../tools/Installer/README.zh-CN.md)。
 
 ## 界面诊断
 

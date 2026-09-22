@@ -6,7 +6,7 @@ A Windows x64 application for switching between separate China and Global instal
 
 The application is written in C# with WPF and .NET 10. Account login, game installation, updates, game-server selection and game startup take place in Battle.net. The Global labels **EU**, **US** and **KR** identify Battle.net login regions; they do not establish which game server is selected.
 
-**Current status: 3.4.1 development preview.** Installer recovery after a failed upgrade has not passed acceptance testing. Version 3.4.1 is not a release candidate; the earlier 3.4.0 candidate remains an unpublished private draft. Packages are unsigned and require **Microsoft .NET 10 Desktop Runtime x64**. See the [validation record](docs/VALIDATION.md) for the tested scope.
+**Current status: 3.4.1 development preview.** The administrator-required, per-machine MSI has passed local build and package checks; CI lifecycle acceptance is pending. Version 3.4.1 is not a release candidate; the earlier 3.4.0 candidate remains an unpublished private draft. Packages are unsigned and require **Microsoft .NET 10 Desktop Runtime x64**. See the [validation record](docs/VALIDATION.md) for the tested scope.
 
 ## Documentation
 
@@ -41,12 +41,12 @@ Run these commands in PowerShell from the project directory:
 | `SC2RegionSwitcher.slnx` | Application, regression runner and icon tool |
 | `src/SC2Switcher.Wpf/` | WPF interface, switching logic, configuration and language resources |
 | `tests/SC2Switcher.Tests/` | Isolated regression tests |
-| `tools/Installer/` | Current-user MSI builder and validation support |
+| `tools/Installer/` | Per-machine MSI builder and validation support |
 | `tools/IconGenerator/`, `assets/icon/` | Icon generator and application artwork |
 | `scripts/`, `eng/`, `.github/` | Build commands, pinned tool metadata and CI workflows |
 | `docs/` | User and maintainer documentation |
 | `artifacts/`, `.tools/` | Ignored build outputs, evidence and local tools |
 
-MSI installations use `%LOCALAPPDATA%\Programs\SC2RegionSwitcher\app` and create one **SC2 Region Switcher** Start menu entry. Configuration and backups are stored separately in `%LOCALAPPDATA%\SC2RegionSwitcherV2` and are retained on uninstall.
+The MSI requires administrator approval, installs to `%ProgramFiles%\SC2RegionSwitcher\app` (64-bit Program Files), and creates one shared **SC2 Region Switcher** Start menu entry. The application runs with ordinary user permissions. Earlier current-user previews require a one-time uninstall before installing this package; see [Setup](docs/SETUP.md). Configuration and backups are stored separately in `%LOCALAPPDATA%\SC2RegionSwitcherV2` and are retained on uninstall.
 
 The [repository](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher) is private. No application license has been selected. Third-party notices apply only to the materials they identify.

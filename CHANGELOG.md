@@ -5,11 +5,13 @@
 ## 3.4.1 — development preview
 
 - Global destination labels show the selected Battle.net login region: EU, US or KR. The current configuration remains separate from the selected target.
-- Corrected MSI schema definitions and validation metadata. The application component uses an HKCU key path with a new component identity.
+- Adopted an administrator-required, per-machine MSI in 64-bit Program Files, with HKLM App Paths and one common Start menu entry. The application still runs as an ordinary user; user configuration and backups remain separate and survive uninstall.
+- Earlier current-user previews require a one-time uninstall/reinstall. Machine versions retain the product-family UpgradeCode and use new product/component identities.
+- Corrected MSI schema definitions and validation metadata.
 - Added independent Windows Installer ICE validation without suppressions.
 - Added paired English and Simplified Chinese documentation, including both README files in the portable ZIP.
 
-Installer failure recovery has not passed acceptance testing; this version is not a release candidate. See [release notes](docs/RELEASE-NOTES-3.4.1.md) and [validation](docs/VALIDATION-3.4.1.md).
+The new administrator-required installer has passed local build and package checks; CI lifecycle acceptance is pending. This version is not a release candidate. See [release notes](docs/RELEASE-NOTES-3.4.1.md) and [validation](docs/VALIDATION-3.4.1.md).
 
 ## 3.4.0 — private draft, on hold
 

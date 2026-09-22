@@ -4,7 +4,31 @@
 
 Recorded 2026-09-22. Version 3.4.1 is a development preview, not a promoted release candidate. The 3.4.0 private draft remains on hold.
 
-## Completed local checks
+## Current machine installer
+
+The adopted design requires administrator approval and installs for all users in 64-bit Program Files, with HKLM App Paths and one common Start menu entry. The application stays `asInvoker`; each user's configuration and backups remain outside MSI ownership. Earlier current-user previews require a one-time uninstall/reinstall. See [Installer](../tools/Installer/README.md).
+
+The local development machine package passed these checks:
+
+| Check | Result |
+| --- | --- |
+| Compilation | Zero warnings and zero errors |
+| Isolated regressions | `TOTAL 52 PASSED` |
+| Package validation | Passed |
+| Release rejection cases | All seven passed |
+| Independent ICE validation | Zero errors, zero warnings, no suppressions |
+
+Schema evidence is retained at `artifacts/installer-schema/3f747e8a932b420b8ceb3a973c08e684/result.json`. These are local development-package results, not CI candidate or installation results.
+
+CI lifecycle acceptance remains pending. The `installer-lifecycle.yml` workflow and `tools/Installer/Test-MachineInstall.ps1` exercise isolated machine installation, maintenance, upgrade, failed-upgrade recovery and uninstall. Candidate provenance, hashes, legacy-preview detection and preserved user data must be recorded against the tested files. No passing lifecycle result for the new machine package is recorded here yet.
+
+Interactive installation from a standard desktop through UAC and subsequent ordinary-user launch remain pending. An elevated CI run does not establish this interactive path. Follow-up application coverage is limited to basic launch and bilingual UI checks unless changed behavior requires broader testing. The completed full UI/online round remains attributed to 3.4.0; no new online roundtrip is claimed.
+
+## Historical current-user evidence
+
+The results below predate the machine-scope change. The administrator comparison is evidence about the old current-user package under that privilege context, not proof that the new machine package passes.
+
+### Local checks
 
 | Check | Result and scope |
 | --- | --- |
@@ -16,13 +40,13 @@ Recorded 2026-09-22. Version 3.4.1 is a development preview, not a promoted rele
 
 The Global card now identifies the selected Battle.net login region. `Core.cs` and `ConfigurationStore.cs` are unchanged. No 3.4.1 online game roundtrip or complete four-scale DPI matrix is recorded. Those completed tests belong to the [original 3.4.0 candidate](VALIDATION.md).
 
-## Development CI
+### Development CI
 
-Commit `d3a179bbbb1ec55f9850f1c0846b79d126ffac4d` passed [CI run 35667524580](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35667524580), including compilation, regressions and package checks. This candidate remains under evaluation while installer recovery acceptance is incomplete.
+Commit `d3a179bbbb1ec55f9850f1c0846b79d126ffac4d` passed [CI run 35667524580](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35667524580), including compilation, regressions and package checks. This candidate predates the adopted machine installation route.
 
-## Installer recovery acceptance
+### Current-user recovery diagnostics
 
-### Paired privilege-context comparison
+#### Paired privilege-context comparison
 
 The [administrator-context run 35668661867](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35668661867) and [standard-user run 35668664128](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35668664128) used the same original candidate and test harness. Both ran on hosted Windows 11 ARM64, build 26200, with Windows Installer 5.0.26100.9444. Isolated product identities kept these tests separate from the production installation. They exercised installer behavior, not application or game operation.
 
@@ -47,11 +71,11 @@ After the standard-user test, removal of the disposable account, profile and wor
 
 The results strongly associate the recovery failure with privilege context in this environment. They do not establish a specific root cause or an officially confirmed Windows defect. The administrator result is a diagnostic comparison, not acceptance of standard-user recovery. Normal MSI action-end return values were excluded from the rollback-failure count.
 
-### Earlier evidence
+#### Earlier evidence
 
 The complete code and documentation revision `a3d0cf55acb694f31f3c3b3eccef8adb0978339b` passed [CI run 35664932110](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35664932110). Its Windows 11 ARM64 [standard-user recovery run 35666330406](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35666330406) independently reproduced the same installed-to-advertised transition after the native failure. The earlier Windows Server [run 35663705665](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35663705665) stopped at baseline installation with policy error 1625 and did not enter rollback.
 
-### Isolated authoring probes
+#### Isolated authoring probes
 
 Local metadata prototypes using `WordCount = 2` alone, or `ALLUSERS = 2`, `MSIINSTALLPERUSER = 1` and `WordCount = 2` together, did not resolve the failure. The combined prototype still recorded registry access-denied events.
 
@@ -63,4 +87,4 @@ Raw packages and diagnostic records remain under ignored `artifacts/validation/3
 
 ## Release status
 
-The release remains on hold. These diagnostics did not change application code, install the production 3.4.1 package locally, or publish a release. Acceptance still requires a defined installation approach and complete lifecycle evidence for the exact candidate files. Schema validation, early rejection and normal installation success do not establish recovery after a failed upgrade.
+The release remains on hold. These diagnostics did not change application code, install the production 3.4.1 package locally, or publish a release. The administrator-required machine route is now defined; acceptance still requires complete lifecycle evidence for its exact candidate files. Schema validation, early rejection and normal installation success do not establish recovery after a failed upgrade.

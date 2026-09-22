@@ -2,33 +2,30 @@
 
 # Development status
 
-Updated 2026-09-22. The active version is **3.4.1 development preview**.
+Updated 2026-09-22. The active version is **3.4.1 development preview**, not tagged or distributed.
 
 ## Current work
 
-The Global card now shows the selected Battle.net login region, EU, US or KR. Current configuration and selected destination remain separate. The switch engine and configuration transactions are unchanged.
+The installer now targets an administrator-required, per-machine installation in 64-bit Program Files, with HKLM App Paths and one common Start menu entry. The application remains `asInvoker`; per-user configuration and backups stay outside MSI ownership and survive uninstall. Earlier current-user previews require a one-time uninstall/reinstall. Subsequent machine releases use major upgrades. See [Installer](../tools/Installer/README.md) and [Setup](SETUP.md).
 
-Local checks passed compilation with no warnings or errors, 52 isolated regressions, package-content checks, five release rejection cases and the independent ICE suite. Basic English and Chinese UI checks passed at 200% scaling. These results do not establish installation-failure recovery or a final CI candidate. See [3.4.1 validation](VALIDATION-3.4.1.md).
+The Global card shows the selected Battle.net login region, EU, US or KR. Current configuration remains separate. The switching engine and configuration transactions are unchanged.
 
-The original 3.4.0 candidate remains an unpublished private draft. Its complete four-scale DPI matrix and China → Europe → China online roundtrip apply to that candidate only. See [historical validation](VALIDATION.md).
+Local machine-package checks passed: compilation with zero warnings and errors, 52 regressions, package validation, seven release rejection cases and the full ICE suite with zero errors or warnings. CI candidate provenance and installation lifecycle acceptance remain pending. Earlier current-user recovery results, including the successful administrator comparison, do not validate the new package. Exact evidence and pending checks are in [3.4.1 validation](VALIDATION-3.4.1.md).
 
 ## Remaining acceptance work
 
-1. Complete the standard-user installer recovery check and resolve any failure.
-2. Produce a clean final CI candidate, verify its provenance and hashes, and test the required installation lifecycle against those exact files.
-3. Reassess UI and online coverage for the final changes; repeat affected checks before promotion.
-4. Keep multi-display, cross-computer and signing limits explicit in the release notes.
+1. Identify a clean CI candidate by source commit and hashes; complete its machine installation lifecycle, including failed-upgrade recovery and legacy-preview detection.
+2. Complete basic launch and bilingual UI checks for the final changes. Retain the existing full DPI and online roundtrip as historical coverage; repeat broader tests only if an affected application behavior requires them.
 
-Commit `d3a179bbbb1ec55f9850f1c0846b79d126ffac4d` passed [CI run 35667524580](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35667524580). Paired Windows 11 ARM64 recovery tests used the same candidate and harness: the [administrator-context run](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35668661867) fully restored the old installation, while the [standard-user run](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35668664128) restored visible resources but left the old product advertised and failed MSI cleanup checks. Both reached the native file-copy failure after old-product removal. The original input MSI remained unchanged, and disposable test environments were removed. A privilege-condition prototype has passed schema checks but has not been adopted or tested through the full lifecycle. Release acceptance remains incomplete; see the [3.4.1 validation record](VALIDATION-3.4.1.md).
+Interactive installation from a standard desktop through UAC, followed by ordinary-user application launch, remains pending. An elevated CI lifecycle test does not establish that interactive path. The original 3.4.0 candidate's four-scale DPI matrix and China → Europe → China roundtrip remain recorded in [historical validation](VALIDATION.md); no new online roundtrip is claimed.
 
 ## Release constraints
 
-The repository is private and no application license has been selected. Packages are unsigned, framework-dependent MSI and ZIP distributions. Every distributed preview increments the three-part version; the distributed 3.4.0 candidate must retain its original files. Promotion copies the tested CI artifacts without rebuilding. The original 3.3.0 MSI has no downgrade protection.
+The repository remains private, and no application license has been selected. Packages are unsigned and require .NET 10 Desktop Runtime x64. The original 3.4.0 private draft and its files remain unchanged. Each distributed preview increments the three-part version; promotion copies tested CI artifacts without rebuilding. Multi-display, cross-computer and system-policy coverage remains limited.
 
 ## Maintainer references
 
 - [Development commands](DEVELOPMENT.md)
 - [Architecture](ARCHITECTURE.md)
-- [Installer](../tools/Installer/README.md)
 - [Candidate promotion](GITHUB-RELEASE.md)
 - [Interface design](UI-DESIGN.md)
