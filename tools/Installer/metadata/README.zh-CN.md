@@ -8,4 +8,4 @@
 
 来源：[WiX Toolset 3.14.1](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm)。上游版权与许可原文保留在 [LICENSE-WiX.txt](LICENSE-WiX.txt)，适用于本元数据。应用许可证尚未选择。
 
-结构验证检查包定义，实际安装与恢复另行测试，参阅[安装器说明](../README.zh-CN.md)。
+结构验证检查包定义，实际安装与恢复需要单独测试，具体范围记录于[安装器说明](../README.zh-CN.md)。

@@ -6,7 +6,7 @@ Recorded 2026-09-22. Version 3.4.1 is a development preview, not a promoted rele
 
 ## Current machine installer
 
-The adopted design requires administrator approval and installs for all users in 64-bit Program Files, with HKLM App Paths and one common Start menu entry. The application stays `asInvoker`; each user's configuration and backups remain outside MSI ownership. Earlier current-user previews require a one-time uninstall/reinstall. See [Installer](../tools/Installer/README.md).
+The adopted design requires administrator approval and installs for all users in 64-bit Program Files, with HKLM App Paths and one common Start menu entry. The application stays `asInvoker`; each user's configuration and backups remain outside MSI ownership. Earlier current-user previews require a one-time uninstall/reinstall. The design is documented in [Installer](../tools/Installer/README.md).
 
 The local development machine package passed these checks:
 
@@ -20,7 +20,20 @@ The local development machine package passed these checks:
 
 Schema evidence is retained at `artifacts/installer-schema/e5de63bf487743a48b79fd3fa2156e21/result.json`. These are local development-package results, not CI candidate or installation results.
 
-CI lifecycle acceptance remains pending. The `installer-lifecycle.yml` workflow and `tools/Installer/Test-MachineInstall.ps1` exercise isolated machine installation, maintenance, upgrade, failed-upgrade recovery and uninstall. Candidate provenance, hashes, legacy-preview detection and preserved user data must be recorded against the tested files. No passing lifecycle result for the new machine package is recorded here yet.
+### Hosted machine lifecycle
+
+The original candidate from [CI run 35721803273](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35721803273) passed [lifecycle run 35722639637](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35722639637).
+
+| Identity | Value |
+| --- | --- |
+| Candidate source | `208cd6e5186b29a9cd3c00382a4c568ed7ee9f18` |
+| Lifecycle harness source | `dc68767ef9b05644ec923bca7d2eaab25c1b4fd2` |
+| MSI SHA-256 | `DF85AFD7FAF3F04FE71A21CCD756726966BCCFD773070AEE60B4A27DCAA9931F` |
+| ZIP SHA-256 | `BD4E4538B0D9BA5BBD2E26092907D12BEBA400EC36D0C2A2D56D3F7C1737C0D5` |
+
+The exact original MSI passed installation, maintenance, uninstall, reinstall and final removal. Verification covered all four installed file hashes, HKLM App Paths, the common advertised shortcut, one uninstall registration and an unchanged user-data test file. Isolated MSI copies passed major upgrade and downgrade rejection; the original MSI passed legacy-preview detection against a synthetic HKCU entry. The file-in-use case returned 3010, indicating success with a restart required. An isolated MSI copy encountered native error 1312 after old-product removal, triggering rollback: the old product returned to installed state 5, the new product was absent, and old file hashes and entry points were restored. No registry rollback error 140x with system error 5 was recorded. Cleanup assertions passed.
+
+These results apply to the identified package and harness. The final documentation revision requires a separately identified CI artifact; the recorded results do not establish installation of a later rebuilt package.
 
 Interactive installation from a standard desktop through UAC and subsequent ordinary-user launch remain pending. An elevated CI run does not establish this interactive path. Follow-up application coverage is limited to basic launch and bilingual UI checks unless changed behavior requires broader testing. The completed full UI/online round remains attributed to 3.4.0; no new online roundtrip is claimed.
 
@@ -87,4 +100,4 @@ Raw packages and diagnostic records remain under ignored `artifacts/validation/3
 
 ## Release status
 
-The release remains on hold. These diagnostics did not change application code, install the production 3.4.1 package locally, or publish a release. The administrator-required machine route is now defined; acceptance still requires complete lifecycle evidence for its exact candidate files. Schema validation, early rejection and normal installation success do not establish recovery after a failed upgrade.
+The release remains on hold pending final artifact identification, interactive UAC installation and subsequent ordinary-user launch. Hosted machine lifecycle acceptance is complete for the exact candidate identified above. No public release or local production installation is recorded in this document.

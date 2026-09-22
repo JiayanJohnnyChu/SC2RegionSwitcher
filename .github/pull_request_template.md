@@ -2,7 +2,7 @@
 
 ## Change
 
-Describe the problem and the resulting behavior.
+The change description identifies the problem and the resulting behavior.
 
 ## Validation
 
@@ -10,4 +10,4 @@ Describe the problem and the resulting behavior.
 - Additional checks for interface, installer or switching changes:
 - Remaining unverified scope:
 
-Exclude real account configuration, game settings, personal paths and unredacted logs.
+The description and attachments must exclude real account configuration, game settings, personal paths and unredacted logs.

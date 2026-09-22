@@ -2,20 +2,20 @@
 
 # Setup and use
 
-SC2 Region Switcher uses one Battle.net desktop app and two independent StarCraft II installations. It changes the Battle.net login region and the language keys in the game's shared settings file. The current development version is 3.4.1; the administrator-required MSI has passed local build and package checks; CI lifecycle acceptance is pending. See [validation status](VALIDATION-3.4.1.md) before evaluating a preview.
+SC2 Region Switcher uses one Battle.net desktop app and two independent StarCraft II installations. It changes the Battle.net login region and the language keys in the game's shared settings file. The current development version is 3.4.1. The administrator-required MSI has passed build, package and hosted lifecycle checks for the candidate identified in the validation record. Interactive UAC installation and subsequent ordinary-user launch remain pending. The tested scope is documented in [validation status](VALIDATION-3.4.1.md).
 
 ## 1. Requirements
 
-- Windows x64 and **Microsoft .NET 10 Desktop Runtime x64**. The .NET SDK is needed only for development. Select the Windows x64 **Desktop Runtime** from the [Microsoft .NET 10 download page](https://dotnet.microsoft.com/en-us/download/dotnet/10.0).
+- Windows x64 and **Microsoft .NET 10 Desktop Runtime x64**. The .NET SDK is needed only for development. The required Windows x64 **Desktop Runtime** is available from the [Microsoft .NET 10 download page](https://dotnet.microsoft.com/en-us/download/dotnet/10.0).
 - One official Battle.net desktop app, with access to the relevant regional services.
 - Separate China and Global StarCraft II installations, with all downloads, updates and repairs completed.
 - The actual `Variables.txt` file used by the game, readable and writable by the current Windows user.
 
-The switcher does not download game data, register accounts or change account eligibility. Complete login and authentication in the official Battle.net app.
+The switcher does not download game data, register accounts or change account eligibility. Login and authentication take place in the official Battle.net app.
 
-## 2. Prepare both game installations
+## 2. Game installation preparation
 
-Choose separate directories, for example:
+The two game installations require separate directories, for example:
 
 ```text
 D:\Games\StarCraft II CN
@@ -24,32 +24,32 @@ D:\Games\StarCraft II Global
 
 The directories must not be the same or contained within one another. A second name or directory link to one installation is insufficient. Each game root must contain `StarCraft II.exe`, `.build.info` and `Versions`.
 
-In Battle.net, install the Global game with English text and speech, and the China game with Simplified Chinese text and speech. Either installation can be prepared first. Check the final installation path before confirming a download: Battle.net may append a `StarCraft II` subfolder or detect an existing installation. If it points to the other region's directory, correct the location before continuing.
+The Global installation requires English text and speech; the China installation requires Simplified Chinese text and speech. Both are installed through Battle.net, in either order. The final installation path requires verification before download confirmation because Battle.net may append a `StarCraft II` subfolder or detect an existing installation. A path that points to the other region's directory must be corrected before installation proceeds.
 
-After each installation finishes, launch that game from Battle.net, confirm that it reaches its main interface, and exit normally. This also creates the shared settings file. Changing a path in the switcher later does not move game files or change Battle.net's installation records.
+Verification of each completed installation consists of a Battle.net launch, observation of the game main interface and a normal exit. This sequence also creates the shared settings file. Changing a path in the switcher later does not move game files or change Battle.net's installation records.
 
-If the required login region is absent during initial preparation, close the game and editor, finish Battle.net downloads, and exit Battle.net normally. The following PowerShell commands request a login region from the same executable; replace its path with the actual path and run only the required command:
+If the required login region is absent during initial preparation, a region request requires the game and editor to be closed, Battle.net downloads to be complete and Battle.net to have exited normally. The following alternative PowerShell commands request a login region from the same executable. The executable path must match the actual installation, and only the command for the required region is applicable:
 
 ```powershell
 & 'C:\Program Files (x86)\Battle.net\Battle.net.exe' --setregion=CN
 & 'C:\Program Files (x86)\Battle.net\Battle.net.exe' --setregion=EU
 ```
 
-`US` and `KR` are the other supported Global login-region values. Check the resulting login screen. The current implementation uses this parameter; compatibility depends on the installed Battle.net version. If it is not accepted, resolve regional access through Battle.net before proceeding. The switcher checks both installations, so it cannot replace this initial preparation.
+`US` and `KR` are the other supported Global login-region values. The resulting login screen provides confirmation of the requested region. The current implementation uses this parameter; compatibility depends on the installed Battle.net version. If the parameter is not accepted, regional access through Battle.net must be resolved before switcher configuration proceeds. The switcher checks both installations, so it cannot replace this initial preparation.
 
-## 3. Locate the shared settings file
+## 3. Shared settings file
 
-Open the current Windows user's actual Documents folder and locate:
+The shared settings file is located within the current Windows user's actual Documents folder:
 
 ```text
 StarCraft II\Variables.txt
 ```
 
-Use the file generated by the game, containing one `localeidassets` and one `localeiddata` entry. If it is missing, run the game, save settings and exit normally. An empty replacement file will not pass validation.
+Configuration requires the file generated by the game, containing one `localeidassets` and one `localeiddata` entry. If the file is absent, a game session with saved settings and a normal exit generates it. An empty replacement file does not pass validation.
 
 The advanced setting accepts the actual file location if Documents has been moved. Paths that traverse reparse points, such as some directory links or synchronized folders, are rejected. A copy of the file elsewhere does not change the location the game uses.
 
-## 4. Install or extract the switcher
+## 4. Switcher installation and extraction
 
 Preview distributions provide an MSI and a portable ZIP. GitHub's “Source code” archives contain source rather than a runnable application. Both package formats require the Desktop Runtime separately and are currently unsigned.
 
@@ -58,15 +58,15 @@ Preview distributions provide an MSI and a portable ZIP. GitHub's “Source code
 | `SC2Switcher-3.4.1-x64.msi` | Requires administrator approval, installs for all users and creates one shared Start menu entry and a machine-wide uninstall entry. |
 | `SC2Switcher-<version>-win-x64-preview.zip` | Extracts to an independent directory; no shortcut or uninstall entry is created. |
 
-Close the switcher, run the MSI and approve the Windows administrator prompt. It installs under `%ProgramFiles%\SC2RegionSwitcher\app` (64-bit Program Files). Open **SC2 Region Switcher** from Start normally; the application uses ordinary user permissions and each user keeps separate configuration. Administrator approval is required for installation and machine-wide maintenance.
+MSI installation requires the switcher to be closed and the Windows administrator prompt to be approved. The package installs under `%ProgramFiles%\SC2RegionSwitcher\app` (64-bit Program Files). The **SC2 Region Switcher** Start entry launches the application with ordinary user permissions, and each user has separate configuration. Administrator approval is required for installation and machine-wide maintenance.
 
-Earlier 3.3.0 and 3.4.0 current-user packages were internal previews. To migrate, sign in as the user who installed that preview, uninstall it through Windows Installed apps, then run the new MSI. Leave `%LOCALAPPDATA%\SC2RegionSwitcherV2` in place: configuration and backups are preserved and reused by the same user. This is a one-time uninstall/reinstall; Windows Installer cannot perform a major upgrade across user and machine contexts. The new installer checks the invoking user's old HKCU App Paths entry and blocks installation with removal instructions when it is present. It does not inventory other users' profiles.
+Earlier 3.3.0 and 3.4.0 current-user packages were internal previews. Migration consists of removing the old preview through Windows Installed apps while signed in as its owning user, followed by installation of the new MSI. The `%LOCALAPPDATA%\SC2RegionSwitcherV2` directory must remain in place so that the same user can reuse the preserved configuration and backups. This is a one-time uninstall/reinstall; Windows Installer cannot perform a major upgrade across user and machine contexts. The new installer checks the invoking user's old HKCU App Paths entry and blocks installation with removal instructions when it is present. It does not inventory other users' profiles.
 
-Later per-machine versions use MSI major upgrades within the same installation context. Acceptance of the new package's installation, maintenance and failed-upgrade recovery is still pending. If installation fails, retain the error details and configuration.
+Later per-machine versions use MSI major upgrades within the same installation context. Hosted checks of installation, maintenance and failed-upgrade recovery passed for the identified candidate; interactive UAC installation remains pending. After an installation failure, the error details and configuration must be retained for diagnosis.
 
-The original 3.3.0 installer has no downgrade protection. Do not run it over a newer installation. Previously created manual shortcuts are outside MSI ownership; if one opens a retired version, verify its target and update or remove that specific shortcut.
+The original 3.3.0 installer has no downgrade protection. It must not be applied over a newer installation. Previously created manual shortcuts are outside MSI ownership. A shortcut that opens a retired version requires target verification followed by correction or removal of that specific shortcut.
 
-For the portable ZIP, extract all files into a separate directory, such as `%LOCALAPPDATA%\Programs\SC2RegionSwitcher-Portable`. Keep these four files together:
+Portable deployment consists of complete ZIP extraction into a separate directory, such as `%LOCALAPPDATA%\Programs\SC2RegionSwitcher-Portable`. The following four files must remain together:
 
 ```text
 SC2Switcher.Wpf.exe
@@ -75,9 +75,9 @@ SC2Switcher.Wpf.deps.json
 SC2Switcher.Wpf.runtimeconfig.json
 ```
 
-The current ZIP also contains English and Chinese README files. Run `SC2Switcher.Wpf.exe`. An optional shortcut can be placed in the current user's Start menu folder, opened with `Win + R` → `shell:programs`. Set its target to the extracted EXE and its working directory to the containing folder. One shortcut serves both destinations.
+The current ZIP also contains English and Chinese README files. The application entry point is `SC2Switcher.Wpf.exe`. An optional shortcut can be placed in the current user's Start menu folder, accessible through `Win + R` → `shell:programs`. Its target is the extracted EXE, and its working directory is the containing folder. One shortcut serves both destinations.
 
-## 5. Configure paths and interface language
+## 5. Path and interface-language configuration
 
 On first use, the application opens Settings if configuration is absent or invalid.
 
@@ -88,27 +88,27 @@ On first use, the application opens Settings if configuration is absent or inval
 | Global installation | The separate Global game root. |
 | Advanced → shared game settings file | The actual `Variables.txt` file. |
 
-Browse to each location or enter its full path. Path fields do not expand expressions such as `%USERPROFILE%`. Select **Save & check**. Validation checks the paths, game branches, completed-update markers, language declarations and shared settings. Invalid input does not replace saved configuration. Return to the main page after a successful save.
+Each location can be specified through the folder picker or a full path. Path fields do not expand expressions such as `%USERPROFILE%`. **Save & check** validates the paths, game branches, completed-update markers, language declarations and shared settings. Invalid input does not replace saved configuration. A successful save permits a return to the main page.
 
-The game profiles use `zhCN` text and speech for China, and `enUS` for Global. Custom game-language combinations are not exposed in Settings. Under **Display language**, choose **English** or **简体中文**. This choice applies and saves immediately, independently of the paths. New or invalid language preferences fall back to English; valid saved preferences are preserved.
+The game profiles use `zhCN` text and speech for China, and `enUS` for Global. Custom game-language combinations are not exposed in Settings. **Display language** provides **English** and **简体中文** options. The selected language takes effect and is saved immediately, independently of the paths. New or invalid language preferences fall back to English; valid saved preferences are preserved.
 
 Unsaved path changes must be saved or discarded before returning, pressing Escape or closing the window. **Discard changes** restores the saved paths.
 
-## 6. Switch regions
+## 6. Region switching
 
-1. Exit StarCraft II and its editor. Wait for Battle.net downloads, updates and repairs to finish.
-2. Open the switcher and confirm that the local installation check passes. Recheck after an update.
-3. Select China or Global. For Global, select Europe (`EU`), Americas (`US`) or Asia (`KR`).
-4. Start the switch and wait while Battle.net exits, language settings are updated, and the selected login region opens.
-5. Complete any required login in Battle.net. Check the game's installation location, select the actual game server there, and launch the game.
+1. Switching requires StarCraft II and its editor to be closed, with Battle.net downloads, updates and repairs complete.
+2. The local installation check must pass in the switcher. An update requires a new check.
+3. The destination is China or Global. Global additionally requires Europe (`EU`), Americas (`US`) or Asia (`KR`) as the Battle.net login region.
+4. The switch action initiates Battle.net exit, language-setting updates and startup of the selected login region. These operations must finish before another switch.
+5. Any required login takes place in Battle.net. Game launch follows verification of the installation location and selection of the actual game server there.
 
-Relevant controls and normal window closing are locked during the operation. There is no cancellation button. If the wrong target was selected, wait for completion before switching again. Battle.net prompts must be handled in Battle.net; the switcher does not force-kill it.
+Relevant controls and normal window closing are locked during the operation. There is no cancellation button. A mistaken target selection can be corrected by another switch only after the current operation completes. Battle.net prompts must be handled in Battle.net; the switcher does not force-kill it.
 
 The **current configuration** is read from Battle.net's local region record. The **selected destination** is the next requested target. Selecting EU, US or KR does not change the displayed current region until it is observed by the application. These are login-region states, not confirmation of account authentication or of the StarCraft II game server.
 
 ## 7. Configuration, backups and recovery
 
-Open `%LOCALAPPDATA%\SC2RegionSwitcherV2` to find the current user's data:
+The current user's data is stored in `%LOCALAPPDATA%\SC2RegionSwitcherV2`:
 
 | File or directory | Purpose |
 | --- | --- |
@@ -119,27 +119,27 @@ Open `%LOCALAPPDATA%\SC2RegionSwitcherV2` to find the current user's data:
 | `pending-language.json` | A language transaction awaiting completion or recovery |
 | `last-success.json`, `last-error.json` | Most recent operation records, when present |
 
-Uninstalling the MSI retains this data. Moving or replacing a portable application folder also leaves it in place. To update a portable installation, close the app, extract the new package into a new directory and update any shortcut. Do not copy portable files over an MSI-managed directory.
+Uninstalling the MSI retains this data. Moving or replacing a portable application folder also leaves it in place. A portable update requires the app to be closed, the new package to be extracted into a new directory and any shortcut to be updated. Portable files must not overwrite an MSI-managed directory.
 
-When no user configuration exists, a valid legacy `profiles.json` beside the application can be migrated; the original is retained. Paths must be reviewed when moving to another computer. After moving a game, let Battle.net recognize and verify the new location before changing the switcher's settings.
+When no user configuration exists, a valid legacy `profiles.json` beside the application can be migrated; the original is retained. Paths must be reviewed when moving to another computer. After a game is moved, Battle.net recognition and verification of the new location must precede changes to the switcher's settings.
 
-If an unfinished language transaction is reported, preserve the original paths, configuration, journal and backups. Close the game and editor, then start a switch with the original configuration after installation checks pass. Recovery is attempted at the beginning of the switch; opening the window or running a check alone does not trigger it. If recovery fails again, preserve the error and files for diagnosis instead of deleting the journal or overwriting current settings with an old backup.
+An unfinished language transaction requires preservation of the original paths, configuration, journal and backups. Recovery is attempted at the beginning of a subsequent switch using the original configuration, after the game and editor have closed and installation checks have passed. Opening the window or running a check alone does not trigger recovery. A repeated recovery failure requires preservation of the error and files for diagnosis; the journal must not be deleted, and an old backup must not overwrite the current settings.
 
 ## Troubleshooting
 
-| Symptom | Action |
+| Symptom | Diagnostic or recovery requirement |
 | --- | --- |
-| .NET is required or the app does not start | Install Desktop Runtime 10 x64 and check that all four runtime files are present. |
-| Missing game manifest or wrong branch | Check the selected directory level and regional installation in Battle.net; finish installation or repair. |
-| Missing language data | Install both text and speech for the required language in Battle.net. |
-| Missing completed-update marker or changing files | Let Battle.net complete the update or repair and create the completion markers, then recheck. |
-| Missing or invalid `Variables.txt` | Select the game's actual file; run and exit the game normally if it has not been generated. |
-| Linked or redirected path rejected | Check the actual game and Documents locations; reparse-point paths are not supported by the current checks. |
-| Game/editor running, or Battle.net has not exited | Close it normally, handle any prompts and retry. |
-| Target login region cannot be confirmed | Inspect Battle.net's login screen and version. A changed launcher interface may need an application update. |
-| Configuration changed in another window | Close duplicate switcher windows and reopen before editing. |
-| File cannot be written | Check read-only attributes, current-user access and whether another process holds the file. |
+| .NET is required or the app does not start | Startup requires Desktop Runtime 10 x64 and all four runtime files. |
+| Missing game manifest or wrong branch | The selected directory level and regional installation in Battle.net require verification; installation or repair must be complete. |
+| Missing language data | Both text and speech for the required language must be installed through Battle.net. |
+| Missing completed-update marker or changing files | A new check is valid after Battle.net completes the update or repair and creates the completion markers. |
+| Missing or invalid `Variables.txt` | Configuration requires the game's actual file; a normal game session and exit generate it if absent. |
+| Linked or redirected path rejected | The actual game and Documents locations require verification; the current checks do not support reparse-point paths. |
+| Game/editor running, or Battle.net has not exited | A retry requires normal exit and resolution of any application prompts. |
+| Target login region cannot be confirmed | Diagnosis requires Battle.net's login screen and version. A changed launcher interface may require an application update. |
+| Configuration changed in another window | Further editing requires duplicate switcher windows to be closed and the application to be reopened. |
+| File cannot be written | Diagnosis includes read-only attributes, current-user access and file locks held by other processes. |
 
 Game installations are not required to have identical build numbers. Compatibility depends on the manifest format, paths and Battle.net behavior remaining supported after official updates.
 
-For a report, include the switcher, Windows, .NET and Battle.net versions, the steps taken and the full error text. Review paths and log excerpts for personal information before sharing. Reports can be limited to application behavior and redacted diagnostic details. Current test coverage and remaining limitations are listed in [Validation](VALIDATION.md).
+A diagnostic report contains the switcher, Windows, .NET and Battle.net versions, the procedure followed and the full error text. Paths and log excerpts require review for personal information before distribution. Report content is limited to application behavior and redacted diagnostic details. Current test coverage and remaining limitations are listed in [Validation](VALIDATION.md).

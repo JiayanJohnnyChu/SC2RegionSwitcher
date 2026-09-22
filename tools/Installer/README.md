@@ -2,7 +2,7 @@
 
 # Per-machine MSI
 
-`scripts/Package.ps1` publishes the application and builds packages without installing them. To package existing published files, use:
+`scripts/Package.ps1` publishes the application and builds packages without installing them. Existing published files can be packaged with the following command:
 
 ```powershell
 .\tools\Installer\Build-MachineMsi.ps1 -AppDirectory <directory> -OutputDirectory <empty-directory>
@@ -18,11 +18,11 @@ The Application component owns the four runtime files and the advertised Start m
 
 ## Migration and upgrades
 
-The earlier 3.3.0 and 3.4.0 current-user packages were internal previews. Uninstall the old package as its owning user, then install the new MSI. Keep the separate user data directory. Windows Installer does not perform major upgrades across installation contexts; see Microsoft's [Major Upgrades](https://learn.microsoft.com/en-us/windows/win32/msi/major-upgrades). A shared UpgradeCode does not remove this restriction.
+The earlier 3.3.0 and 3.4.0 current-user packages were internal previews. Migration requires removal of the old package by its owning user before installation of the new MSI, with the separate user data directory retained. Windows Installer does not perform major upgrades across installation contexts, as documented in Microsoft's [Major Upgrades](https://learn.microsoft.com/en-us/windows/win32/msi/major-upgrades). A shared UpgradeCode does not remove this restriction.
 
 AppSearch and RegLocator check the invoking user's old HKCU App Paths entry. If found, the installer blocks the new installation and asks for the old preview to be uninstalled. This check does not search other users' profiles. The transition is a one-time uninstall/reinstall, followed by ordinary major upgrades between later machine releases.
 
-For machine upgrades, `RemoveExistingProducts` runs immediately after `InstallInitialize`, before `ProcessComponents` and new file installation, so removal is inside the rollback transaction. Newer related machine versions are rejected. Restart Manager automatic shutdown is disabled; close the switcher before installation. The original MSI supports maintenance invocation.
+For machine upgrades, `RemoveExistingProducts` runs immediately after `InstallInitialize`, before `ProcessComponents` and new file installation, so removal is inside the rollback transaction. Newer related machine versions are rejected. Restart Manager automatic shutdown is disabled; installation requires the switcher to be closed. The original MSI supports maintenance invocation.
 
 ## Validation
 
@@ -35,6 +35,6 @@ The database uses standard MSI definitions and imports constraints from [metadat
 | `scripts/Test-InstallerSchema.ps1 -ReleaseDirectory <directory>` | Full unsuppressed ICE suite; machine packages require zero errors and warnings |
 | `tools/Installer/Test-MachineInstall.ps1`, `installer-lifecycle.yml` | Isolated machine installation, maintenance, upgrade, recovery and removal |
 
-Lifecycle acceptance for the new package is pending. Record the exact tested MSI hash and source revision. The old `installer-recovery.yml` workflow and administrator/standard-user comparisons describe the earlier current-user design; they do not validate this machine package. See [3.4.1 validation](../../docs/VALIDATION-3.4.1.md).
+Hosted lifecycle tests passed for the candidate identified in the validation record. Interactive UAC installation and subsequent ordinary-user launch remain pending. The validation record must identify the exact tested MSI hash and source revision. The old `installer-recovery.yml` workflow and administrator/standard-user comparisons describe the earlier current-user design; they do not validate this machine package. The evidence is documented in [3.4.1 validation](../../docs/VALIDATION-3.4.1.md).
 
-Every distributed preview increments the three-part ProductVersion. Preserve original files once tagged or distributed, and promote accepted CI artifacts without rebuilding. The original 3.3.0 MSI lacks downgrade protection. See the [release workflow](../../docs/GITHUB-RELEASE.md).
+Every distributed preview increments the three-part ProductVersion. Tagged or distributed versions must retain their original files, and promotion must use accepted CI artifacts without rebuilding. The original 3.3.0 MSI lacks downgrade protection. The procedure is documented in the [release workflow](../../docs/GITHUB-RELEASE.md).

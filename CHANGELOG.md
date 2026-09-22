@@ -5,29 +5,29 @@
 ## 3.4.1 — development preview
 
 - Global destination labels show the selected Battle.net login region: EU, US or KR. The current configuration remains separate from the selected target.
-- Adopted an administrator-required, per-machine MSI in 64-bit Program Files, with HKLM App Paths and one common Start menu entry. The application still runs as an ordinary user; user configuration and backups remain separate and survive uninstall.
+- The installer uses an administrator-required, per-machine MSI in 64-bit Program Files, with HKLM App Paths and one common Start menu entry. The application still runs as an ordinary user; user configuration and backups remain separate and survive uninstall.
 - Earlier current-user previews require a one-time uninstall/reinstall. Machine versions retain the product-family UpgradeCode and use new product/component identities.
-- Corrected MSI schema definitions and validation metadata.
-- Added independent Windows Installer ICE validation without suppressions.
-- Added paired English and Simplified Chinese documentation, including both README files in the portable ZIP.
+- MSI schema definitions and validation metadata have been corrected.
+- Package checks include independent Windows Installer ICE validation without suppressions.
+- Documentation is available in paired English and Simplified Chinese versions, including both README files in the portable ZIP.
 
-The new administrator-required installer has passed local build and package checks; CI lifecycle acceptance is pending. This version is not a release candidate. See [release notes](docs/RELEASE-NOTES-3.4.1.md) and [validation](docs/VALIDATION-3.4.1.md).
+The administrator-required installer has passed build, package and hosted lifecycle checks for the candidate identified in the validation record. Interactive UAC installation and subsequent ordinary-user launch remain pending; final acceptance is incomplete. The changes and evidence are documented in [release notes](docs/RELEASE-NOTES-3.4.1.md) and [validation](docs/VALIDATION-3.4.1.md).
 
 ## 3.4.0 — private draft, on hold
 
-- Revised typography, spacing, destination colors and page alignment.
-- Separated the current Battle.net configuration from the selected destination.
-- Added current-user major upgrades, a stable application directory and one Start menu entry.
-- Added candidate provenance checks and promotion of original CI artifacts.
+- The interface received revised typography, spacing, destination colors and page alignment.
+- The interface separated the current Battle.net configuration from the selected destination.
+- The installer introduced current-user major upgrades, a stable application directory and one Start menu entry.
+- The release workflow introduced candidate provenance checks and promotion of original CI artifacts.
 
-The identified candidate passed normal installation lifecycle checks, the four-scale bilingual DPI matrix and one China → Europe → China online roundtrip. Failed-upgrade recovery remained unresolved. See [release notes](docs/RELEASE-NOTES-3.4.0.md) and [validation](docs/VALIDATION.md).
+The identified candidate passed normal installation lifecycle checks, the four-scale bilingual DPI matrix and one China → Europe → China online roundtrip. Failed-upgrade recovery remained unresolved. The changes and evidence are documented in [release notes](docs/RELEASE-NOTES-3.4.0.md) and [validation](docs/VALIDATION.md).
 
 ## 3.3.0 — historical preview
 
-- Provided a WPF interface with independent English and Simplified Chinese selection.
-- Supported configurable Battle.net, China, Global and shared-settings paths.
-- Included validated configuration saving, backups, unsaved-edit prompts and concurrent-change checks.
-- Provided a current-user MSI, one Start menu entry and a portable ZIP.
-- Included a pinned development SDK, isolated regressions and package checks.
+- The application provided a WPF interface with independent English and Simplified Chinese selection.
+- Configuration supported Battle.net, China, Global and shared-settings paths.
+- Configuration handling included validated saving, backups, unsaved-edit prompts and concurrent-change checks.
+- The distribution included a current-user MSI, one Start menu entry and a portable ZIP.
+- Development tooling included a pinned SDK, isolated regressions and package checks.
 
-This installer used a versioned application directory and had no major-upgrade or downgrade-protection design. See [release notes](docs/RELEASE-NOTES-3.3.0.md).
+This installer used a versioned application directory and had no major-upgrade or downgrade-protection design. The version is described in [release notes](docs/RELEASE-NOTES-3.3.0.md).

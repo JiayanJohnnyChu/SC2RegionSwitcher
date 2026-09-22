@@ -6,7 +6,7 @@ Updated 2026-09-22. Results apply to the identified revision and package hashes.
 
 ## 3.4.1 development preview
 
-The administrator-required, per-machine MSI passed local compilation with zero warnings/errors, all 52 regressions, package validation, eight release rejection cases and the full unsuppressed ICE suite with zero warnings/errors. CI candidate and lifecycle acceptance remain pending. Earlier basic bilingual UI checks and current-user recovery diagnostics are recorded separately. This version is not a promoted candidate. Detailed scope is in [3.4.1 validation](VALIDATION-3.4.1.md).
+The administrator-required, per-machine MSI passed local compilation with zero warnings/errors, all 52 regressions, package validation, eight release rejection cases and the full unsuppressed ICE suite with zero warnings/errors. The candidate from [CI run 35721803273](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35721803273) passed hosted machine lifecycle testing in [run 35722639637](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35722639637), including upgrade and failed-upgrade recovery. Interactive UAC installation and subsequent ordinary-user launch remain pending. Earlier basic bilingual UI checks and current-user recovery diagnostics are recorded separately. This version is not a promoted candidate. Detailed scope is in [3.4.1 validation](VALIDATION-3.4.1.md).
 
 The full DPI matrix and online roundtrip below belong to 3.4.0, not 3.4.1.
 

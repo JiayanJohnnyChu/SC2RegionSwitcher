@@ -47,6 +47,6 @@ Checking and switching disable the relevant actions; there is no cancellation co
 
 `--matrix` exports both languages across normal, narrow, busy, error, success, settings, unsaved-edit and reference states. It requires an explicit isolated `--data-dir` and disables real switching and path saving during the presentation. Synthetic reports set `SyntheticState=true`.
 
-For DPI validation, launch the EXE so its PerMonitorV2 manifest applies. Self-rendering and external window capture are separate observations. Store raw images and reports under ignored `artifacts/` directories.
+DPI validation requires execution of the EXE so that its PerMonitorV2 manifest applies. Self-rendering and external window capture are separate observations. Raw images and reports are stored under ignored `artifacts/` directories.
 
-The complete 100%, 125%, 150% and 200% bilingual matrix belongs to the original 3.4.0 candidate. Version 3.4.1 has basic bilingual label checks at 200% in the standard window. Multi-display movement and cross-computer behavior remain unverified. See [Validation](VALIDATION.md).
+The complete 100%, 125%, 150% and 200% bilingual matrix belongs to the original 3.4.0 candidate. Version 3.4.1 has basic bilingual label checks at 200% in the standard window. Multi-display movement and cross-computer behavior remain unverified. The evidence is documented in [Validation](VALIDATION.md).

@@ -2,7 +2,7 @@
 
 # 全机 MSI
 
-`scripts/Package.ps1` 发布运行文件并生成安装包，不执行安装。已有发布文件时，可运行：
+`scripts/Package.ps1` 发布运行文件并生成安装包，不执行安装。已有发布文件可通过以下命令打包：
 
 ```powershell
 .\tools\Installer\Build-MachineMsi.ps1 -AppDirectory <目录> -OutputDirectory <空目录>
@@ -18,11 +18,11 @@ Application 组件管理四个运行文件和已播发开始菜单快捷方式�
 
 ## 迁移与升级
 
-此前的 3.3.0 和 3.4.0 当前用户包属于内部预览。先由原安装用户卸载旧包，再安装新 MSI，保留独立用户数据目录。Windows Installer 无法跨安装上下文执行大版本升级，参阅 Microsoft 的 [Major Upgrades](https://learn.microsoft.com/en-us/windows/win32/msi/major-upgrades)。共用 UpgradeCode 不改变这一限制。
+此前的 3.3.0 和 3.4.0 当前用户包属于内部预览。迁移要求旧包先由原安装用户移除，再安装新 MSI，同时保留独立用户数据目录。Windows Installer 无法跨安装上下文执行大版本升级，这一限制记录于 Microsoft 的 [Major Upgrades](https://learn.microsoft.com/en-us/windows/win32/msi/major-upgrades)。共用 UpgradeCode 不改变这一限制。
 
 AppSearch 和 RegLocator 检查发起安装的用户旧有的 HKCU App Paths 项；发现后阻止新安装，提示先卸载旧预览版。这一检查不扫描其他用户的配置。完成这次一次性卸载重装后，后续全机版本通过正常大版本升级更新。
 
-全机升级时，`RemoveExistingProducts` 紧接 `InstallInitialize`，在 `ProcessComponents` 和新文件安装之前执行，将旧产品移除置于回滚事务内。检测到更高的相关全机版本时拒绝安装。Restart Manager 自动关闭应用已禁用，安装前应关闭切换器。原始 MSI 支持维护调用。
+全机升级时，`RemoveExistingProducts` 紧接 `InstallInitialize`，在 `ProcessComponents` 和新文件安装之前执行，将旧产品移除置于回滚事务内。检测到更高的相关全机版本时拒绝安装。Restart Manager 自动关闭应用已禁用，安装要求切换器已关闭。原始 MSI 支持维护调用。
 
 ## 验证
 
@@ -35,6 +35,6 @@ AppSearch 和 RegLocator 检查发起安装的用户旧有的 HKCU App Paths 项
 | `scripts/Test-InstallerSchema.ps1 -ReleaseDirectory <目录>` | 不屏蔽规则的完整 ICE 套件；全机包要求零错误、零警告 |
 | `tools/Installer/Test-MachineInstall.ps1`、`installer-lifecycle.yml` | 隔离的全机安装、维护、升级、恢复和移除 |
 
-新包的生命周期验收尚未完成。结果须记录确切 MSI 哈希和源码提交。旧 `installer-recovery.yml` 工作流及管理员／标准用户对照描述的是此前的当前用户设计，不能证明全机包通过。参阅 [3.4.1 验证](../../docs/VALIDATION-3.4.1.zh-CN.md)。
+验证记录标明的候选已通过托管环境生命周期测试。交互式 UAC 安装及随后以普通用户启动的检查仍待完成。结果须记录确切 MSI 哈希和源码提交。旧 `installer-recovery.yml` 工作流及管理员／标准用户对照描述的是此前的当前用户设计，不能证明全机包通过。证据记录于 [3.4.1 验证](../../docs/VALIDATION-3.4.1.zh-CN.md)。
 
-每个分发预览递增三段 ProductVersion。打标签或分发后保留原文件，提升已接受的 CI 制品时不重新构建。原始 3.3.0 MSI 没有降级保护。参阅[发布流程](../../docs/GITHUB-RELEASE.zh-CN.md)。
+每个分发预览递增三段 ProductVersion。已打标签或分发的版本必须保留原文件，提升必须使用已接受的 CI 制品，不得重新构建。原始 3.3.0 MSI 没有降级保护。流程记录于[发布流程](../../docs/GITHUB-RELEASE.zh-CN.md)。

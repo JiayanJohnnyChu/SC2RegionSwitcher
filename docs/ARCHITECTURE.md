@@ -24,11 +24,11 @@ The regression project links core source files and supplies `FakePlatform` imple
 
 ## Switch transaction
 
-1. Validate configured paths, installation branches, language data and game/editor state.
-2. Request a normal Battle.net exit, wait, and recheck the installations.
-3. Back up `Variables.txt` and atomically update its language keys, recording original and applied hashes.
-4. Launch Battle.net with the selected login-region argument and observe its local region record.
-5. Commit the transaction, or attempt recovery when the failure stage and file-consistency checks permit it.
+1. The engine validates configured paths, installation branches, language data and game/editor state.
+2. It requests a normal Battle.net exit, waits, and rechecks the installations.
+3. It backs up `Variables.txt` and atomically updates its language keys, recording original and applied hashes.
+4. It launches Battle.net with the selected login-region argument and observes its local region record.
+5. It commits the transaction, or attempts recovery when the failure stage and file-consistency checks permit it.
 
 At the start of a switch, an unfinished language transaction is recovered before new language changes are made. Recovery verifies journal paths, backup placement and file hashes before restoring the settings. Merely opening the app or rechecking installations does not perform recovery.
 
@@ -42,7 +42,7 @@ State is stored under `%LOCALAPPDATA%\SC2RegionSwitcherV2`. `profiles.json` stor
 
 China uses `zhCN` text and speech; Global uses `enUS`. Interface language is independent. Missing or invalid language preferences fall back to `en-US`; valid `en-US` and `zh-CN` preferences are retained. Both translation catalogs must have identical keys and matching format placeholders.
 
-The current Battle.net configuration and the selected destination are separate state. Global's EU/US/KR label reflects the selected login region. It does not set or verify the StarCraft II game server.
+The current Battle.net configuration and the selected destination are maintained separately. Global's EU/US/KR label reflects the selected login region. It does not set or verify the StarCraft II game server.
 
 ## Installation
 
@@ -50,4 +50,4 @@ Version 3.4.1 adopts a per-machine MSI: `ALLUSERS=1`, `ProgramFiles64Folder\SC2R
 
 The product-family UpgradeCode is retained. Machine installation uses new ProductCode and component identities. Earlier current-user previews require a one-time uninstall/reinstall; subsequent machine versions use major upgrades in the same context. `RemoveExistingProducts` runs after `InstallInitialize`, before new files are installed.
 
-The switching engine and configuration transactions are unchanged. New-package lifecycle and recovery acceptance is pending. See [Installer](../tools/Installer/README.md) and [Validation](VALIDATION-3.4.1.md).
+The switching engine and configuration transactions are unchanged. Hosted machine lifecycle and failed-upgrade recovery checks passed for the candidate identified in the validation record; interactive UAC installation remains pending. The design and evidence are documented in [Installer](../tools/Installer/README.md) and [Validation](VALIDATION-3.4.1.md).

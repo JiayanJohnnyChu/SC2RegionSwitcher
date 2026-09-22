@@ -8,4 +8,4 @@ The builder imports these constraints before inserting application rows. Togethe
 
 Source: [WiX Toolset 3.14.1](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm). The upstream copyright and license are preserved in [LICENSE-WiX.txt](LICENSE-WiX.txt), which applies to this metadata. No application license has been selected.
 
-Schema validation checks package structure. Actual installation and recovery require separate testing; see the [installer guide](../README.md).
+Schema validation checks package structure. Actual installation and recovery require separate testing, as described in the [installer guide](../README.md).

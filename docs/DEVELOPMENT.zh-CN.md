@@ -2,11 +2,11 @@
 
 # 开发与构建
 
-使用 Windows x64 和 `global.json` 固定的 .NET SDK **10.0.401**。仅有 Desktop Runtime 无法编译。打开 `SC2RegionSwitcher.slnx` 可加载应用、回归程序及图标工具。
+开发环境要求 Windows x64 和 `global.json` 固定的 .NET SDK **10.0.401**。仅有 Desktop Runtime 无法编译。`SC2RegionSwitcher.slnx` 解决方案包含应用、回归程序及图标工具。
 
 ## 工具与命令
 
-在项目根目录的 PowerShell 中执行下列命令。脚本按自身位置定位根目录，因此也可用脚本绝对路径调用。
+下列命令的执行环境为项目根目录中的 PowerShell。脚本按自身位置定位根目录，因此也可用脚本绝对路径调用。
 
 | 命令 | 用途 |
 | --- | --- |
@@ -42,21 +42,21 @@ Setup 按 `eng/dotnet-sdk.json` 校验 Microsoft SDK 压缩包后才解压。`-A
 
 `--ui-report <绝对JSON路径>` 导出布局报告和 WPF 自渲染图。`--compact` 请求最小窗口尺寸。F12 捕获当前主页面、设置页或参考页。输出应放入 `artifacts/`。
 
-`--matrix` 必须同时指定独立的 `--data-dir`，用于导出两种语言的模拟状态。展示期间禁止真实切换和路径保存，报告标记 `SyntheticState=true`。DPI 检查应启动生成的 EXE，使应用清单生效；经 dotnet 宿主运行 DLL 的渲染不能证明 EXE 的 PerMonitorV2 行为。参阅[界面设计](UI-DESIGN.zh-CN.md)。
+`--matrix` 必须同时指定独立的 `--data-dir`，用于导出两种语言的模拟状态。展示期间禁止真实切换和路径保存，报告标记 `SyntheticState=true`。DPI 检查要求通过生成的 EXE 启动应用，以使应用清单生效；经 dotnet 宿主运行 DLL 的渲染不能证明 EXE 的 PerMonitorV2 行为。诊断流程记录于[界面设计](UI-DESIGN.zh-CN.md)。
 
 ## 图标
 
-应用与安装器共用 `assets/icon/switcher.ico`，同目录含矢量原稿和预览。先在临时位置生成拟议变更：
+应用与安装器共用 `assets/icon/switcher.ico`，同目录含矢量原稿和预览。以下命令在临时位置生成拟议变更：
 
 ```powershell
 . .\scripts\Common.ps1
 Invoke-ProjectDotNet -Arguments @('run', '--project', '.\tools\IconGenerator\IconGenerator.csproj', '--configuration', 'Release', '--no-build', '--', '.\artifacts\icon-preview')
 ```
 
-检查 SVG、PNG、ICO 和对照图后再更新资源。主窗口相关几何图形另在 XAML 中维护。
+资源更新以 SVG、PNG、ICO 和对照图的预先检查为前提。主窗口相关几何图形另在 XAML 中维护。
 
 ## CI 与发布维护
 
 Windows CI 检查工作流与仓库内容，完成编译、回归、打包以及内容、结构和拒绝情形检查。Action 固定到提交；Dependabot 每月提出更新，不自动合并。升级 SDK 时同时更新 `global.json` 和 `eng/dotnet-sdk.json`；验证器及工作流工具更新也需修改对应版本与哈希元数据。
 
-每个分发预览使用新的三段版本号。重新构建的 MSI 字节和 PackageCode 均不同，因此安装结果必须标明确切哈希。提升已接受的 CI 原文件时不得重新构建。参阅[安装器说明](../tools/Installer/README.zh-CN.md)、[发布流程](GITHUB-RELEASE.zh-CN.md)和[当前状态](HANDOFF.zh-CN.md)。
+每个分发预览使用新的三段版本号。重新构建的 MSI 字节和 PackageCode 均不同，因此安装结果必须标明确切哈希。提升已接受的 CI 原文件时不得重新构建。流程与证据记录于[安装器说明](../tools/Installer/README.zh-CN.md)、[发布流程](GITHUB-RELEASE.zh-CN.md)和[当前状态](HANDOFF.zh-CN.md)。
