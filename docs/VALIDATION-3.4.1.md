@@ -2,7 +2,7 @@
 
 # 3.4.1 validation status
 
-Recorded 2026-09-22. Version 3.4.1 is a development preview, not a promoted release candidate. The 3.4.0 private draft remains on hold.
+Recorded 2026-09-22. Version 3.4.1 is a private preview. The 3.4.0 private draft remains on hold.
 
 ## Current machine installer
 
@@ -33,9 +33,23 @@ The original candidate from [CI run 35721803273](https://github.com/JiayanJohnny
 
 The exact original MSI passed installation, maintenance, uninstall, reinstall and final removal. Verification covered all four installed file hashes, HKLM App Paths, the common advertised shortcut, one uninstall registration and an unchanged user-data test file. Isolated MSI copies passed major upgrade and downgrade rejection; the original MSI passed legacy-preview detection against a synthetic HKCU entry. The file-in-use case returned 3010, indicating success with a restart required. An isolated MSI copy encountered native error 1312 after old-product removal, triggering rollback: the old product returned to installed state 5, the new product was absent, and old file hashes and entry points were restored. No registry rollback error 140x with system error 5 was recorded. Cleanup assertions passed.
 
-These results apply to the identified package and harness. The final documentation revision requires a separately identified CI artifact; the recorded results do not establish installation of a later rebuilt package.
+These lifecycle results apply to the identified package and harness.
 
-Interactive installation from a standard desktop through UAC and subsequent ordinary-user launch remain pending. An elevated CI run does not establish this interactive path. Follow-up application coverage is limited to basic launch and bilingual UI checks unless changed behavior requires broader testing. The completed full UI/online round remains attributed to 3.4.0; no new online roundtrip is claimed.
+### Final candidate and local migration
+
+The final candidate passed [CI run 35723586274](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35723586274). Comparison with the hosted lifecycle source confirmed identical application source and MSI authoring; the intervening changes concern documentation and the test harness.
+
+| Identity | Value |
+| --- | --- |
+| Final candidate source | `3337cbacbf2acc0bc8ba9a04c3431cb6e5ab819a` |
+| MSI SHA-256 | `C93CF161DFE30ECD2E154B10CD4B9F3B666FC371A553B2E0752FB2F9594B4D7C` |
+| ZIP SHA-256 | `C52607AB1193848E226DA5BF38E6351143011A6AFFB9649A18AB87879EF991E5` |
+
+Local migration used this original MSI. The native Windows Installer log recorded an elevation request, successful consent and elevated installation. Removal of the 3.4.0 current-user package and installation of 3.4.1 both returned zero. The old product was absent and the new product was installed. All four runtime files matched the final ZIP; one common Start menu shortcut and one HKLM uninstall registration remained, and the old user shortcut was absent. Sixteen existing configuration and backup files retained their hashes.
+
+The installed application launched through the actual Start menu shortcut, resolved to the Program Files executable and remained responsive. The process token reported `TokenElevation=false`, confirming ordinary-user execution after installation.
+
+The installed application's Settings window passed a read-only English check with the existing configuration. Separate launches of the same installed EXE with isolated configuration passed English and Simplified Chinese Settings UI checks. Screenshots and accessibility trees showed complete controls and legible labels without observed clipping. These checks did not save paths, modify existing configuration, perform game operations or repeat the DPI matrix. Evidence is retained in `artifacts/final-machine-ui/UI_SMOKE_SUMMARY.md`. The completed full UI/online round remains attributed to 3.4.0; no new online roundtrip is claimed.
 
 ## Historical current-user evidence
 
@@ -100,4 +114,4 @@ Raw packages and diagnostic records remain under ignored `artifacts/validation/3
 
 ## Release status
 
-The release remains on hold pending final artifact identification, interactive UAC installation and subsequent ordinary-user launch. Hosted machine lifecycle acceptance is complete for the exact candidate identified above. No public release or local production installation is recorded in this document.
+The final candidate is identified and has passed local UAC migration and ordinary-user launch. Hosted lifecycle evidence applies to the earlier package specified above, with identical application source and MSI authoring. Basic English and Simplified Chinese Settings UI checks passed with isolated configuration. The original final CI files are retained for promotion without rebuilding; no public release is recorded.

@@ -2,7 +2,7 @@
 
 # Setup and use
 
-SC2 Region Switcher uses one Battle.net desktop app and two independent StarCraft II installations. It changes the Battle.net login region and the language keys in the game's shared settings file. The current development version is 3.4.1. The administrator-required MSI has passed build, package and hosted lifecycle checks for the candidate identified in the validation record. Interactive UAC installation and subsequent ordinary-user launch remain pending. The tested scope is documented in [validation status](VALIDATION-3.4.1.md).
+SC2 Region Switcher uses one Battle.net desktop app and two independent StarCraft II installations. It changes the Battle.net login region and the language keys in the game's shared settings file. The current preview version is 3.4.1. The administrator-required MSI has passed build, package and hosted lifecycle checks for the candidate identified in the validation record. The final CI candidate passed interactive UAC migration and subsequent ordinary-user launch. Basic English and Simplified Chinese Settings UI checks passed with isolated configuration. The tested scope is documented in [validation status](VALIDATION-3.4.1.md).
 
 ## 1. Requirements
 
@@ -62,7 +62,7 @@ MSI installation requires the switcher to be closed and the Windows administrato
 
 Earlier 3.3.0 and 3.4.0 current-user packages were internal previews. Migration consists of removing the old preview through Windows Installed apps while signed in as its owning user, followed by installation of the new MSI. The `%LOCALAPPDATA%\SC2RegionSwitcherV2` directory must remain in place so that the same user can reuse the preserved configuration and backups. This is a one-time uninstall/reinstall; Windows Installer cannot perform a major upgrade across user and machine contexts. The new installer checks the invoking user's old HKCU App Paths entry and blocks installation with removal instructions when it is present. It does not inventory other users' profiles.
 
-Later per-machine versions use MSI major upgrades within the same installation context. Hosted checks of installation, maintenance and failed-upgrade recovery passed for the identified candidate; interactive UAC installation remains pending. After an installation failure, the error details and configuration must be retained for diagnosis.
+Later per-machine versions use MSI major upgrades within the same installation context. Hosted checks of installation, maintenance and failed-upgrade recovery passed for the identified candidate; the final CI candidate also passed interactive UAC migration and ordinary-user launch. After an installation failure, the error details and configuration must be retained for diagnosis.
 
 The original 3.3.0 installer has no downgrade protection. It must not be applied over a newer installation. Previously created manual shortcuts are outside MSI ownership. A shortcut that opens a retired version requires target verification followed by correction or removal of that specific shortcut.
 

@@ -35,6 +35,6 @@ AppSearch 和 RegLocator 检查发起安装的用户旧有的 HKCU App Paths 项
 | `scripts/Test-InstallerSchema.ps1 -ReleaseDirectory <目录>` | 不屏蔽规则的完整 ICE 套件；全机包要求零错误、零警告 |
 | `tools/Installer/Test-MachineInstall.ps1`、`installer-lifecycle.yml` | 隔离的全机安装、维护、升级、恢复和移除 |
 
-验证记录标明的候选已通过托管环境生命周期测试。交互式 UAC 安装及随后以普通用户启动的检查仍待完成。结果须记录确切 MSI 哈希和源码提交。旧 `installer-recovery.yml` 工作流及管理员／标准用户对照描述的是此前的当前用户设计，不能证明全机包通过。证据记录于 [3.4.1 验证](../../docs/VALIDATION-3.4.1.zh-CN.md)。
+验证记录标明的候选已通过托管环境生命周期测试。最终 CI 候选已通过交互式 UAC 迁移及随后以普通用户启动的检查，隔离配置下的基本英文和简体中文设置界面检查已通过。结果须记录确切 MSI 哈希和源码提交。旧 `installer-recovery.yml` 工作流及管理员／标准用户对照描述的是此前的当前用户设计，不能证明全机包通过。证据记录于 [3.4.1 验证](../../docs/VALIDATION-3.4.1.zh-CN.md)。
 
 每个分发预览递增三段 ProductVersion。已打标签或分发的版本必须保留原文件，提升必须使用已接受的 CI 制品，不得重新构建。原始 3.3.0 MSI 没有降级保护。流程记录于[发布流程](../../docs/GITHUB-RELEASE.zh-CN.md)。

@@ -6,7 +6,7 @@ SC2 Region Switcher is a Windows x64 application for switching between separate 
 
 The application is written in C# with WPF and .NET 10. Account login, game installation, updates, game-server selection and game startup take place in Battle.net. The Global labels **EU**, **US** and **KR** identify Battle.net login regions; they do not establish which game server is selected.
 
-**Current status: 3.4.1 development preview.** The administrator-required, per-machine MSI has passed build, package and hosted lifecycle checks for the candidate identified in the validation record. Interactive UAC installation and subsequent ordinary-user launch remain pending. Version 3.4.1 is not a release candidate; the earlier 3.4.0 candidate remains an unpublished private draft. Packages are unsigned and require **Microsoft .NET 10 Desktop Runtime x64**. The tested scope is documented in the [validation record](docs/VALIDATION.md).
+**Current status: 3.4.1 preview.** The administrator-required, per-machine MSI has passed build, package and hosted lifecycle checks for the candidate identified in the validation record. The final CI candidate passed interactive UAC migration and subsequent ordinary-user launch. Basic English and Simplified Chinese Settings UI checks passed with isolated configuration. The earlier 3.4.0 candidate remains an unpublished private draft. Packages are unsigned and require **Microsoft .NET 10 Desktop Runtime x64**. The tested scope is documented in the [validation record](docs/VALIDATION.md).
 
 ## Documentation
 

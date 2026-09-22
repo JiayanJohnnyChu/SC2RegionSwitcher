@@ -1,8 +1,8 @@
 [简体中文](RELEASE-NOTES-3.4.1.zh-CN.md)
 
-# SC2 Region Switcher 3.4.1 development preview
+# SC2 Region Switcher 3.4.1 preview
 
-The administrator-required MSI has passed build, package and hosted lifecycle checks for the candidate identified in the validation record. Interactive UAC installation and subsequent ordinary-user launch remain pending. Version 3.4.1 has not been tagged, distributed or promoted.
+The administrator-required MSI has passed build, package and hosted lifecycle checks for the candidate identified in the validation record. The final CI candidate passed interactive UAC migration and subsequent ordinary-user launch. Basic English and Simplified Chinese Settings UI checks passed with isolated configuration. Distribution remains private.
 
 ## Changes
 
@@ -16,8 +16,8 @@ The switching engine, configuration transactions and independent interface-langu
 
 ## Validation and distribution
 
-The identified machine candidate passed hosted installation, maintenance, upgrade, failed-upgrade recovery and removal checks. Its CI provenance, hashes and tested scope are recorded separately from pending interactive UAC and application-launch checks. Earlier current-user package checks and the administrator recovery comparison do not establish acceptance of this package. The evidence is documented in [3.4.1 validation](VALIDATION-3.4.1.md).
+The identified machine candidate passed hosted installation, maintenance, upgrade, failed-upgrade recovery and removal checks. The final candidate from CI run 35723586274 passed interactive UAC migration and ordinary-user launch. The full hosted lifecycle result belongs to an earlier package with identical application source and MSI authoring; the final revision changes documentation and the test harness. Earlier current-user package checks and the administrator recovery comparison do not establish acceptance of this package. The evidence is documented in [3.4.1 validation](VALIDATION-3.4.1.md).
 
-The complete DPI matrix and online roundtrip remain historical 3.4.0 results. Follow-up UI checks cover the changed labels; no new full online roundtrip is claimed. Multi-display movement and cross-computer behavior remain unverified.
+The complete DPI matrix and online roundtrip remain historical 3.4.0 results. The final installed application passed basic English and Simplified Chinese Settings UI checks with isolated configuration; no new full DPI matrix or online roundtrip is claimed. Multi-display movement and cross-computer behavior remain unverified.
 
 The original 3.4.0 files remain unchanged. Packages are unsigned and require Microsoft .NET 10 Desktop Runtime x64. The repository remains private; no application license has been selected. Installation and migration steps are in [Setup](SETUP.md).

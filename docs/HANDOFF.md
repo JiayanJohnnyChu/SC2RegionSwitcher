@@ -2,7 +2,7 @@
 
 # Development status
 
-Updated 2026-09-22. The active version is **3.4.1 development preview**, not tagged or distributed.
+Updated 2026-09-22. The active version is **3.4.1 preview**.
 
 ## Current work
 
@@ -10,14 +10,11 @@ The installer now targets an administrator-required, per-machine installation in
 
 The Global card shows the selected Battle.net login region, EU, US or KR. Current configuration remains separate. The switching engine and configuration transactions are unchanged.
 
-Local machine-package checks passed: compilation with zero warnings and errors, 52 regressions, package validation, eight release rejection cases and the full ICE suite with zero errors or warnings. The candidate from [CI run 35721803273](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35721803273) passed hosted machine lifecycle testing in [run 35722639637](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35722639637). Earlier current-user recovery results, including the successful administrator comparison, do not validate the new package. Exact evidence and pending checks are in [3.4.1 validation](VALIDATION-3.4.1.md).
+Local machine-package checks passed: compilation with zero warnings and errors, 52 regressions, package validation, eight release rejection cases and the full ICE suite with zero errors or warnings. The candidate from [CI run 35721803273](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35721803273) passed hosted machine lifecycle testing in [run 35722639637](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35722639637). Earlier current-user recovery results, including the successful administrator comparison, do not validate the new package. The final candidate from [CI run 35723586274](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35723586274), source `3337cbacbf2acc0bc8ba9a04c3431cb6e5ab819a`, passed interactive UAC migration from 3.4.0 and ordinary-user launch. Its application source and MSI authoring are identical to the hosted lifecycle candidate. Exact evidence and coverage limits are in [3.4.1 validation](VALIDATION-3.4.1.md).
 
-## Remaining acceptance work
+## Validation scope and artifact promotion
 
-1. The final documentation revision requires an identified CI artifact; the recorded lifecycle result applies to the earlier candidate specified in the validation record.
-2. Interactive UAC installation, ordinary-user launch and basic bilingual UI checks remain pending. The existing full DPI and online roundtrip remain historical coverage; broader tests are repeated only if affected application behavior requires them.
-
-Interactive installation from a standard desktop through UAC, followed by ordinary-user application launch, remains pending. An elevated CI lifecycle test does not establish that interactive path. The original 3.4.0 candidate's four-scale DPI matrix and China → Europe → China roundtrip remain recorded in [historical validation](VALIDATION.md); no new online roundtrip is claimed.
+Basic English and Simplified Chinese Settings UI checks passed with isolated configuration. Promotion requires the original final CI files without rebuilding. The existing full DPI and online roundtrip remain historical coverage; broader tests are repeated only if affected application behavior requires them. The original 3.4.0 candidate's four-scale DPI matrix and China → Europe → China roundtrip remain recorded in [historical validation](VALIDATION.md); no new online roundtrip is claimed.
 
 ## Release constraints
 

@@ -2,7 +2,7 @@
 
 # Changelog
 
-## 3.4.1 — development preview
+## 3.4.1 — preview
 
 - Global destination labels show the selected Battle.net login region: EU, US or KR. The current configuration remains separate from the selected target.
 - The installer uses an administrator-required, per-machine MSI in 64-bit Program Files, with HKLM App Paths and one common Start menu entry. The application still runs as an ordinary user; user configuration and backups remain separate and survive uninstall.
@@ -11,7 +11,7 @@
 - Package checks include independent Windows Installer ICE validation without suppressions.
 - Documentation is available in paired English and Simplified Chinese versions, including both README files in the portable ZIP.
 
-The administrator-required installer has passed build, package and hosted lifecycle checks for the candidate identified in the validation record. Interactive UAC installation and subsequent ordinary-user launch remain pending; final acceptance is incomplete. The changes and evidence are documented in [release notes](docs/RELEASE-NOTES-3.4.1.md) and [validation](docs/VALIDATION-3.4.1.md).
+The administrator-required installer has passed build, package and hosted lifecycle checks for the candidate identified in the validation record. The final CI candidate passed interactive UAC migration and subsequent ordinary-user launch; basic English and Simplified Chinese Settings UI checks passed with isolated configuration. The changes and evidence are documented in [release notes](docs/RELEASE-NOTES-3.4.1.md) and [validation](docs/VALIDATION-3.4.1.md).
 
 ## 3.4.0 — private draft, on hold
 
