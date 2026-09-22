@@ -120,7 +120,7 @@ try{
     [void](Invoke-Msi production-uninstall @('/x',$CandidateMsi));Assert-ProductionAbsent;Assert-Canary $canary $canaryHash
     [void](Invoke-Msi production-reinstall @('/i',$CandidateMsi));Assert-Hashes $portableHashes (File-Hashes $installDir) 'production reinstall';[void](Invoke-Msi production-final-uninstall @('/x',$CandidateMsi));Assert-ProductionAbsent;Assert-Canary $canary $canaryHash
 
-    if(Test-Path -LiteralPath "HKCU:\$appPathKey"){throw 'Current user already owns the preview App Paths key; refusing to overwrite it.'};New-Item -Path "HKCU:\$appPathKey"|Out-Null;Set-Item -LiteralPath "HKCU:\$appPathKey" -Value 'synthetic-preview-owned-by-lifecycle-test';$ownedLegacyKey=$true
+    if(Test-Path -LiteralPath "HKCU:\$appPathKey"){throw 'Current user already owns the preview App Paths key; refusing to overwrite it.'};New-Item -Path "HKCU:\$appPathKey" -Force|Out-Null;Set-Item -LiteralPath "HKCU:\$appPathKey" -Value 'synthetic-preview-owned-by-lifecycle-test';$ownedLegacyKey=$true
     [void](Invoke-Msi preview-guard @('/i',$CandidateMsi) @(1603));if((Product-State $productCode)-ne-1-or(Test-Path -LiteralPath $installDir)){throw 'Preview guard mutated production installation state.'};Remove-Item -LiteralPath "HKCU:\$appPathKey" -Recurse -Force;$ownedLegacyKey=$false;Assert-Canary $canary $canaryHash
 
     foreach($fixture in $fixtures){[void](Invoke-Msi "fixture-preclean-$($fixture.Role)" @('/x',$fixture.Path) @(0,1605))}
