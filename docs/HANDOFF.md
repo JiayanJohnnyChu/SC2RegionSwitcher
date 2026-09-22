@@ -10,7 +10,7 @@ The installer now targets an administrator-required, per-machine installation in
 
 The Global card shows the selected Battle.net login region, EU, US or KR. Current configuration remains separate. The switching engine and configuration transactions are unchanged.
 
-Local machine-package checks passed: compilation with zero warnings and errors, 52 regressions, package validation, seven release rejection cases and the full ICE suite with zero errors or warnings. CI candidate provenance and installation lifecycle acceptance remain pending. Earlier current-user recovery results, including the successful administrator comparison, do not validate the new package. Exact evidence and pending checks are in [3.4.1 validation](VALIDATION-3.4.1.md).
+Local machine-package checks passed: compilation with zero warnings and errors, 52 regressions, package validation, eight release rejection cases and the full ICE suite with zero errors or warnings. CI candidate provenance and installation lifecycle acceptance remain pending. Earlier current-user recovery results, including the successful administrator comparison, do not validate the new package. Exact evidence and pending checks are in [3.4.1 validation](VALIDATION-3.4.1.md).
 
 ## Remaining acceptance work
 

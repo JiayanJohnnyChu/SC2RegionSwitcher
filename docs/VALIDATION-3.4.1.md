@@ -15,10 +15,10 @@ The local development machine package passed these checks:
 | Compilation | Zero warnings and zero errors |
 | Isolated regressions | `TOTAL 52 PASSED` |
 | Package validation | Passed |
-| Release rejection cases | All seven passed |
+| Release rejection cases | All eight passed |
 | Independent ICE validation | Zero errors, zero warnings, no suppressions |
 
-Schema evidence is retained at `artifacts/installer-schema/3f747e8a932b420b8ceb3a973c08e684/result.json`. These are local development-package results, not CI candidate or installation results.
+Schema evidence is retained at `artifacts/installer-schema/e5de63bf487743a48b79fd3fa2156e21/result.json`. These are local development-package results, not CI candidate or installation results.
 
 CI lifecycle acceptance remains pending. The `installer-lifecycle.yml` workflow and `tools/Installer/Test-MachineInstall.ps1` exercise isolated machine installation, maintenance, upgrade, failed-upgrade recovery and uninstall. Candidate provenance, hashes, legacy-preview detection and preserved user data must be recorded against the tested files. No passing lifecycle result for the new machine package is recorded here yet.
 

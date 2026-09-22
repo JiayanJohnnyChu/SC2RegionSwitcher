@@ -89,3 +89,12 @@ Upgrade	Remove	Y					Formatted		The list of features to remove when uninstalling
 Upgrade	UpgradeCode	N					Guid		The UpgradeCode GUID belonging to the products in this set.
 Upgrade	VersionMax	Y					Text		The maximum ProductVersion of the products in this set.  The set may or may not include products with this particular version.
 Upgrade	VersionMin	Y					Text		The minimum ProductVersion of the products in this set.  The set may or may not include products with this particular version.
+Signature	FileName	N					Text		The name of the file. This may contain a "short name|long name" pair.
+Signature	Languages	Y					Language		The languages supported by the file.
+Signature	MaxDate	Y	0	2147483647					The maximum creation date of the file.
+Signature	MaxSize	Y	0	2147483647					The maximum size of the file.
+Signature	MaxVersion	Y					Text		The maximum version of the file.
+Signature	MinDate	Y	0	2147483647					The minimum creation date of the file.
+Signature	MinSize	Y	0	2147483647					The minimum size of the file.
+Signature	MinVersion	Y					Text		The minimum version of the file.
+Signature	Signature	N					Identifier		The table key. The Signature represents a unique file signature.

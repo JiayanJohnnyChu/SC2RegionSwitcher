@@ -97,6 +97,9 @@ try{
  $ca=Map @(Rows 'SELECT `Action`,`Type` FROM `CustomAction`' 2);Require ($ca.Count-eq2 -and $ca.SetInstallLocation-eq'51' -and $ca.RejectNewerProduct-eq'19') 'Custom action contract is incorrect.';$seq=Map @(Rows 'SELECT `Action`,`Sequence` FROM `InstallExecuteSequence`' 2);Require ($seq.FindRelatedProducts-eq'200' -and $seq.RejectNewerProduct-eq'210' -and $seq.LaunchConditions-eq'400' -and $seq.InstallInitialize-eq'1500' -and $seq.RemoveExistingProducts-eq'1510' -and $seq.ProcessComponents-eq'1600') 'Upgrade action sequence is incorrect.';$cond=Map @(Rows 'SELECT `Action`,`Condition` FROM `InstallExecuteSequence`' 2);Require ($cond.RejectNewerProduct-eq'NEWERPRODUCTS') 'Newer-product condition is incorrect.';$launch=Map @(Rows 'SELECT `Condition`,`Description` FROM `LaunchCondition`' 2)
  if($machineInstall){
   Require ($seq.AppSearch-eq'300' -and $launch.Count-eq2 -and $launch.ContainsKey('ALLUSERS=1') -and $launch.ContainsKey('Installed OR NOT LEGACYUSERINSTALL')) 'Machine scope or preview migration condition is missing.'
+  $tables=@(Rows 'SELECT `Name` FROM `_Tables`' 1 | ForEach-Object {$_[0]})
+  Require ('Signature'-in$tables) 'AppSearch Signature table is missing.'
+  Require (@(Rows 'SELECT `Signature` FROM `Signature`' 1).Count-eq0) 'Registry-only preview detection must not define a file signature.'
   $search=Map @(Rows 'SELECT `Property`,`Signature_` FROM `AppSearch`' 2)
   $locator=@(Rows 'SELECT `Signature_`,`Root`,`Key`,`Name`,`Type` FROM `RegLocator`' 5)
   Require ($search.Count-eq1 -and $search.LEGACYUSERINSTALL-eq'LegacyUserAppPath' -and $locator.Count-eq1 -and $locator[0][0]-eq'LegacyUserAppPath' -and $locator[0][1]-eq'1' -and $locator[0][2]-eq'Software\Microsoft\Windows\CurrentVersion\App Paths\SC2Switcher.Wpf.exe' -and [string]::IsNullOrEmpty($locator[0][3]) -and $locator[0][4]-eq'18') 'Current-user preview detection is incorrect.'

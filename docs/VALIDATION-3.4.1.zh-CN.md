@@ -15,10 +15,10 @@
 | 编译 | 零警告、零错误 |
 | 隔离回归 | `TOTAL 52 PASSED` |
 | 包验证 | 通过 |
-| 发布拒绝情形 | 七项全部通过 |
+| 发布拒绝情形 | 八项全部通过 |
 | 独立 ICE 验证 | 零错误、零警告，不屏蔽规则 |
 
-结构证据保存在 `artifacts/installer-schema/3f747e8a932b420b8ceb3a973c08e684/result.json`。这些结果属于本地开发包，不是 CI 候选或安装结果。
+结构证据保存在 `artifacts/installer-schema/e5de63bf487743a48b79fd3fa2156e21/result.json`。这些结果属于本地开发包，不是 CI 候选或安装结果。
 
 CI 生命周期验收仍待完成。`installer-lifecycle.yml` 工作流及 `tools/Installer/Test-MachineInstall.ps1` 隔离测试全机安装、维护、升级、升级失败恢复与卸载。候选来源、哈希、旧预览版检测及用户数据保留均需对应确切实测文件记录。此处尚未记录新全机包的生命周期通过结果。
 

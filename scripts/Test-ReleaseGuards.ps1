@@ -42,6 +42,7 @@ if([version]$ExpectedVersion-ge[version]'3.4.1'){$case=Join-Path $root 'applicat
 if([version]$ExpectedVersion-ge[version]'3.4.1'){
  Reject-InstallerScope 'missing-machine-scope' "DELETE FROM ``Property`` WHERE ``Property``='ALLUSERS'" 'Machine installation properties are incorrect.'
  Reject-InstallerScope 'missing-preview-migration-guard' "DELETE FROM ``LaunchCondition`` WHERE ``Condition``='Installed OR NOT LEGACYUSERINSTALL'" 'Machine scope or preview migration condition is missing.'
+ Reject-InstallerScope 'missing-appsearch-signature-table' 'DROP TABLE `Signature`' 'AppSearch Signature table is missing.'
 }
 Write-Output 'Release guard negative tests passed: tampering, version mismatch, source mismatch and current component rules were enforced.'
 Write-Output "Evidence retained: $root"

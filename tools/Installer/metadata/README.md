@@ -2,7 +2,7 @@
 
 # Windows Installer validation metadata
 
-`_Validation.idt` contains standard column constraints for the seventeen tables used by this package builder. The original fifteen-table subset was exported from a control package generated with WiX 3.14.1.8722. Seven rows for AppSearch and RegLocator were added from standard MSI definitions and checked by the unsuppressed ICE suite. The file contains no application identity, local paths, payload or test-user data.
+`_Validation.idt` contains standard column constraints for the eighteen tables used by this package builder. The original fifteen-table subset and the nine Signature rows were exported from a control package generated with WiX 3.14.1.8722. Seven rows for AppSearch and RegLocator were added from standard MSI definitions. The package includes an empty Signature table required by AppSearch; it is checked alongside the other tables by package validation and the unsuppressed ICE suite. The file contains no application identity, local paths, payload or test-user data.
 
 The builder imports these constraints before inserting application rows. Together with standard SQL column types, they support independent Windows Installer ICE validation. Optional UI and administrative sequence tables are not added to the application package.
 
