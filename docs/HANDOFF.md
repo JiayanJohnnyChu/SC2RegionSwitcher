@@ -2,27 +2,21 @@
 
 # Development status
 
-Updated 2026-09-22. The active version is **3.4.1 preview**.
+Updated 2026-09-22. The active version is **3.4.2 preview**.
 
-## Current work
+## Current revision
 
-The installer now targets an administrator-required, per-machine installation in 64-bit Program Files, with HKLM App Paths and one common Start menu entry. The application remains `asInvoker`; per-user configuration and backups stay outside MSI ownership and survive uninstall. Earlier current-user previews require a one-time uninstall/reinstall. Subsequent machine releases use major upgrades. The design and migration procedure are documented in [Installer](../tools/Installer/README.md) and [Setup](SETUP.md).
+Version 3.4.2 adopts MIT for original project code, documentation and icons, copyright 2026 Jiayan Chu. MSI and ZIP distributions include the project license, bilingual third-party notices, the upstream Radix MIT license, and the WiX MS-RL license with its corresponding validation source. The application behavior and interface are unchanged.
 
-The Global card shows the selected Battle.net login region, EU, US or KR. Current configuration remains separate. The switching engine and configuration transactions are unchanged.
+Verification is limited to license and distribution contents and the existing build, package and static CI checks. Local packaging and content verification passed, as recorded in [3.4.2 validation](VALIDATION-3.4.2.md). CI results are associated with the candidate source commit in its release record. The [3.4.1 record](VALIDATION-3.4.1.md) retains prior installer, UAC migration and basic UI evidence; the full DPI matrix and online roundtrip remain historical 3.4.0 results.
 
-Local machine-package checks passed: compilation with zero warnings and errors, 52 regressions, package validation, eight release rejection cases and the full ICE suite with zero errors or warnings. The candidate from [CI run 35721803273](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35721803273) passed hosted machine lifecycle testing in [run 35722639637](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35722639637). Earlier current-user recovery results, including the successful administrator comparison, do not validate the new package. The final candidate from [CI run 35723586274](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35723586274), source `3337cbacbf2acc0bc8ba9a04c3431cb6e5ab819a`, passed interactive UAC migration from 3.4.0 and ordinary-user launch. Its application source and MSI authoring are identical to the hosted lifecycle candidate. Exact evidence and coverage limits are in [3.4.1 validation](VALIDATION-3.4.1.md).
+## Distribution
 
-## Validation scope and artifact promotion
-
-Basic English and Simplified Chinese Settings UI checks passed with isolated configuration. Promotion requires the original final CI files without rebuilding. The existing full DPI and online roundtrip remain historical coverage; broader tests are repeated only if affected application behavior requires them. The original 3.4.0 candidate's four-scale DPI matrix and China → Europe → China roundtrip remain recorded in [historical validation](VALIDATION.md); no new online roundtrip is claimed.
-
-## Release constraints
-
-The repository remains private, and no application license has been selected. Packages are unsigned and require .NET 10 Desktop Runtime x64. The original 3.4.0 private draft and its files remain unchanged. Each distributed preview increments the three-part version; promotion copies tested CI artifacts without rebuilding. Multi-display, cross-computer and system-policy coverage remains limited.
+The original 3.4.1 preview files remain immutable. Every distributed preview increments the three-part version, and promotion uses the original CI artifacts without rebuilding. Packages remain unsigned and require .NET 10 Desktop Runtime x64. Repository visibility remains private.
 
 ## Maintainer references
 
 - [Development commands](DEVELOPMENT.md)
-- [Architecture](ARCHITECTURE.md)
+- [Installer](../tools/Installer/README.md)
+- [Third-party notices](../THIRD-PARTY-NOTICES.md)
 - [Candidate promotion](GITHUB-RELEASE.md)
-- [Interface design](UI-DESIGN.md)

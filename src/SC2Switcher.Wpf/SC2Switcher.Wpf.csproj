@@ -5,7 +5,8 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>SC2Switcher.Wpf</AssemblyName>
     <RootNamespace>Sc2Wpf</RootNamespace>
-    <Version>3.4.1</Version>
+    <Version>3.4.2</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <ApplicationIcon>..\..\assets\icon\switcher.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PlatformTarget>x64</PlatformTarget>

@@ -14,4 +14,6 @@ English and Simplified Chinese are available in Settings. Interface language is 
 
 Configuration and backups are stored in `%LOCALAPPDATA%\SC2RegionSwitcherV2`. Moving the application folder does not move these settings. The portable package creates no Start menu shortcut or Windows uninstall entry.
 
+Original project code, documentation and icons use the MIT License in `LICENSE`. The package also contains bilingual `THIRD-PARTY-NOTICES` files and the `licenses/` directory, including the Radix license and the WiX license with its metadata source. These files remain part of the extracted distribution.
+
 This is an unsigned preview. Operating details and the tested scope are documented in the [setup guide](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/blob/main/docs/SETUP.md) and [validation record](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/blob/main/docs/VALIDATION.md). Repository access is required while the repository is private.

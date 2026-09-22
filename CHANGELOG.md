@@ -2,6 +2,14 @@
 
 # Changelog
 
+## 3.4.2 — preview
+
+- Original project code, documentation and icons are licensed under MIT, copyright 2026 Jiayan Chu.
+- MSI and ZIP packages include the project license, bilingual notices, the Radix MIT license, and the WiX MS-RL license with its validation source.
+- Application behavior is unchanged. Local license-content and package verification passed; the original 3.4.1 preview files remain immutable.
+
+The changes and scope are documented in [release notes](docs/RELEASE-NOTES-3.4.2.md) and [validation](docs/VALIDATION-3.4.2.md).
+
 ## 3.4.1 — preview
 
 - Global destination labels show the selected Battle.net login region: EU, US or KR. The current configuration remains separate from the selected target.

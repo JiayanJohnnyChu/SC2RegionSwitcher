@@ -32,7 +32,7 @@ Setup 按 `eng/dotnet-sdk.json` 校验 Microsoft SDK 压缩包后才解压。`-A
 
 编译输出位于各项目的 `bin/` 和 `obj/`，发布文件位于 `artifacts/publish/win-x64/`。每次测试在 `artifacts/tests/` 下有独立目录，安装包位于 `artifacts/packages/<本次构建>/release`。
 
-发布目录恰有四个文件：MSI、便携 ZIP、`release-manifest.json` 和 `SHA256SUMS.txt`。当前 ZIP 包含四个运行文件及 `README.md`、`README.zh-CN.md`。打包脚本生成文件，不执行安装。清单记录源码提交、工作树状态及 CI 来源。本地开发包不属于已接受的 CI 候选。MSI 文件名为 `SC2Switcher-<version>-x64.msi`，采用需要管理员权限的全机范围；构建时无需安装它。
+发布目录恰有四个文件：MSI、便携 ZIP、`release-manifest.json` 和 `SHA256SUMS.txt`。ZIP 包含十二个文件：四个运行文件、两份 README，以及[第三方声明](../THIRD-PARTY-NOTICES.zh-CN.md)标明的六个许可／源码文件。MSI 包含四个运行文件及相同的六个许可／源码文件。打包脚本生成文件，不执行安装。清单记录源码提交、工作树状态及 CI 来源。本地开发包不属于已接受的 CI 候选。MSI 文件名为 `SC2Switcher-<version>-x64.msi`，采用需要管理员权限的全机范围；构建时无需安装它。
 
 独立的 `installer-lifecycle.yml` 工作流通过 `tools/Installer/Test-MachineInstall.ps1` 隔离测试全机安装、维护、升级、回滚和移除，结果须标明输入候选及哈希。较早的恢复工作流保留用于历史当前用户设计诊断。当前范围与迁移规则见[安装器说明](../tools/Installer/README.zh-CN.md)。
 
@@ -54,6 +54,10 @@ Invoke-ProjectDotNet -Arguments @('run', '--project', '.\tools\IconGenerator\Ico
 ```
 
 资源更新以 SVG、PNG、ICO 和对照图的预先检查为前提。主窗口相关几何图形另在 XAML 中维护。
+
+## 验证范围
+
+验证范围由受影响的变更确定。应用大版本发布前需要一次全面验证，后续小幅修订采用针对性检查。文档、许可和包内容修订需要内容与包验证，不要求重复安装、界面、DPI 或在线测试。必要的构建／包检查与既有 CI 检查仍适用，每个补丁不默认要求额外执行一轮完整的人工回归。
 
 ## CI 与发布维护
 

@@ -27,8 +27,14 @@ foreach($file in $files){Copy-Item -LiteralPath (Join-Path $projectRoot "artifac
 foreach($readme in @('README.md','README.zh-CN.md')){
     Copy-Item -LiteralPath (Join-Path $projectRoot "docs\portable\$readme") -Destination (Join-Path $portable $readme)
 }
+foreach($license in Get-LicensePayload){
+    $target=Join-Path $portable $license.RelativePath
+    [void][IO.Directory]::CreateDirectory((Split-Path $target -Parent))
+    Copy-Item -LiteralPath $license.Source -Destination $target
+}
 $archive=Join-Path $packageRoot "SC2Switcher-$version-win-x64-preview.zip"
-Compress-Archive -LiteralPath @(Get-ChildItem -LiteralPath $portable -File | ForEach-Object FullName) -DestinationPath $archive
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[IO.Compression.ZipFile]::CreateFromDirectory($portable,$archive)
 & (Join-Path $projectRoot 'tools\Installer\Build-MachineMsi.ps1') -AppDirectory $portable -OutputDirectory (Join-Path $packageRoot 'msi')
 $msi=Join-Path $packageRoot "msi\SC2Switcher-$version-x64.msi"
 $manifest=[ordered]@{

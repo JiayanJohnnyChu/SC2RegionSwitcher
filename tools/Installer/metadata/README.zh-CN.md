@@ -6,6 +6,6 @@
 
 构建器在插入应用数据行之前导入约束。它与标准 SQL 列类型共同支持独立 Windows Installer ICE 验证。应用包不添加可选 UI 表或管理序列表。
 
-来源：[WiX Toolset 3.14.1](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm)。上游版权与许可原文保留在 [LICENSE-WiX.txt](LICENSE-WiX.txt)，适用于本元数据。应用许可证尚未选择。
+来源：[WiX Toolset 3.14.1](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm)。上游版权与许可原文保留在 [LICENSE-WiX.txt](LICENSE-WiX.txt)，适用于本元数据。原创项目材料采用 [MIT 许可证](../../../LICENSE)，本元数据保留 MS-RL，具体范围记录于[第三方声明](../../../THIRD-PARTY-NOTICES.zh-CN.md)。
 
 结构验证检查包定义，实际安装与恢复需要单独测试，具体范围记录于[安装器说明](../README.zh-CN.md)。

@@ -8,13 +8,13 @@
 .\tools\Installer\Build-MachineMsi.ps1 -AppDirectory <目录> -OutputDirectory <空目录>
 ```
 
-构建器使用 Windows Installer COM 和 `makecab`，通过 `scripts/Release-Common.ps1` 读取三段版本，检查 EXE 清单与运行文件版本，打包四个运行文件。当前文件名为 `SC2Switcher-3.4.1-x64.msi`。Microsoft .NET 10 Desktop Runtime x64 需单独安装，包未签名。
+构建器使用 Windows Installer COM 和 `makecab`，通过 `scripts/Release-Common.ps1` 读取三段版本，检查 EXE 清单与运行文件版本，打包四个运行文件和六个许可／源码文件。当前文件名为 `SC2Switcher-3.4.2-x64.msi`。Microsoft .NET 10 Desktop Runtime x64 需单独安装，包未签名。
 
 ## 安装与资源范围
 
 MSI 设置 `ALLUSERS=1`，需要管理员批准。程序安装到 `ProgramFiles64Folder\SC2RegionSwitcher\app`，登记 HKLM App Paths，创建单一公共开始菜单入口。应用仍声明 `asInvoker`，以普通用户权限运行。配置、偏好、备份和恢复记录仍保存在每位用户的 `%LOCALAPPDATA%\SC2RegionSwitcherV2`，不属于 MSI 管理范围，卸载后保留。
 
-Application 组件管理四个运行文件和已播发开始菜单快捷方式，以 EXE 为键路径。AppRegistration 组件管理 HKLM App Paths 项。产品族 UpgradeCode 保留，全机安装使用新的 ProductCode 和组件标识。每个数值版本使用不同的 ProductCode，每次构建生成新的 PackageCode。
+Application 组件管理四个运行文件和已播发开始菜单快捷方式，以 EXE 为键路径。AppRegistration 组件管理 HKLM App Paths 项。六个独立的文件键组件分别管理 `LICENSE`、两份第三方声明及 `licenses/` 下的三个文件，其标识在兼容的包修订中保持稳定。产品族 UpgradeCode 保留，全机安装使用新的 ProductCode 和组件标识。每个数值版本使用不同的 ProductCode，每次构建生成新的 PackageCode。
 
 ## 迁移与升级
 
@@ -35,6 +35,6 @@ AppSearch 和 RegLocator 检查发起安装的用户旧有的 HKCU App Paths 项
 | `scripts/Test-InstallerSchema.ps1 -ReleaseDirectory <目录>` | 不屏蔽规则的完整 ICE 套件；全机包要求零错误、零警告 |
 | `tools/Installer/Test-MachineInstall.ps1`、`installer-lifecycle.yml` | 隔离的全机安装、维护、升级、恢复和移除 |
 
-验证记录标明的候选已通过托管环境生命周期测试。最终 CI 候选已通过交互式 UAC 迁移及随后以普通用户启动的检查，隔离配置下的基本英文和简体中文设置界面检查已通过。结果须记录确切 MSI 哈希和源码提交。旧 `installer-recovery.yml` 工作流及管理员／标准用户对照描述的是此前的当前用户设计，不能证明全机包通过。证据记录于 [3.4.1 验证](../../docs/VALIDATION-3.4.1.zh-CN.md)。
+3.4.2 验证覆盖许可／源码内容及既有构建、包检查和静态 CI 检查，本地打包与内容检查已通过，记录于 [3.4.2 验证](../../docs/VALIDATION-3.4.2.zh-CN.md)。CI 结果通过发布记录与候选源码提交关联。此前全机生命周期、UAC 和界面证据保留于 [3.4.1 验证](../../docs/VALIDATION-3.4.1.zh-CN.md)。各项结果均由确切包哈希和源码提交标识。
 
 每个分发预览递增三段 ProductVersion。已打标签或分发的版本必须保留原文件，提升必须使用已接受的 CI 制品，不得重新构建。原始 3.3.0 MSI 没有降级保护。流程记录于[发布流程](../../docs/GITHUB-RELEASE.zh-CN.md)。

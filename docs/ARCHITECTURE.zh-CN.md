@@ -50,4 +50,4 @@ SC2 Region Switcher 是面向 Windows x64 的 C# / WPF / .NET 10 应用，协调
 
 产品族 UpgradeCode 保留。全机安装使用新的 ProductCode 和组件标识。此前的当前用户预览版需一次性卸载重装，后续全机版本在相同上下文中执行大版本升级。`RemoveExistingProducts` 位于 `InstallInitialize` 之后、新文件安装之前。
 
-切换引擎与配置事务未改。验证记录标明的候选已通过托管环境中的全机生命周期与升级失败恢复检查，最终 CI 候选亦已通过交互式 UAC 迁移及普通用户启动检查。设计与证据记录于[安装器说明](../tools/Installer/README.zh-CN.md)和[验证状态](VALIDATION-3.4.1.zh-CN.md)。
+切换引擎与配置事务未改。3.4.2 通过独立的文件键组件向 MSI 增加六个许可／源码文件，已有应用与注册组件保留原标识。3.4.1 的安装与恢复结果保留为历史证据。设计与证据记录于[安装器说明](../tools/Installer/README.zh-CN.md)和[验证状态](VALIDATION-3.4.1.zh-CN.md)。

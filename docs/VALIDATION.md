@@ -4,6 +4,10 @@
 
 Updated 2026-09-22. Results apply to the identified revision and package hashes. Compilation, package structure, installation, interface rendering and online use are recorded separately.
 
+## 3.4.2 preview
+
+Version 3.4.2 changes licensing and distribution contents. Local packaging and license-content verification passed. The existing CI results are associated with the candidate source commit in its release record. The scope and results are recorded in [3.4.2 validation](VALIDATION-3.4.2.md). Earlier installation, UI, DPI and online results retain their original version attribution.
+
 ## 3.4.1 preview
 
 The administrator-required, per-machine MSI passed local compilation with zero warnings/errors, all 52 regressions, package validation, eight release rejection cases and the full unsuppressed ICE suite with zero warnings/errors. The candidate from [CI run 35721803273](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35721803273) passed hosted machine lifecycle testing in [run 35722639637](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35722639637), including upgrade and failed-upgrade recovery. The final CI candidate passed interactive UAC migration and subsequent ordinary-user launch. Basic English and Simplified Chinese Settings UI checks passed with isolated configuration. Earlier basic bilingual UI checks and current-user recovery diagnostics are recorded separately. Detailed scope is in [3.4.1 validation](VALIDATION-3.4.1.md).

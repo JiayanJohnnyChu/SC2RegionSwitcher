@@ -6,6 +6,6 @@
 
 The builder imports these constraints before inserting application rows. Together with standard SQL column types, they support independent Windows Installer ICE validation. Optional UI and administrative sequence tables are not added to the application package.
 
-Source: [WiX Toolset 3.14.1](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm). The upstream copyright and license are preserved in [LICENSE-WiX.txt](LICENSE-WiX.txt), which applies to this metadata. No application license has been selected.
+Source: [WiX Toolset 3.14.1](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm). The upstream copyright and license are preserved in [LICENSE-WiX.txt](LICENSE-WiX.txt), which applies to this metadata. Original project material is licensed under [MIT](../../../LICENSE); this metadata retains MS-RL, as documented in [third-party notices](../../../THIRD-PARTY-NOTICES.md).
 
 Schema validation checks package structure. Actual installation and recovery require separate testing, as described in the [installer guide](../README.md).

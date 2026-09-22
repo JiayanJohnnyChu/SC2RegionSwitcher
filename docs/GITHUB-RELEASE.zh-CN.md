@@ -2,7 +2,7 @@
 
 # 候选包与发布草稿流程
 
-[仓库](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher)目前为私有。当前版本为 3.4.1，原始 3.4.0 候选保留为未发布草稿。剩余验收工作见[当前状态](HANDOFF.zh-CN.md)。
+[仓库](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher)目前为私有。当前版本为 3.4.2，原始 3.4.1 预览制品保持不变。剩余验收工作见[当前状态](HANDOFF.zh-CN.md)。
 
 ## 候选生成与标识
 
@@ -10,13 +10,13 @@
 2. 推送到 `main` 的提交触发 Windows CI，后者使用固定 SDK，检查通过后上传 `SC2RegionSwitcher-win-x64-preview`。
 3. 候选记录包含成功运行编号和完整源码提交。安装及必要的游戏测试使用该次运行下载的原始制品。
 4. 候选标识包括 `SHA256SUMS.txt` 与 `release-manifest.json` 的核验。Schema 2 记录版本、源码提交、工作树状态、CI 运行编号、运行次数和包哈希。可接受候选应来自干净的 `main` CI 运行。
-5. 候选验收要求针对这些文件执行全机安装生命周期测试，包括升级恢复和旧预览版检测，以及基本启动与双语界面检查。已完成的 3.4.0 完整界面／在线测试保留为历史覆盖，应用重测范围仅在行为变更需要时扩大。完成项与受阻项分别记录于 Git 忽略的 `artifacts/`。
+5. 原始制品的验证范围由受影响的变更确定。应用大版本发布前完成一次全面验证，后续小幅修订采用针对性检查。文档、许可和包内容变化需要相关内容／包验证及既有构建／包／静态 CI 检查，不重复安装、界面或在线矩阵。完成项与受阻项分别记录于 Git 忽略的 `artifacts/`。
 
-发布集合恰有四个文件：MSI、便携 ZIP、`release-manifest.json` 和 `SHA256SUMS.txt`。当前 ZIP 包含四个运行文件以及中英文 README。较早候选保留原有内容。
+发布集合恰有四个文件：MSI、便携 ZIP、`release-manifest.json` 和 `SHA256SUMS.txt`。ZIP 包含四个运行文件、中英文 README，以及[第三方声明](../THIRD-PARTY-NOTICES.zh-CN.md)标明的六个许可／源码文件。较早候选保留原有内容。
 
 ## 提升原始制品
 
-提升流程以验收通过及实测源码提交上的匹配标签为前提，例如 `v3.4.1-preview.1`。单独推送标签不会创建发布。**Promote tested candidate to draft prerelease** 工作流使用以下输入：
+提升流程以验收通过及实测源码提交上的匹配标签为前提，例如 `v3.4.2-preview.1`。单独推送标签不会创建发布。**Promote tested candidate to draft prerelease** 工作流使用以下输入：
 
 - `version_tag`：指向实测提交的已有标签。
 - `candidate_run_id`：生成实测文件的成功 `main` CI 运行编号。
@@ -29,7 +29,7 @@
 
 Windows Installer 比较三段数值版本。因此每个分发预览都需递增该版本，仅将 `preview.1` 改成 `preview.2` 不够。每个数值版本使用新的 ProductCode，产品族 UpgradeCode 保持稳定。
 
-打包时若已有该数值版本的本地标签则拒绝，CI 会先获取标签。提升流程也拒绝同版本的已有草稿或发布。已分发的 3.4.0 候选不得重建、移动标签或替换。
+打包时若已有该数值版本的本地标签则拒绝，CI 会先获取标签。提升流程也拒绝同版本的已有草稿或发布。已经分发的候选，包括 3.4.1，不得重建、移动标签或替换。
 
 3.4.1 是首个全机包。此前的当前用户预览版需一次性卸载重装，保留 UpgradeCode 不代表可以跨上下文升级。迁移流程记录于[安装器说明](../tools/Installer/README.zh-CN.md)。
 
@@ -37,4 +37,4 @@ Windows Installer 比较三段数值版本。因此每个分发预览都需递�
 
 ## 发布范围
 
-包未签名，依赖 .NET 10 Desktop Runtime x64，应用许可证尚未选择。创建草稿不会将其发布，也不会改变仓库可见性。构建成功不能证明安装、恢复或在线运行成功。新源码版本或重建 MSI 需重新评估受影响检查。
+包未签名，依赖 .NET 10 Desktop Runtime x64，原创项目材料采用 [MIT 许可证](../LICENSE)，[第三方声明](../THIRD-PARTY-NOTICES.zh-CN.md)标明保留的上游许可。创建草稿不会将其发布，也不会改变仓库可见性。构建成功不能证明安装、恢复或在线运行成功。新源码版本或重建 MSI 需重新评估受影响检查。

@@ -31,7 +31,7 @@ Settings and reference pages use the same surface, typography, separators and fo
 | Input / primary action height | 40 / 46 DIP |
 | Content margins | 32 DIP normally, 22 on the compact main view; forms reduce from 32 to 22 in compact windows |
 
-Colors are defined in `src/SC2Switcher.Wpf/Palette.xaml` and merged by `App.xaml`. The sRGB values come from [Radix Colors](https://github.com/radix-ui/colors/blob/main/src/light.ts); their assignment to application roles is specific to this project. No Radix framework or web runtime is included.
+Colors are defined in `src/SC2Switcher.Wpf/Palette.xaml` and merged by `App.xaml`. The sRGB values come from [Radix Colors](https://github.com/radix-ui/colors/blob/main/src/light.ts); their assignment to application roles is specific to this project. No Radix framework or web runtime is included. The upstream MIT license and attribution are retained in [third-party notices](../THIRD-PARTY-NOTICES.md).
 
 White text on Tomato 11 has approximately 4.98:1 contrast; white on Indigo 9 has approximately 5.21:1. Selected labels and their parent cards retain full opacity while busy. These values describe those color pairs, not overall accessibility conformance.
 
@@ -49,4 +49,4 @@ Checking and switching disable the relevant actions; there is no cancellation co
 
 DPI validation requires execution of the EXE so that its PerMonitorV2 manifest applies. Self-rendering and external window capture are separate observations. Raw images and reports are stored under ignored `artifacts/` directories.
 
-The complete 100%, 125%, 150% and 200% bilingual matrix belongs to the original 3.4.0 candidate. Earlier 3.4.1 testing covered bilingual label checks at 200% in the standard window. The final installed candidate additionally passed basic English and Simplified Chinese Settings UI checks with isolated configuration; screenshots and accessibility trees showed complete controls without observed clipping. The DPI matrix was not repeated. Multi-display movement and cross-computer behavior remain unverified. The evidence is documented in [Validation](VALIDATION.md).
+The complete 100%, 125%, 150% and 200% bilingual matrix belongs to the original 3.4.0 candidate. Earlier 3.4.1 testing covered bilingual label checks at 200% in the standard window. The final installed 3.4.1 candidate additionally passed basic English and Simplified Chinese Settings UI checks with isolated configuration; screenshots and accessibility trees showed complete controls without observed clipping. The DPI matrix was not repeated. Multi-display movement and cross-computer behavior remain unverified. The evidence is documented in [Validation](VALIDATION.md).

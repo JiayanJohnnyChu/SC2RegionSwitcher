@@ -2,27 +2,21 @@
 
 # 开发状态
 
-更新于 2026-09-22。当前为 **3.4.1 预览版**。
+更新于 2026-09-22。当前版本为 **3.4.2 预览版**。
 
-## 当前工作
+## 当前修订
 
-安装器现以需要管理员权限的全机安装为目标，使用 64 位 Program Files、HKLM App Paths 和单一公共开始菜单入口。应用仍为 `asInvoker`，按用户保存的配置与备份不由 MSI 管理，卸载后保留。此前的当前用户预览版需一次性卸载重装，后续全机版本通过大版本升级更新。设计与迁移流程记录于[安装器说明](../tools/Installer/README.zh-CN.md)和[使用指南](SETUP.zh-CN.md)。
+3.4.2 为项目原创代码、文档和图标采用 MIT 许可证，版权人为 Jiayan Chu，年份为 2026。MSI 与 ZIP 分发包含项目许可证、双语第三方声明、上游 Radix MIT 许可证，以及 WiX MS-RL 许可证与对应验证源码。应用行为与界面不变。
 
-国际服卡片显示所选战网登录区域 EU、US 或 KR，当前配置仍单独显示。切换引擎与配置事务未改。
+验证仅覆盖许可与分发内容，以及既有构建、包检查和静态 CI 检查。本地打包与内容验证已通过，记录于 [3.4.2 验证](VALIDATION-3.4.2.zh-CN.md)。CI 结果通过发布记录与候选源码提交关联。[3.4.1 记录](VALIDATION-3.4.1.zh-CN.md)保留此前的安装器、UAC 迁移和基本界面证据；完整 DPI 矩阵及在线往返仍属于 3.4.0 的历史结果。
 
-全机包本地检查已通过：编译零警告、零错误，52 项回归、包验证、八项发布拒绝情形，以及零错误、零警告的完整 ICE 套件。[CI 运行 35721803273](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35721803273) 的候选通过[运行 35722639637](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35722639637)的托管全机生命周期测试。此前当前用户包的恢复结果，包括管理员对照通过，不能证明新包通过。[CI 运行 35723586274](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35723586274) 的最终候选、源码 `3337cbacbf2acc0bc8ba9a04c3431cb6e5ab819a`，通过了从 3.4.0 进行的交互式 UAC 迁移及普通用户启动检查。其应用源码和 MSI 定义与托管生命周期候选相同。确切证据及覆盖限制见 [3.4.1 验证](VALIDATION-3.4.1.zh-CN.md)。
+## 分发
 
-## 验证范围与制品提升
-
-隔离配置下的基本英文和简体中文设置界面检查已通过。提升流程要求使用最终 CI 原文件，不得重新构建。已有完整 DPI 与在线往返保留为历史覆盖，重测范围仅在受影响的应用行为需要时扩大。原始 3.4.0 候选的四档 DPI 矩阵和国服 → 欧洲 → 国服往返仍记录于[历史验证](VALIDATION.zh-CN.md)，不宣称完成了新的在线往返。
-
-## 发布约束
-
-仓库保持私有，应用许可证尚未选择。包未签名，依赖 .NET 10 Desktop Runtime x64。原始 3.4.0 私有草稿及文件保持不变。每个分发预览递增三段版本；提升时复制实测 CI 制品，不重新构建。跨显示器、跨电脑及系统策略覆盖仍有限。
+原始 3.4.1 预览文件保持不变。每个分发预览递增三段版本，提升采用原始 CI 制品，不重新构建。包仍未签名，运行需要 .NET 10 Desktop Runtime x64。仓库可见性保持私有。
 
 ## 维护参考
 
 - [开发命令](DEVELOPMENT.zh-CN.md)
-- [架构说明](ARCHITECTURE.zh-CN.md)
+- [安装器说明](../tools/Installer/README.zh-CN.md)
+- [第三方声明](../THIRD-PARTY-NOTICES.zh-CN.md)
 - [候选提升](GITHUB-RELEASE.zh-CN.md)
-- [界面设计](UI-DESIGN.zh-CN.md)

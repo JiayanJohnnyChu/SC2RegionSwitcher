@@ -8,13 +8,13 @@
 .\tools\Installer\Build-MachineMsi.ps1 -AppDirectory <directory> -OutputDirectory <empty-directory>
 ```
 
-The builder uses Windows Installer COM and `makecab`. It reads the three-part version through `scripts/Release-Common.ps1`, checks the executable manifest and runtime versions, and packages four runtime files. The current filename is `SC2Switcher-3.4.1-x64.msi`. Microsoft .NET 10 Desktop Runtime x64 is a separate dependency; packages are unsigned.
+The builder uses Windows Installer COM and `makecab`. It reads the three-part version through `scripts/Release-Common.ps1`, checks the executable manifest and runtime versions, and packages four runtime files plus six licensing/source files. The current filename is `SC2Switcher-3.4.2-x64.msi`. Microsoft .NET 10 Desktop Runtime x64 is a separate dependency; packages are unsigned.
 
 ## Installation and ownership
 
 The MSI sets `ALLUSERS=1` and requires administrator approval. It installs to `ProgramFiles64Folder\SC2RegionSwitcher\app`, registers HKLM App Paths and creates one common Start menu entry. The application remains `asInvoker` and runs with ordinary user permissions. Profiles, preferences, backups and recovery journals stay in each user's `%LOCALAPPDATA%\SC2RegionSwitcherV2`, outside MSI ownership and preserved on uninstall.
 
-The Application component owns the four runtime files and the advertised Start menu shortcut, with the EXE as its key path. AppRegistration owns the HKLM App Paths entry. The product-family UpgradeCode is retained, while machine installation uses new ProductCode and component identities. Each numerical version has a distinct ProductCode; each build has a new PackageCode.
+The Application component owns the four runtime files and the advertised Start menu shortcut, with the EXE as its key path. AppRegistration owns the HKLM App Paths entry. Six independent file-keyed components own `LICENSE`, the two third-party notices and the three files under `licenses/`; their identities remain stable across compatible package revisions. The product-family UpgradeCode is retained, while machine installation uses new ProductCode and component identities. Each numerical version has a distinct ProductCode; each build has a new PackageCode.
 
 ## Migration and upgrades
 
@@ -35,6 +35,6 @@ The database uses standard MSI definitions and imports constraints from [metadat
 | `scripts/Test-InstallerSchema.ps1 -ReleaseDirectory <directory>` | Full unsuppressed ICE suite; machine packages require zero errors and warnings |
 | `tools/Installer/Test-MachineInstall.ps1`, `installer-lifecycle.yml` | Isolated machine installation, maintenance, upgrade, recovery and removal |
 
-Hosted lifecycle tests passed for the candidate identified in the validation record. The final CI candidate passed interactive UAC migration and subsequent ordinary-user launch. Basic English and Simplified Chinese Settings UI checks passed with isolated configuration. The validation record must identify the exact tested MSI hash and source revision. The old `installer-recovery.yml` workflow and administrator/standard-user comparisons describe the earlier current-user design; they do not validate this machine package. The evidence is documented in [3.4.1 validation](../../docs/VALIDATION-3.4.1.md).
+Version 3.4.2 verification covers licensing/source contents and the existing build, package and static CI checks. Local packaging and content checks passed, as recorded in [3.4.2 validation](../../docs/VALIDATION-3.4.2.md). CI results are associated with the candidate source commit in its release record. Prior machine lifecycle, UAC and UI evidence remains in [3.4.1 validation](../../docs/VALIDATION-3.4.1.md). The validation record identifies the exact package hashes and source revision for each result.
 
 Every distributed preview increments the three-part ProductVersion. Tagged or distributed versions must retain their original files, and promotion must use accepted CI artifacts without rebuilding. The original 3.3.0 MSI lacks downgrade protection. The procedure is documented in the [release workflow](../../docs/GITHUB-RELEASE.md).

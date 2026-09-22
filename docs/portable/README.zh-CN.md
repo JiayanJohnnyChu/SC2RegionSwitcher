@@ -14,4 +14,6 @@
 
 配置和备份保存在 `%LOCALAPPDATA%\SC2RegionSwitcherV2`。移动应用目录不会移动这些设置。便携包不创建开始菜单快捷方式或 Windows 卸载登记。
 
+原创项目代码、文档和图标采用 `LICENSE` 中的 MIT 许可证。包中另含双语 `THIRD-PARTY-NOTICES` 文件及 `licenses/` 目录，包括 Radix 许可证和 WiX 许可证与元数据源码。这些文件属于解压后的分发内容。
+
 本包为未签名预览版。操作细节和实测范围记录于[配置指南](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/blob/main/docs/SETUP.zh-CN.md)和[验证记录](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/blob/main/docs/VALIDATION.zh-CN.md)。仓库为私有时，这些页面需要仓库访问权限。

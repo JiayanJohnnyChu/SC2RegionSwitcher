@@ -18,10 +18,14 @@ $files=@(
  @{Id='DepsJson';Name='SC2Switcher.Wpf.deps.json';Short='DEPS.JSN';Version=$null},
  @{Id='RuntimeJson';Name='SC2Switcher.Wpf.runtimeconfig.json';Short='RUNTIME.JSN';Version=$null}
 )
+$licensePayload=@(Get-LicensePayload)
+foreach($file in $files){$file.Component='Application';$file.Source=Join-Path $AppDirectory $file.Name}
+foreach($license in $licensePayload){
+ $files+=@{Id=$license.Id;Name=$license.Name;Short=$license.Short;Version=$null;Component=$license.Id;Source=$license.Source}
+}
 $ddl=@('.OPTION EXPLICIT','.Set CabinetNameTemplate=app.cab',('.Set DiskDirectoryTemplate="'+$stage+'"'),'.Set CompressionType=MSZIP','.Set Cabinet=on','.Set Compress=on')
 foreach($file in $files){
- $file.Source=Join-Path $AppDirectory $file.Name
- if(!(Test-Path -LiteralPath $file.Source -PathType Leaf)){throw "Missing runtime file: $($file.Name)"}
+ if(!(Test-Path -LiteralPath $file.Source -PathType Leaf)){throw "Missing package file: $($file.Name)"}
  if($file.Version -and [Diagnostics.FileVersionInfo]::GetVersionInfo($file.Source).FileVersion -ne $file.Version){throw "Runtime file version mismatch: $($file.Name)"}
  $ddl+=('"'+$file.Source+'" '+$file.Id)
 }
@@ -70,6 +74,7 @@ $database.Import((Join-Path $PSScriptRoot 'metadata'),'_Validation.idt')
 $productCode=$release.ProductCode
 $packageCode='{'+[guid]::NewGuid().ToString().ToUpperInvariant()+'}'
 $componentCodes=[ordered]@{Application='{9087858A-CB27-4146-BA8D-C7E90FFB0C37}';AppRegistration='{A64B85A6-A03A-4319-AE88-ED3B53C40952}'}
+foreach($license in $licensePayload){$componentCodes[$license.Id]=$license.ComponentCode}
 $properties=[ordered]@{
  ProductCode=$productCode;ProductVersion=$version;ProductLanguage='1033';ProductName='SC2 Region Switcher';Manufacturer='SC2 Region Switcher';
  UpgradeCode=$release.UpgradeCode;INSTALLLEVEL='1';ALLUSERS='1';ARPNOMODIFY='1';ARPNOREPAIR='1';ARPPRODUCTICON='SwitcherIcon.exe';ARPCOMMENTS='StarCraft II CN and Global region switcher';
@@ -84,25 +89,27 @@ Insert Upgrade @('UpgradeCode','VersionMin','VersionMax','Language','Attributes'
 Insert Upgrade @('UpgradeCode','VersionMin','VersionMax','Language','Attributes','Remove','ActionProperty') @($release.UpgradeCode,$version,$null,$null,[int]2,$null,'NEWERPRODUCTS')
 foreach($dir in @(
  @('TARGETDIR',$null,'SourceDir'),@('ProgramFiles64Folder','TARGETDIR','.'),
- @('ProductRoot','ProgramFiles64Folder','SC2REG~1|SC2RegionSwitcher'),@('INSTALLDIR','ProductRoot','app'),
+ @('ProductRoot','ProgramFiles64Folder','SC2REG~1|SC2RegionSwitcher'),@('INSTALLDIR','ProductRoot','app'),@('LicenseDir','INSTALLDIR','licenses'),
  @('ProgramMenuFolder','TARGETDIR','.'),@('MenuGroup','ProgramMenuFolder','SC2REG~1|SC2 Region Switcher')
 )){Insert Directory @('Directory','Directory_Parent','DefaultDir') $dir}
 Insert Component @('Component','ComponentId','Directory_','Attributes','Condition','KeyPath') @('Application',$componentCodes.Application,'INSTALLDIR',[int]256,$null,'AppExe')
 Insert Component @('Component','ComponentId','Directory_','Attributes','Condition','KeyPath') @('AppRegistration',$componentCodes.AppRegistration,'INSTALLDIR',[int]260,$null,'AppPath')
+foreach($license in $licensePayload){Insert Component @('Component','ComponentId','Directory_','Attributes','Condition','KeyPath') @($license.Id,$license.ComponentCode,$license.Directory,[int]256,$null,$license.Id)}
 Insert Feature @('Feature','Feature_Parent','Title','Description','Display','Level','Directory_','Attributes') @('MainFeature',$null,'SC2 Region Switcher','Application and one Start menu shortcut',[int]1,[int]1,'INSTALLDIR',[int]0)
 foreach($component in $componentCodes.Keys){Insert FeatureComponents @('Feature_','Component_') @('MainFeature',$component)}
 $sequence=1
 foreach($file in $files){
  $language=if($file.Version){'0'}else{$null}
- Insert File @('File','Component_','FileName','FileSize','Version','Language','Attributes','Sequence') @($file.Id,'Application',($file.Short+'|'+$file.Name),[int](Get-Item -LiteralPath $file.Source).Length,$file.Version,$language,[int]512,[int]$sequence)
+ Insert File @('File','Component_','FileName','FileSize','Version','Language','Attributes','Sequence') @($file.Id,$file.Component,($file.Short+'|'+$file.Name),[int](Get-Item -LiteralPath $file.Source).Length,$file.Version,$language,[int]512,[int]$sequence)
  $sequence++
 }
-Insert Media @('DiskId','LastSequence','DiskPrompt','Cabinet','VolumeLabel','Source') @([int]1,[int]4,$null,'#app.cab',$null,$null)
+Insert Media @('DiskId','LastSequence','DiskPrompt','Cabinet','VolumeLabel','Source') @([int]1,[int]$files.Count,$null,'#app.cab',$null,$null)
 Insert Shortcut @('Shortcut','Directory_','Name','Component_','Target','Arguments','Description','Hotkey','Icon_','IconIndex','ShowCmd','WkDir') @('StartMenu','MenuGroup','SC2REG~1|SC2 Region Switcher','Application','MainFeature',$null,'StarCraft II CN and Global region switcher',$null,'SwitcherIcon.exe',[int]0,[int]1,'INSTALLDIR')
 Insert Registry @('Registry','Root','Key','Name','Value','Component_') @('AppPath',[int]2,'Software\Microsoft\Windows\CurrentVersion\App Paths\SC2Switcher.Wpf.exe',$null,'[INSTALLDIR]SC2Switcher.Wpf.exe','AppRegistration')
 Insert RemoveFile @('FileKey','Component_','FileName','DirProperty','InstallMode') @('RemoveMenuGroup','Application',$null,'MenuGroup',[int]2)
 Insert RemoveFile @('FileKey','Component_','FileName','DirProperty','InstallMode') @('RemoveApplicationFolder','Application',$null,'INSTALLDIR',[int]2)
 Insert RemoveFile @('FileKey','Component_','FileName','DirProperty','InstallMode') @('RemoveProductFolder','Application',$null,'ProductRoot',[int]2)
+Insert RemoveFile @('FileKey','Component_','FileName','DirProperty','InstallMode') @('RemoveLicenseFolder','RadixLicense',$null,'LicenseDir',[int]2)
 Insert CustomAction @('Action','Type','Source','Target') @('SetInstallLocation',[int]51,'ARPINSTALLLOCATION','[INSTALLDIR]')
 Insert CustomAction @('Action','Type','Source','Target') @('RejectNewerProduct',[int]19,$null,'A newer version of SC2 Region Switcher is already installed. Uninstall it before installing an older release.')
 Insert InstallExecuteSequence @('Action','Condition','Sequence') @('RejectNewerProduct','NEWERPRODUCTS',[int]210)
