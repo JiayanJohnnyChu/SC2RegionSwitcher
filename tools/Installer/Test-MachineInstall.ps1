@@ -68,7 +68,7 @@ function New-Fixture([string]$Role,[string]$Version,[string]$Token){
         Set-Value $opened.Database Shortcut Name Shortcut StartMenu "SC2MQA|SC2 Machine QA $Token"
         Set-Value $opened.Database Registry Key Registry AppPath "Software\Microsoft\Windows\CurrentVersion\App Paths\SC2MachineQA.$Token.exe"
         Set-Value $opened.Database RegLocator Key Signature_ LegacyUserAppPath "Software\SC2MachineQA\$Token\LegacyPreview"
-        foreach($component in @('Application','AppRegistration')){Set-Value $opened.Database Component ComponentId Component $component (Stable-Guid "$Token/component/$Role/$component")}
+        foreach($source in $sourceComponents){$component=[string]$source[0];Set-Value $opened.Database Component ComponentId Component $component (Stable-Guid "$Token/component/$Role/$component")}
         $summary=$opened.Database.SummaryInformation(20);try{$summary.Property(3)="SC2 Machine QA $Token";$summary.Property(9)=$package;[void]$summary.Persist()}finally{[void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($summary)}
         [void]$opened.Database.Commit()
     }finally{[void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($opened.Database);[void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($opened.Installer);[GC]::Collect();[GC]::WaitForPendingFinalizers()}
@@ -88,14 +88,21 @@ $token=('R'+$env:GITHUB_RUN_ID+'A'+$env:GITHUB_RUN_ATTEMPT).ToUpperInvariant()
 $fixtureRoot=Join-Path $env:ProgramFiles "SC2MachineQA$Token";$fixtureOld=Join-Path $fixtureRoot 'old';$fixtureApp=Join-Path $fixtureRoot 'app'
 $fixtureShortcut=Join-Path $env:ProgramData "Microsoft\Windows\Start Menu\Programs\SC2 Machine QA $Token\SC2 Machine QA $Token.lnk"
 $fixtureAppPath="Software\Microsoft\Windows\CurrentVersion\App Paths\SC2MachineQA.$Token.exe"
+$sourceComponents=@(Rows $CandidateMsi 'SELECT `Component`,`ComponentId`,`Directory_`,`Attributes`,`KeyPath` FROM `Component`' 5)
 $baseline=New-Fixture baseline '3.4.1' $token;$candidate=New-Fixture candidate '3.4.2' $token;$newer=New-Fixture newer '3.5.0' $token;$rollback=New-Fixture rollback '3.4.2' $token
 $fixtures=@($baseline,$candidate,$newer,$rollback)
 foreach($fixture in $fixtures){
-    $components=@(Rows $fixture.Path 'SELECT `Component`,`Attributes`,`KeyPath` FROM `Component`' 3)
+    $components=@(Rows $fixture.Path 'SELECT `Component`,`ComponentId`,`Directory_`,`Attributes`,`KeyPath` FROM `Component`' 5)
     $registry=@(Rows $fixture.Path 'SELECT `Registry`,`Root`,`Component_` FROM `Registry`' 3)
     $shortcutRows=@(Rows $fixture.Path 'SELECT `Shortcut`,`Component_`,`Target` FROM `Shortcut`' 3)
     $componentMap=@{};foreach($row in $components){$componentMap[[string]$row[0]]=$row}
-    if($components.Count-ne2-or$componentMap.Application[1]-ne'256'-or$componentMap.Application[2]-ne'AppExe'-or$componentMap.AppRegistration[1]-ne'260'-or$componentMap.AppRegistration[2]-ne'AppPath'){throw "Fixture component contract mismatch: $($fixture.Role)"}
+    if($components.Count-ne$sourceComponents.Count-or$componentMap.Count-ne$components.Count){throw "Fixture component contract mismatch: $($fixture.Role)"}
+    foreach($source in $sourceComponents){
+        $name=[string]$source[0];$actual=$componentMap[$name]
+        $expectedId=Stable-Guid "$token/component/$($fixture.Role)/$name"
+        if(!$actual-or$actual[1]-ne$expectedId-or$actual[2]-ne$source[2]-or$actual[3]-ne$source[3]-or$actual[4]-ne$source[4]){throw "Fixture component contract mismatch: $($fixture.Role)/$name"}
+    }
+    if($componentMap.Application[3]-ne'256'-or$componentMap.Application[4]-ne'AppExe'-or$componentMap.AppRegistration[3]-ne'260'-or$componentMap.AppRegistration[4]-ne'AppPath'){throw "Fixture component contract mismatch: $($fixture.Role)"}
     if($registry.Count-ne1-or$registry[0][0]-ne'AppPath'-or$registry[0][1]-ne'2'-or$registry[0][2]-ne'AppRegistration'){throw "Fixture registry contract mismatch: $($fixture.Role)"}
     if($shortcutRows.Count-ne1-or$shortcutRows[0][1]-ne'Application'-or$shortcutRows[0][2]-ne'MainFeature'){throw "Fixture advertised shortcut contract mismatch: $($fixture.Role)"}
 }
