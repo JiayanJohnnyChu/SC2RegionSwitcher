@@ -8,7 +8,7 @@
 .\tools\Installer\Build-MachineMsi.ps1 -AppDirectory <directory> -OutputDirectory <empty-directory>
 ```
 
-The builder uses Windows Installer COM and `makecab`, reads the three-part version through `scripts/Release-Common.ps1`, and checks the executable manifest/runtime versions. The current definition has four runtime files and nine licensing/source files in one embedded cabinet. Version 3.5.1 packaging and hosted CI remain pending. Packages are unsigned; .NET 10 Desktop Runtime x64 is a separate dependency.
+The builder uses Windows Installer COM and `makecab`, reads the three-part version through `scripts/Release-Common.ps1`, and checks the executable manifest/runtime versions. The current definition has four runtime files and nine licensing/source files in one embedded cabinet. Packages are unsigned; .NET 10 Desktop Runtime x64 is a separate dependency.
 
 ## Ownership and upgrades
 

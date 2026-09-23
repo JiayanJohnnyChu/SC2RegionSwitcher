@@ -8,7 +8,7 @@
 .\tools\Installer\Build-MachineMsi.ps1 -AppDirectory <directory> -OutputDirectory <empty-directory>
 ```
 
-构建器使用 Windows Installer COM 与 `makecab`，从 `scripts/Release-Common.ps1` 读取三段版本并检查可执行清单／运行时版本。当前定义在一个内嵌 cabinet 中包含四个运行文件和九个许可／源文件。3.5.1 的正式打包与托管 CI 尚未执行。包未签名，.NET 10 Desktop Runtime x64 为独立依赖。
+构建器使用 Windows Installer COM 与 `makecab`，从 `scripts/Release-Common.ps1` 读取三段版本并检查可执行清单／运行时版本。当前定义在一个内嵌 cabinet 中包含四个运行文件和九个许可／源文件。包未签名，.NET 10 Desktop Runtime x64 为独立依赖。
 
 ## 所有权与升级
 

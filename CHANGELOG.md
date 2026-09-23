@@ -4,7 +4,7 @@
 
 ## Unreleased
 
-Development version: **3.5.1**, not yet packaged or published.
+Candidate **3.5.1** has passed package, installation and integrated Global language checks. A draft prerelease is prepared from the accepted CI artifacts; it is not yet public.
 
 - A redesigned, responsive interface keeps settings and actions accessible in small windows.
 - Eleven independent interface languages and embedded fonts support Latin, Greek, Chinese and Korean text.
@@ -12,7 +12,7 @@ Development version: **3.5.1**, not yet packaged or published.
 - Matching region and language settings avoid unnecessary restarts.
 - Navigation, saving after path edits, repair links and translated error details behave consistently.
 
-[Development notes](docs/RELEASE-NOTES-3.5.1.md) · [Validation](docs/VALIDATION.md)
+[Preview notes](docs/RELEASE-NOTES-3.5.1.md) · [Validation](docs/VALIDATION.md)
 
 ## 3.4.2 — 22 September 2026
 

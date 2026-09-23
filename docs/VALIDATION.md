@@ -4,23 +4,36 @@
 
 Recorded 23 September 2026. Results apply to the source or artifact identified below. Detailed logs, hashes and rendering reports remain in ignored `artifacts/`.
 
-## Development version: 3.5.1
+## Release candidate: 3.5.1
 
-The current source has local build, regression and rendering results. It has no formal package, hosted CI result, installation verification, integrated live WPF/game verification, tag or publication. Release acceptance requires identified CI artifacts, package and installer checks, and an integrated live check under the [release process](DEVELOPMENT.md#release).
+`v3.5.1-preview.1` is prepared as a draft prerelease using the original accepted CI artifacts. It is not publicly available; the public download remains 3.4.2.
 
-| Scope | Recorded result |
+| Identity / check | Recorded result |
 | --- | --- |
-| Functional baseline, before the font-only changes | Release build with SDK 10.0.401: zero warnings/errors; regression exit 0 with `TOTAL 82 PASSED`; five synthetic WPF event checks passed |
-| Baseline layout | English, Simplified Chinese and Greek: 97 renders at 200% / 192 DPI and 98 at 100% / 96 DPI, with selected layout samples reviewed |
-| Translation consistency | Eleven catalogues with 264 matching keys and placeholders |
-| Final font build | Release build: zero warnings/errors; all fifteen font hashes and per-weight character coverage verified |
-| Font preservation | Six CJK 600/650/700 subsets retain mapped outlines, advance widths, hinting, vertical metrics and name metadata; distinct 650 outlines remain in the display family registered at native WPF weight 600. The other nine font files are unchanged |
-| Focused native rendering | 105 glyph samples passed without empty/missing glyphs or simulated weights; four Chinese/Korean compact Settings captures were reviewed without font clipping |
-| Font size | 29,759,648 bytes (28.38 MiB); a compression probe of the complete fifteen-file portable payload produced a ZIP of 16,630,678 bytes (15.86 MiB), not a formal release package |
+| Source | `306da479814f1451779915b403ed447d15b6cd0d` |
+| Candidate CI | [35854904452](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35854904452): Release build with zero warnings/errors; `TOTAL 82 PASSED`; package identity, payload, release guards and full unsuppressed MSI ICE checks passed, with zero ICE warnings/errors |
+| Installer lifecycle | [35855805823](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35855805823): all 28 expected steps passed in an elevated Windows 11 ARM64 environment; harness source `2f56c9b028aa22a23d043b5efc44bcd8af1ea125` |
+| Installed upgrade | Original MSI upgraded 3.4.1 to 3.5.1 with exit 0; all thirteen installed files matched the package hashes; existing configuration and recovery data were preserved; one Start menu entry, one uninstall entry and the expected App Paths registration were present |
+| Integrated live check | Installed application detected installed language resources, saved and applied `frFR`, and opened Battle.net Global in Europe. StarCraft II 5.0.16.97563 reached its online French main menu |
+| State after live check | Normal game exit; Global text/speech restored to `enUS` through the app; China remained `zhCN`; profiles and interface preferences matched their original values; no pending recovery |
+| Draft promotion | [35856933187](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35856933187): the four original CI assets were uploaded, downloaded again and hash-verified without rebuilding |
 
-Final application DLL SHA-256: `BA293765A5DCA23166F36BBD904AE168B9D641417B8F6670500E0E62AAD59B6E`.
+| Original CI artifact | Bytes | SHA-256 |
+| --- | ---: | --- |
+| MSI | 16,719,872 | `51490A95C5ED7BDB17F31FD0D00D8636BE8466D3E78E56924481AB99E15B4AA2` |
+| Portable ZIP | 16,629,526 | `4D79FDC9B5EF0E2D9E2CAD9F61974D6120B067CAA77982C9EC37D01BAB357458` |
 
-The functional and baseline DPI results precede the font-only changes; the final build received the focused font checks above. These results cover simulated data and rendering, with live acceptance still pending. [Development notes](RELEASE-NOTES-3.5.1.md) describe the changes; [font documentation](../src/SC2Switcher.Wpf/Fonts/README.md) records font sources and coverage.
+Candidate application DLL SHA-256: `81DB66B10D387C65A3258000EF651D5B02006376420F5AACBD4AA32A55539548`.
+
+The live check covers the new Global language selection in the installed application. It does not extend the earlier China roundtrip or DPI results to this package.
+
+### Supporting interface and font checks
+
+Earlier 3.5.1 builds passed five synthetic WPF event checks and produced 97 renders at 200% / 192 DPI and 98 at 100% / 96 DPI across English, Simplified Chinese and Greek, with selected layout samples reviewed. These event and layout results precede the font-only changes. Eleven translation catalogues had 264 matching keys and placeholders.
+
+The final font revision passed all fifteen font hashes and per-weight coverage checks, 105 native glyph samples, and review of four Chinese/Korean compact Settings captures without font clipping. Six reduced CJK 600/650/700 subsets preserved mapped outlines and metrics, including distinct 650 display outlines registered at native WPF weight 600; the other nine font files were unchanged. Fonts total 29,759,648 bytes (28.38 MiB). These focused results belong to the font verification build; the table above records the packaged candidate's checks.
+
+[Release notes](RELEASE-NOTES-3.5.1.md) · [Font documentation](../src/SC2Switcher.Wpf/Fonts/README.md) · [Release process](DEVELOPMENT.md#release)
 
 ## Published preview: 3.4.2
 
