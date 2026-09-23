@@ -23,7 +23,9 @@ public partial class SwissSettingsView:UserControl {
     void AdaptLayout(){
         bool narrow=ActualWidth<=600,compact=ActualWidth<=900;
         double gutter=narrow?18:compact?24:40;
-        FormContent.Margin=new Thickness(gutter,compact?24:28,gutter,compact?24:28);
+        double scrollbarSpace=FormScroll.ComputedVerticalScrollBarVisibility==Visibility.Visible&&FormScroll.ViewportWidth>0
+            ?Math.Max(0,FormScroll.ActualWidth-FormScroll.ViewportWidth):0;
+        FormContent.Margin=new Thickness(gutter,compact?24:28,Math.Max(0,gutter-scrollbarSpace),compact?24:28);
         SettingsDock.Padding=new Thickness(gutter,compact?14:20,gutter,compact?6:12);
         SettingsTitle.FontSize=narrow?30:36;
         bool shortWindow=(Window.GetWindow(this)?.ActualHeight??800)<=740;
@@ -40,6 +42,9 @@ public partial class SwissSettingsView:UserControl {
             item.Item1.Margin=new Thickness(0,narrow?22:24,0,narrow?22:24);
         }
         SaveButton.MinWidth=narrow?0:190;SaveButton.MaxWidth=narrow?Math.Max(150,(ActualWidth-gutter*2)*.48):320;
+    }
+    void FormScroll_ScrollChanged(object sender,ScrollChangedEventArgs e){
+        if(ReferenceEquals(e.OriginalSource,FormScroll)&&e.ViewportWidthChange!=0)AdaptLayout();
     }
     void LanguageChanged(object sender,PropertyChangedEventArgs e)=>model.Refresh();
     public void ShowMessage(string key,bool error=false)=>model.Status(key,error);
