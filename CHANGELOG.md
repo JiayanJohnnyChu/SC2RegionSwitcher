@@ -4,15 +4,15 @@
 
 ## Unreleased
 
-Candidate **3.5.2** is in preparation. The public download remains 3.4.2.
+Candidate **3.5.3** is in preparation. The public download remains 3.4.2.
 
-- A redesigned, responsive interface keeps settings and actions accessible in small windows, with aligned Settings content and consistent path-field text insets.
+- A redesigned, responsive interface keeps settings and actions accessible in small windows, with aligned Settings content and consistent internal spacing in text fields and language selectors.
 - Eleven independent interface languages and embedded fonts support Latin, Greek, Chinese and Korean text.
 - Global game language can be selected from installed text/speech pairs. The saved preference is retained when its installation is unavailable.
 - Matching region and language settings avoid unnecessary restarts.
 - Navigation, saving after path edits, repair links and translated error details behave consistently.
 
-[Preview notes](docs/RELEASE-NOTES-3.5.2.md) · [Validation](docs/VALIDATION.md)
+[Preview notes](docs/RELEASE-NOTES-3.5.3.md) · [Validation](docs/VALIDATION.md)
 
 ## 3.4.2 — 22 September 2026
 
