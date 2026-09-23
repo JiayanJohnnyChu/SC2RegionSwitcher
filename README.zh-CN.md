@@ -2,13 +2,13 @@
 
 # SC2 Region Switcher
 
-**下载：**[v3.4.2-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1) · [全部版本](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases)
+**下载：**[v3.5.3-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.5.3-preview.1) · [全部版本](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases)
 
 SC2 Region Switcher 供玩家通过一套战网使用两套独立的《星际争霸 II》国服和国际服安装，切换战网登录区域及游戏共享语言设置。
 
-公开下载为 **3.4.2**，提供英文和简体中文界面，游戏语言固定为国服中文、国际服英文。截图展示使用模拟配置的 **3.5.1 开发版**。3.5.1 源码支持十一种界面语言及已安装的国际服游戏语言选择，尚无已发布的发行包。
+应用支持十一种界面语言，以及已安装的国际服游戏语言选择。
 
-![SC2 Region Switcher 3.5.1 开发界面，使用模拟配置](assets/screenshots/sc2-switcher-3.5.1.png)
+![SC2 Region Switcher，使用模拟配置](assets/screenshots/sc2-switcher-3.5.1.png)
 
 ## 安装
 
@@ -23,7 +23,7 @@ GitHub 的“Source code”下载不是可直接运行的应用包。
 
 ## 首次配置
 
-1. 两套游戏通过战网完成安装，使用独立目录，例如 `D:\Games\StarCraft II CN` 和 `D:\Games\StarCraft II Global`。国服需要中文文字与语音，公开版的国际服需要英文文字与语音。
+1. 两套游戏通过战网完成安装，使用独立目录，例如 `D:\Games\StarCraft II CN` 和 `D:\Games\StarCraft II Global`。国服需要简体中文文字与语音，国际服需要所选语言的文字与语音资源。
 2. 即使战网显示**安装**，安装前也需要核对最终目录。战网可能自动补上 `StarCraft II` 子目录，或识别另一套安装。
 3. 设置页填写战网目录、两套游戏目录，以及游戏实际使用的“文档”文件夹中的 `StarCraft II\Variables.txt`。文件缺失时，一次正常游戏启动和退出会生成它。
 4. **保存并检查**验证并保存路径，单独保存不会修改游戏语言。完整准备流程和路径示例见[使用指南](docs/SETUP.zh-CN.md)。
@@ -32,7 +32,7 @@ GitHub 的“Source code”下载不是可直接运行的应用包。
 
 切换要求《星际争霸 II》和地图编辑器已关闭，战网下载、更新和修复已完成。目标为国服或国际服，国际服另有 EU、US 或 KR 登录区域选项。切换器正常关闭战网，备份后应用游戏语言设置，再打开所选登录区域。操作完成前相关控件保持锁定。
 
-登录、游戏服务器选择和游戏启动均在战网中完成。**EU、US 和 KR 是战网登录区域，不代表已经选定相应游戏服务器。**界面语言独立于游戏语言。开发版在下一次切换时应用已保存的国际服语言选择，文字和语音资源均需预先通过战网安装。
+登录、游戏服务器选择和游戏启动均在战网中完成。**EU、US 和 KR 是战网登录区域，不代表已经选定相应游戏服务器。**界面语言独立于游戏语言。应用在下一次切换时应用已保存的国际服语言选择，文字和语音资源均需预先通过战网安装。
 
 ## 存档、备份与更新
 

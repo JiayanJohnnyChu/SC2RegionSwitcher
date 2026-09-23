@@ -2,13 +2,13 @@
 
 # SC2 Region Switcher
 
-**Downloads:** [v3.4.2-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1) · [Alle versies](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases)
+**Downloads:** [v3.5.3-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.5.3-preview.1) · [Alle versies](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases)
 
 SC2 Region Switcher maakt het mogelijk om afzonderlijke Chinese en internationale installaties van StarCraft II te gebruiken met één Battle.net-app. Het programma wisselt de aanmeldregio van Battle.net en de gedeelde taalinstellingen van het spel.
 
-De openbare download is **3.4.2**, met Engels en vereenvoudigd Chinees als interfacetalen en vaste speltalen: Chinees voor China, Engels voor de internationale installatie. De afbeelding toont **ontwikkelversie 3.5.1** met een gesimuleerde configuratie. De broncode van 3.5.1 ondersteunt elf interfacetalen en een keuze uit geïnstalleerde internationale speltalen; er is nog geen releasepakket van die versie gepubliceerd.
+De toepassing ondersteunt elf interfacetalen en een keuze uit geïnstalleerde internationale speltalen.
 
-![Ontwikkelinterface van SC2 Region Switcher 3.5.1 met gesimuleerde configuratie](assets/screenshots/sc2-switcher-3.5.1.png)
+![SC2 Region Switcher met gesimuleerde configuratie](assets/screenshots/sc2-switcher-3.5.1.png)
 
 ## Installatie
 
@@ -23,7 +23,7 @@ De “Source code”-downloads van GitHub zijn geen direct uitvoerbare toepassin
 
 ## Eerste configuratie
 
-1. Beide spelinstallaties zijn voltooid in Battle.net en staan in afzonderlijke mappen, bijvoorbeeld `D:\Games\StarCraft II CN` en `D:\Games\StarCraft II Global`. China vereist Chinese tekst en spraak; de openbare versie vereist beide in het Engels voor de internationale installatie.
+1. Beide spelinstallaties zijn voltooid in Battle.net en staan in afzonderlijke mappen, bijvoorbeeld `D:\Games\StarCraft II CN` en `D:\Games\StarCraft II Global`. China vereist tekst en spraak in vereenvoudigd Chinees; de internationale installatie vereist beide in de gekozen taal.
 2. De uiteindelijke installatiemap wordt vóór installatie in Battle.net gecontroleerd, ook als **Installeren** wordt getoond. Battle.net kan een submap `StarCraft II` toevoegen of de andere installatie herkennen.
 3. De instellingen bevatten de Battle.net-map, beide spelmappen en het daadwerkelijk gebruikte bestand `StarCraft II\Variables.txt` in de Documenten-map van het spel. Normaal starten en afsluiten van het spel maakt dit bestand aan als het ontbreekt.
 4. **Opslaan en controleren** controleert de paden en slaat ze op, zonder de speltaal te wijzigen. De volledige voorbereiding en padvoorbeelden staan in de Engelstalige [gebruikershandleiding](docs/SETUP.md).
@@ -32,7 +32,7 @@ De “Source code”-downloads van GitHub zijn geen direct uitvoerbare toepassin
 
 Wisselen vereist dat StarCraft II en de editor gesloten zijn en dat Battle.net-downloads, updates en reparaties voltooid zijn. Het doel is China of Internationaal; Internationaal biedt ook de aanmeldregio's EU, US en KR. Het programma sluit Battle.net normaal af, maakt een back-up, past de taalinstellingen toe en opent de gevraagde aanmeldregio. De bedieningselementen blijven geblokkeerd totdat de bewerking is voltooid.
 
-Aanmelden, de spelserver kiezen en het spel starten gebeuren in Battle.net. **EU, US en KR zijn Battle.net-aanmeldregio's en bevestigen niet welke spelserver is geselecteerd.** De interfacetaal staat los van de speltaal. De ontwikkelversie past de opgeslagen internationale speltaal bij de volgende wissel toe; tekst en spraak moeten al via Battle.net zijn geïnstalleerd.
+Aanmelden, de spelserver kiezen en het spel starten gebeuren in Battle.net. **EU, US en KR zijn Battle.net-aanmeldregio's en bevestigen niet welke spelserver is geselecteerd.** De interfacetaal staat los van de speltaal. De toepassing past de opgeslagen internationale speltaal bij de volgende wissel toe; tekst en spraak moeten al via Battle.net zijn geïnstalleerd.
 
 ## Spelvoortgang, back-ups en updates
 

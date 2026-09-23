@@ -2,9 +2,9 @@
 
 # Changelog
 
-## Unreleased
+## 3.5.3 — 23 September 2026
 
-Candidate **3.5.3** is in preparation. The public download remains 3.4.2.
+[Preview release](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.5.3-preview.1).
 
 - A redesigned, responsive interface keeps settings and actions accessible in small windows, with aligned Settings content and consistent internal spacing in text fields and language selectors.
 - Eleven independent interface languages and embedded fonts support Latin, Greek, Chinese and Korean text.

@@ -2,13 +2,13 @@
 
 # SC2 Region Switcher
 
-**Downloads:** [v3.4.2-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1) · [Alle Versionen](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases)
+**Downloads:** [v3.5.3-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.5.3-preview.1) · [Alle Versionen](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases)
 
 SC2 Region Switcher ermöglicht die Nutzung getrennter China- und internationaler Installationen von StarCraft II mit einer Battle.net-Anwendung. Das Programm wechselt die Battle.net-Anmelderegion und die gemeinsam genutzten Spracheinstellungen des Spiels.
 
-Öffentlich verfügbar ist **3.4.2**, mit englischer und vereinfachter chinesischer Oberfläche sowie festen Spielsprachen: Chinesisch für China, Englisch für die internationale Installation. Die Abbildung zeigt die **Entwicklungsversion 3.5.1** mit simulierter Konfiguration. Der Quellstand 3.5.1 unterstützt elf Oberflächensprachen und die Auswahl einer installierten internationalen Spielsprache; ein veröffentlichtes Paket dieser Version liegt noch nicht vor.
+Die Anwendung unterstützt elf Oberflächensprachen und die Auswahl einer installierten internationalen Spielsprache.
 
-![Entwicklungsoberfläche von SC2 Region Switcher 3.5.1 mit simulierter Konfiguration](assets/screenshots/sc2-switcher-3.5.1.png)
+![SC2 Region Switcher mit simulierter Konfiguration](assets/screenshots/sc2-switcher-3.5.1.png)
 
 ## Installation
 
@@ -23,7 +23,7 @@ Die „Source code“-Downloads von GitHub sind keine direkt ausführbaren Anwen
 
 ## Erste Konfiguration
 
-1. Beide Spielinstallationen sind in Battle.net vollständig installiert und verwenden getrennte Verzeichnisse, etwa `D:\Games\StarCraft II CN` und `D:\Games\StarCraft II Global`. China benötigt chinesische Texte und Sprachausgabe; die öffentliche Version benötigt beide Ressourcen auf Englisch für die internationale Installation.
+1. Beide Spielinstallationen sind in Battle.net vollständig installiert und verwenden getrennte Verzeichnisse, etwa `D:\Games\StarCraft II CN` und `D:\Games\StarCraft II Global`. China benötigt Texte und Sprachausgabe in vereinfachtem Chinesisch; die internationale Installation benötigt beide Ressourcen in der gewählten Sprache.
 2. Der endgültige Installationspfad wird vor der Installation in Battle.net geprüft, auch wenn **Installieren** angezeigt wird. Battle.net kann einen Unterordner `StarCraft II` ergänzen oder die andere Installation erkennen.
 3. Die Einstellungen enthalten das Battle.net-Verzeichnis, beide Spielverzeichnisse und die tatsächlich verwendete Datei `StarCraft II\Variables.txt` im Dokumente-Ordner des Spiels. Ein normaler Spielstart mit anschließendem regulärem Beenden erzeugt die Datei, falls sie fehlt.
 4. **Speichern und prüfen** prüft und speichert die Pfade, ohne die Spielsprache zu ändern. Vorbereitung und Pfadbeispiele stehen in der englischen [Nutzungsanleitung](docs/SETUP.md).
@@ -32,7 +32,7 @@ Die „Source code“-Downloads von GitHub sind keine direkt ausführbaren Anwen
 
 Vor dem Wechsel müssen StarCraft II und der Editor geschlossen sowie Battle.net-Downloads, Aktualisierungen und Reparaturen abgeschlossen sein. Das Ziel ist China oder International; für International stehen zusätzlich die Anmelderegionen EU, US und KR zur Auswahl. Das Programm beendet Battle.net regulär, sichert und ändert die Spracheinstellungen und öffnet die gewünschte Anmelderegion. Die Bedienelemente bleiben bis zum Abschluss gesperrt.
 
-Kontoanmeldung, Spielserverauswahl und Spielstart erfolgen in Battle.net. **EU, US und KR sind Battle.net-Anmelderegionen und bestätigen nicht den ausgewählten Spielserver.** Die Oberflächensprache ist von der Spielsprache unabhängig. Die Entwicklungsversion übernimmt die gespeicherte internationale Spielsprache beim nächsten Wechsel; Texte und Sprachausgabe müssen bereits über Battle.net installiert sein.
+Kontoanmeldung, Spielserverauswahl und Spielstart erfolgen in Battle.net. **EU, US und KR sind Battle.net-Anmelderegionen und bestätigen nicht den ausgewählten Spielserver.** Die Oberflächensprache ist von der Spielsprache unabhängig. Die Anwendung übernimmt die gespeicherte internationale Spielsprache beim nächsten Wechsel; Texte und Sprachausgabe müssen bereits über Battle.net installiert sein.
 
 ## Spielstände, Sicherungen und Updates
 
