@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -17,6 +18,8 @@ public sealed class ConfigurationLoadResult {
     public bool Migrated {get;set;}
 }
 public static class ConfigurationValidator {
+    public static IReadOnlyList<string> DiscoverGlobalLanguages(string directory) => BuildInfo.ReadInstallation(
+        new Profile{Name="外服",GamePath=LocalPath(directory,"GlobalDirectory",true)},false).AvailableLocales;
     public static Settings Defaults() {
         var candidates=new[]{Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)};
         string battle=candidates.Where(x=>!String.IsNullOrEmpty(x)).Select(x=>Path.Combine(x,"Battle.net","Battle.net.exe")).FirstOrDefault(File.Exists)??"";
@@ -100,6 +103,7 @@ public sealed class ConfigurationStore {
         return new ConfigurationLoadResult{Settings=defaults,NeedsSetup=true,NoticeKey="首次使用，请设置战网和两套游戏的安装目录。"};
     }
     static bool SamePaths(Settings a,Settings b)=>a!=null&&Paths.Same(a.BattleNetPath,b.BattleNetPath)&&Paths.Same(a.VariablesPath,b.VariablesPath)&&Paths.Same(a.CN.GamePath,b.CN.GamePath)&&Paths.Same(a.Global.GamePath,b.Global.GamePath);
+    static bool SameLanguages(Settings a,Settings b)=>a!=null&&a.CN.TextLocale==b.CN.TextLocale&&a.CN.SpeechLocale==b.CN.SpeechLocale&&a.Global.TextLocale==b.Global.TextLocale&&a.Global.SpeechLocale==b.Global.SpeechLocale;
     public Settings Save(Settings candidate) {
         using var mutex=new Mutex(false,mutexName);bool acquired=false;
         try {
@@ -108,6 +112,7 @@ public sealed class ConfigurationStore {
             var validated=ConfigurationValidator.Validate(candidate);
             if(Stamp(ConfigPath)!=expectedHash)throw new IOException(UiText.T("配置已被其他窗口修改。请重新打开程序后再保存。"));
             if(File.Exists(Path.Combine(stateRoot,"pending-language.json"))&&!SamePaths(lastSettings,validated))throw new IOException(UiText.T("存在未恢复的切换记录，请先按原配置完成恢复后再修改安装目录。"));
+            if(File.Exists(Path.Combine(stateRoot,"pending-language.json"))&&!SameLanguages(lastSettings,validated))throw new SettingsValidationException("GlobalLanguage",UiText.T("存在未恢复的切换记录，请先按原配置完成恢复后再修改游戏语言。"));
             if(expectedHash!=null&&lastSettings!=null&&JsonSerializer.Serialize(lastSettings)==JsonSerializer.Serialize(validated))return validated;
             if(expectedHash!=null){
                 string backup=Path.Combine(stateRoot,"ConfigurationBackups","profiles-"+DateTime.Now.ToString("yyyyMMdd-HHmmss-fff")+"-"+Guid.NewGuid().ToString("N")+".json");

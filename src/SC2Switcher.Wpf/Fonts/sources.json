@@ -1,0 +1,29 @@
+[
+  {
+    "Family": "Inter",
+    "Version": "Version 4.001;git-9221beed3",
+    "SourceUrl": "https://raw.githubusercontent.com/rsms/inter/353b61b9f4430d5f420d56605a6e7993e0941470/docs/font-files/InterVariable.woff2",
+    "SourceRevision": "353b61b9f4430d5f420d56605a6e7993e0941470",
+    "SourceSHA256": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+    "LicenseFile": "licenses/LICENSE-Inter.txt",
+    "LicenseUrl": "https://raw.githubusercontent.com/rsms/inter/353b61b9f4430d5f420d56605a6e7993e0941470/LICENSE.txt"
+  },
+  {
+    "Family": "Noto Sans SC",
+    "Version": "Version 2.004-H2;hotconv 1.0.118;makeotfexe 2.5.65603",
+    "SourceUrl": "https://raw.githubusercontent.com/google/fonts/e44c4b011a820c2cbe2fd2cfa8052037d7edb571/ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf",
+    "SourceRevision": "e44c4b011a820c2cbe2fd2cfa8052037d7edb571",
+    "SourceSHA256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+    "LicenseFile": "licenses/LICENSE-NotoSC.txt",
+    "LicenseUrl": "https://raw.githubusercontent.com/google/fonts/e44c4b011a820c2cbe2fd2cfa8052037d7edb571/ofl/notosanssc/OFL.txt"
+  },
+  {
+    "Family": "Noto Sans KR",
+    "Version": "Version 2.004-H2;hotconv 1.0.118;makeotfexe 2.5.65603",
+    "SourceUrl": "https://raw.githubusercontent.com/google/fonts/e44c4b011a820c2cbe2fd2cfa8052037d7edb571/ofl/notosanskr/NotoSansKR%5Bwght%5D.ttf",
+    "SourceRevision": "e44c4b011a820c2cbe2fd2cfa8052037d7edb571",
+    "SourceSHA256": "194018e6b2b293a7964f037b25c0249ce1418bc9ab3c971060a03aa57861e252",
+    "LicenseFile": "licenses/LICENSE-NotoKR.txt",
+    "LicenseUrl": "https://raw.githubusercontent.com/google/fonts/e44c4b011a820c2cbe2fd2cfa8052037d7edb571/ofl/notosanskr/OFL.txt"
+  }
+]

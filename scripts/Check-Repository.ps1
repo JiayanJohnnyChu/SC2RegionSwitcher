@@ -16,7 +16,7 @@ try {
         if([IO.Path]::GetFileName($file) -in @('profiles.json','ui-preferences.json','pending-language.json','Variables.txt','Battle.net.config')){
             $problems+="Runtime configuration included: $file"
         }
-        if([IO.Path]::GetExtension($file) -in @('.png','.ico')){continue}
+        if([IO.Path]::GetExtension($file) -in @('.png','.ico','.ttf','.woff2')){continue}
         $path=Join-Path $projectRoot $file
         if(!(Test-Path -LiteralPath $path -PathType Leaf)){continue}
         $content=Get-Content -LiteralPath $path -Raw

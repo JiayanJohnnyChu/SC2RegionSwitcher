@@ -1,54 +1,35 @@
 [简体中文](VALIDATION.zh-CN.md)
 
-# Validation record
+# Validation
 
-Updated 2026-09-22. Results apply to the identified revision and package hashes. Compilation, package structure, installation, interface rendering and online use are recorded separately.
+Recorded 23 September 2026. Results apply to the source or artifact identified below. Detailed logs, hashes and rendering reports remain in ignored `artifacts/`.
 
-## 3.4.2 preview
+## Development version: 3.5.1
 
-Version 3.4.2 changes licensing and distribution contents. Local packaging and license-content verification passed. [v3.4.2-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1) is a published public prerelease. CI and promotion passed, and anonymous downloads of its four assets matched the original hashes. The scope and results are recorded in [3.4.2 validation](VALIDATION-3.4.2.md). Earlier installation, UI, DPI and online results retain their original version attribution.
+The current source has local build, regression and rendering results. It has no formal package, hosted CI result, installation verification, integrated live WPF/game verification, tag or publication. Release acceptance requires identified CI artifacts, package and installer checks, and an integrated live check under the [release process](DEVELOPMENT.md#release).
 
-## 3.4.1 preview
-
-The administrator-required, per-machine MSI passed local compilation with zero warnings/errors, all 52 regressions, package validation, eight release rejection cases and the full unsuppressed ICE suite with zero warnings/errors. The candidate from [CI run 35721803273](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35721803273) passed hosted machine lifecycle testing in [run 35722639637](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35722639637), including upgrade and failed-upgrade recovery. The final CI candidate passed interactive UAC migration and subsequent ordinary-user launch. Basic English and Simplified Chinese Settings UI checks passed with isolated configuration. Earlier basic bilingual UI checks and current-user recovery diagnostics are recorded separately. Detailed scope is in [3.4.1 validation](VALIDATION-3.4.1.md).
-
-The full DPI matrix and online roundtrip below belong to 3.4.0, not 3.4.1.
-
-## 3.4.0 candidate
-
-Source commit `b3c37fce22da78db7e6865df37818eb30f5708dc` passed [CI run 35649099018](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35649099018). The tested MSI SHA-256 is:
-
-```text
-73344512F949FC4ECB851279618E0F63D1B88BD5577AC5C7BEA558D19CC59C9A
-```
-
-This historical candidate was retained as an unpublished private draft.
-
-| Area | Verified scope |
+| Scope | Recorded result |
 | --- | --- |
-| Build and regressions | Release compilation with zero warnings/errors; all 52 isolated regressions passed. |
-| Packages | Four-file release payload, manifest provenance, hashes, ZIP/MSI runtime-file identity, upgrade tables, current-user components and one Start menu shortcut. |
-| Normal installation lifecycle | Clean installation, repeated invocation of the same MSI, uninstall/reinstall, direct upgrade from the original 3.3.0 package, an occupied-executable case, and rejection when a higher product-family version was present. |
-| Direct 3.3.0 upgrade | One application registration and one Start menu entry remained. The four installed runtime files matched the candidate. The old product and versioned application directory were removed; thirteen existing state and backup files retained their hashes. |
-| DPI and localization | 100%, 125%, 150% and 200% groups reported 96, 120, 144 and 192 DPI. Each group contained 33 synthetic reports and one actual local-window report. Primary actions, destinations and regions remained visible; no WPF binding or layout error was recorded. |
-| Online use | One China → Europe → China roundtrip reached the corresponding official game main interfaces, with normal game exits. |
+| Functional baseline, before the font-only changes | Release build with SDK 10.0.401: zero warnings/errors; regression exit 0 with `TOTAL 82 PASSED`; five synthetic WPF event checks passed |
+| Baseline layout | English, Simplified Chinese and Greek: 97 renders at 200% / 192 DPI and 98 at 100% / 96 DPI, with selected layout samples reviewed |
+| Translation consistency | Eleven catalogues with 264 matching keys and placeholders |
+| Final font build | Release build: zero warnings/errors; all fifteen font hashes and per-weight character coverage verified |
+| Font preservation | Six CJK 600/650/700 subsets retain mapped outlines, advance widths, hinting, vertical metrics and name metadata; distinct 650 outlines remain in the display family registered at native WPF weight 600. The other nine font files are unchanged |
+| Focused native rendering | 105 glyph samples passed without empty/missing glyphs or simulated weights; four Chinese/Korean compact Settings captures were reviewed without font clipping |
+| Font size | 29,759,648 bytes (28.38 MiB); a compression probe of the complete fifteen-file portable payload produced a ZIP of 16,630,678 bytes (15.86 MiB), not a formal release package |
 
-### Limits and unresolved checks
+Final application DLL SHA-256: `BA293765A5DCA23166F36BBD904AE168B9D641417B8F6670500E0E62AAD59B6E`.
 
-Failure tests did not fully restore the previous installation in the standard-user test environment. Installation recovery therefore remains an unresolved release gate, separate from the application's game-language transaction recovery.
+The functional and baseline DPI results precede the font-only changes; the final build received the focused font checks above. These results cover simulated data and rendering, with live acceptance still pending. [Development notes](RELEASE-NOTES-3.5.1.md) describe the changes; [font documentation](../src/SC2Switcher.Wpf/Fonts/README.md) records font sources and coverage.
 
-Manual shortcuts or App Paths entries from earlier manual deployments can point to retired directories outside MSI ownership. Their migration is separate from a clean MSI-to-MSI upgrade.
+## Published preview: 3.4.2
 
-The DPI tests used one active display. Multi-display movement, other computers and different system-policy environments remain unverified. Packages are unsigned.
+| Identity / result | Record |
+| --- | --- |
+| Release | [v3.4.2-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1), 22 September 2026 |
+| Source | `1e89600a713f650376f081af3146a6e3825d7e7e` |
+| Successful CI / promotion | [35727903561](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35727903561) / [35728297411](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35728297411) |
+| Verification | License/payload checks passed; anonymous downloads of all four assets matched the original hashes; promotion reused the CI artifacts without rebuilding |
+| Scope | Licensing and distribution changes; installation, interface and live-operation evidence comes from earlier artifacts, not a new test of this package |
 
-## Earlier records
-
-The original 3.3.0 package used a versioned application directory and had no major-upgrade or downgrade-protection design.
-
-The preceding interface/localization revision, commit `2cca07ad1698ec81e552f48679da1b31958a5fed`, passed [CI run 35644370416](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35644370416). The initial remote CI record is commit `5886efa9bf49312a84b59ac7e98ddc4dda6100f1`, [run 35629504891](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35629504891), covering build, regressions and package checks without MSI installation.
-
-## Evidence interpretation
-
-Raw candidates, screenshots, logs and configuration fixtures remain under ignored `artifacts/` directories. Shared records retain source revisions, CI links, package hashes and conclusions.
-
-Synthetic reports carry `SyntheticState=true`. They describe presentation states; a process launch or a local region record likewise does not establish an authenticated game session. Source changes and rebuilt packages require reassessment of the affected checks.
+[Release notes](RELEASE-NOTES-3.4.2.md) · [Development](DEVELOPMENT.md) · [Changelog](../CHANGELOG.md)

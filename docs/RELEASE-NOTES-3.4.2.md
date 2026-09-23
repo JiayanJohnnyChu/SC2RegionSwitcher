@@ -2,12 +2,10 @@
 
 # SC2 Region Switcher 3.4.2 preview
 
-[v3.4.2-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1) was published on 2026-09-22 at 12:44:51 UTC as a public prerelease. The release page provides the MSI, portable ZIP, manifest and SHA-256 file.
+The [first public preview](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1) was published on 22 September 2026. It provides switching between separate China and Global installations through one Battle.net app, English/Simplified Chinese interface selection, configuration validation, backups and recovery.
 
-Version 3.4.2 adds licensing and distribution materials. Original project code, documentation and icons use the [MIT License](../LICENSE), copyright 2026 Jiayan Chu. Radix Colors retains its upstream MIT notices; WiX validation metadata retains MS-RL and its corresponding source. The scope is documented in [third-party notices](../THIRD-PARTY-NOTICES.md).
+The release contains a per-machine MSI, portable ZIP, manifest and SHA-256 file. Packages are unsigned and require Windows x64 with .NET 10 Desktop Runtime x64. MSI installation requires administrator approval; the application runs as an ordinary user. Configuration and backups survive uninstall.
 
-MSI and ZIP packages include the project license, bilingual notices, the Radix license, the WiX license and the WiX validation source. The application behavior and interface are unchanged. Installation remains per machine with administrator approval; ordinary application execution remains `asInvoker`.
+This revision added the [MIT license](../LICENSE) and [third-party materials](../THIRD-PARTY-NOTICES.md) to both packages without changing application behavior. CI, promotion and anonymous-download hash checks passed. [Validation](VALIDATION.md) records the release identity and the scope of earlier installation and interface evidence.
 
-Local packaging and license-content verification passed, as recorded in [3.4.2 validation](VALIDATION-3.4.2.md). The source commit passed [CI run 35727903561](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35727903561), and [promotion run 35728297411](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/actions/runs/35728297411) retained the original artifacts. The recorded 3.4.1 installation and UI results remain historical evidence for that version. No new lifecycle, UI, DPI or online test is part of this revision.
-
-The original 3.4.1 preview files remain unchanged. Packages are unsigned and require Microsoft .NET 10 Desktop Runtime x64. The repository and release assets are publicly accessible.
+[Setup](SETUP.md) · [Validation and release identity](VALIDATION.md) · [Changelog](../CHANGELOG.md)

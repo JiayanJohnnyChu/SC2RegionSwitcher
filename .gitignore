@@ -31,3 +31,8 @@ LanguageBackups/
 *.exe
 *.dll
 *.pdb
+
+# Local collaboration notes and design studies.
+/AGENTS.md
+/AGENTS.zh-CN.md
+/design/

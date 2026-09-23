@@ -1,0 +1,161 @@
+[
+  {
+    "file": "SwitcherSans-Regular.ttf",
+    "family": "Switcher Sans",
+    "weight": 400,
+    "glyphs": 2852,
+    "sha256": "5a763c52a1fe2611f3f7012d0b785b0f0ef4df6a21e2d9c0a5e59ef96ecc106f",
+    "sourceSha256": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+    "nativeWeight": 400
+  },
+  {
+    "file": "SwitcherSans-Medium.ttf",
+    "family": "Switcher Sans",
+    "weight": 500,
+    "glyphs": 2852,
+    "sha256": "becb561c0a63cca9a9b95677a82c69cb61501ed4cfb026d294c712060d482cc7",
+    "sourceSha256": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+    "nativeWeight": 500
+  },
+  {
+    "file": "SwitcherSans-SemiBold.ttf",
+    "family": "Switcher Sans",
+    "weight": 600,
+    "glyphs": 2852,
+    "sha256": "0b830b11d84a6970a80334493b0030c5bff715cceefd7f34e71108f5d41cfc90",
+    "sourceSha256": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+    "nativeWeight": 600
+  },
+  {
+    "file": "SwitcherSans-Bold.ttf",
+    "family": "Switcher Sans",
+    "weight": 700,
+    "glyphs": 2852,
+    "sha256": "ffc1d052c1247ff1ba925e134d4a7228899fd097104728eeaff4b609fbb490bb",
+    "sourceSha256": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+    "nativeWeight": 700
+  },
+  {
+    "file": "SwitcherDisplay-SemiBold.ttf",
+    "family": "Switcher Display",
+    "weight": 650,
+    "glyphs": 2852,
+    "sha256": "2b8821dc76b46b6ab3a3db1f42e90143abc46f6dadf73c3aa3b0dac7a5eb8cd8",
+    "sourceSha256": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+    "nativeWeight": 600
+  },
+  {
+    "file": "SwitcherHan-Regular.ttf",
+    "family": "Switcher Han",
+    "weight": 400,
+    "glyphs": 30890,
+    "sha256": "f69f5093110cbb99ccb03c95bbcd2e00c62276666b974bba0ed75fb8d2ace554",
+    "sourceSha256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+    "nativeWeight": 400
+  },
+  {
+    "file": "SwitcherHan-Medium.ttf",
+    "family": "Switcher Han",
+    "weight": 500,
+    "glyphs": 9754,
+    "sha256": "d0dbbc90d714f7c709e9b092e7c85ffb29485f96ed0b502fc8833e087845b0dd",
+    "sourceSha256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+    "nativeWeight": 500,
+    "subset": "gb2312+ui",
+    "fullSha256": "34d02cb3fdce6019a0f1c8dc41e632e79c7a5e35f3d442ace9fcf931ce61f7ad",
+    "fullCharacters": 30890
+  },
+  {
+    "file": "SwitcherHan-SemiBold.ttf",
+    "family": "Switcher Han",
+    "weight": 600,
+    "glyphs": 3328,
+    "sha256": "615eb372ef43c041767d6b8138311fc72819e7f613b9b3a15f5a19c2bd03d275",
+    "sourceSha256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+    "nativeWeight": 600,
+    "subset": "ui",
+    "fullSha256": "4aa2da3d2dd470e519879ec803aadc940d823be8a7c660a843145564e5f5c6b9",
+    "fullCharacters": 30890
+  },
+  {
+    "file": "SwitcherHanDisplay-SemiBold.ttf",
+    "family": "Switcher Han Display",
+    "weight": 650,
+    "glyphs": 3328,
+    "sha256": "f2cf4db000488796ab36eb76758d94fe1a43816593bf8bdae6a764b10bcb48bf",
+    "sourceSha256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+    "nativeWeight": 600,
+    "subset": "ui",
+    "fullSha256": "1fa2415928c695c6d2916629c3bdeffec3acb2d03931ed4adbc4eadc1a8176f9",
+    "fullCharacters": 30890
+  },
+  {
+    "file": "SwitcherHan-Bold.ttf",
+    "family": "Switcher Han",
+    "weight": 700,
+    "glyphs": 3328,
+    "sha256": "4b1fee84372dbdbed37fab5f35cf4676fbdbde539bdd293fbafc146b8a4852ea",
+    "sourceSha256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da",
+    "nativeWeight": 700,
+    "subset": "ui",
+    "fullSha256": "ad5d99f2b90e83cdd2644526f28acf61d3bd848f33f0afbfc8e3f9888db7c70f",
+    "fullCharacters": 30890
+  },
+  {
+    "file": "SwitcherHangul-Regular.ttf",
+    "family": "Switcher Hangul",
+    "weight": 400,
+    "glyphs": 23174,
+    "sha256": "63ab1e97dd40a03a165d6bc08ac40e204868b50cefe0f5dfab194d7d0890de59",
+    "sourceSha256": "194018e6b2b293a7964f037b25c0249ce1418bc9ab3c971060a03aa57861e252",
+    "nativeWeight": 400
+  },
+  {
+    "file": "SwitcherHangul-Medium.ttf",
+    "family": "Switcher Hangul",
+    "weight": 500,
+    "glyphs": 10617,
+    "sha256": "465b70d5d6be2cbba4c6669c5234ad8758c36ed545b5a0422553fde5139c0d55",
+    "sourceSha256": "194018e6b2b293a7964f037b25c0249ce1418bc9ab3c971060a03aa57861e252",
+    "nativeWeight": 500,
+    "subset": "euc_kr+ui",
+    "fullSha256": "388149a74daeb609546790ec00dd694459c3074bde4be00ceedd4e1d2db27fd6",
+    "fullCharacters": 23174
+  },
+  {
+    "file": "SwitcherHangul-SemiBold.ttf",
+    "family": "Switcher Hangul",
+    "weight": 600,
+    "glyphs": 3833,
+    "sha256": "c9ad8fcbfaef6789a282409eece3f637c39d2306bae50d1203d034e0f1fa0126",
+    "sourceSha256": "194018e6b2b293a7964f037b25c0249ce1418bc9ab3c971060a03aa57861e252",
+    "nativeWeight": 600,
+    "subset": "ui",
+    "fullSha256": "3a3a124adb440ac1eeff0518603c54fe667d0a3d22dea6995b6a736447e2b34a",
+    "fullCharacters": 23174
+  },
+  {
+    "file": "SwitcherHangulDisplay-SemiBold.ttf",
+    "family": "Switcher Hangul Display",
+    "weight": 650,
+    "glyphs": 3833,
+    "sha256": "626a7e43d9254eb385d74b0398c6eba66039f201d900aba21f3facfd89c600db",
+    "sourceSha256": "194018e6b2b293a7964f037b25c0249ce1418bc9ab3c971060a03aa57861e252",
+    "nativeWeight": 600,
+    "subset": "ui",
+    "fullSha256": "14cca57ba640495bf89b907bb500fe3b43a119e818f25026c3f55a9e3156f72e",
+    "fullCharacters": 23174
+  },
+  {
+    "file": "SwitcherHangul-Bold.ttf",
+    "family": "Switcher Hangul",
+    "weight": 700,
+    "glyphs": 3833,
+    "sha256": "fa12d33989a7cef7855b80ce0924117292d77f4fd58978aeb9b63814876b0b3c",
+    "sourceSha256": "194018e6b2b293a7964f037b25c0249ce1418bc9ab3c971060a03aa57861e252",
+    "nativeWeight": 700,
+    "subset": "ui",
+    "fullSha256": "64f98926fa5c50a9ad3cf05b562da15112bcd7610d7375a45e6d891d9fd0e089",
+    "fullCharacters": 23174
+  }
+]

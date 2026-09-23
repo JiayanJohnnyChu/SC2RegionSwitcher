@@ -19,7 +19,7 @@ class FakePlatform:IPlatform {
     public string ReadRegion(){return Region;}
     public Task Delay(int ms,CancellationToken token){Delays++;if(Delays==CancelOnDelay)Cancellation.Cancel();token.ThrowIfCancellationRequested();return Task.FromResult(0);}
 }
-class Tests {
+partial class Tests {
     static int pass;
     static string root,vars,state;
     static Settings settings;
@@ -51,7 +51,7 @@ class Tests {
         Test("System.Text.Json preserves profiles including Unicode paths",()=>{string f=Path.Combine(root,"profiles.json");Json.Write(f,settings);var s=Settings.Load(f);Assert(s.CN.GamePath==settings.CN.GamePath&&s.GlobalRegion=="EU","Profiles roundtrip");});
         Test("Battle.net region reads unique service values",()=>{Assert(NativePlatform.ParseRegion("{\"Client\":{\"Services\":{\"LastLoginRegion\":\"eu\"}},\"other\":2}")=="EU","Region parse");Assert(NativePlatform.ParseRegion("{\"A\":{\"Services\":{\"LastLoginRegion\":\"EU\"}},\"B\":{\"Services\":{\"LastLoginRegion\":\"CN\"}}}")==null,"Ambiguous region");Assert(NativePlatform.ParseRegion("{\"x\":{\"Services\":5}}") == null,"Invalid service");});
         Test("existing compact language journal remains readable",()=>{string f=Path.Combine(root,"old-journal.json");File.WriteAllText(f,"{\"VariablesPath\":\"D:\\\\Test\\\\Variables.txt\",\"BackupPath\":\"D:\\\\Backups\\\\变量.txt\",\"OriginalHash\":\"ABC\",\"AppliedHash\":\"DEF\",\"Target\":\"Global\",\"Stage\":\"applied\"}");var j=Json.Read<Journal>(f);Assert(j.Stage=="applied"&&j.BackupPath.EndsWith("变量.txt"),"Legacy journal");});
-        Test("interface catalogs translate every Chinese key with matching format arguments",()=>{foreach(string key in UiText.Keys){string zh=UiText.Get("zh-CN",key),en=UiText.Get("en-US",key);Assert(zh==key,"Chinese catalog changed key: "+key);Assert(!String.IsNullOrWhiteSpace(en)&&!Regex.IsMatch(en,"[\\u3400-\\u9FFF]"),"English value missing or untranslated: "+key);Assert(Placeholders(zh)==Placeholders(en),"Format arguments differ: "+key);}});
+        Test("interface catalogs translate every Chinese key with matching format arguments",()=>{foreach(string key in UiText.Keys){string zh=UiText.Get("zh-CN",key),en=UiText.Get("en-US",key);Assert(key.StartsWith("web.")||zh==key,"Chinese catalog changed key: "+key);Assert(!String.IsNullOrWhiteSpace(en)&&!Regex.IsMatch(en,"[\\u3400-\\u9FFF]"),"English value missing or untranslated: "+key);Assert(Placeholders(zh)==Placeholders(en),"Format arguments differ: "+key);}});
         Test("interface language changes dynamically without touching game language settings",()=>{Reset();string gameHash=Files.HashFile(vars);UiText.SetLanguage("zh-CN");var m=new Sc2Wpf.MainViewModel();m.Initialize("EU","EU");m.Status("正在检查安装","读取两个版本的安装信息。","working");string action=m.ActionLabel,current=m.CurrentRegion,status=m.StatusTitle,step=m.StepLabel;Assert(m.Target=="Global"&&m.Region=="EU","Initial UI model");m.UiLanguage="en-US";Assert(m.UiLanguage=="en-US"&&m.ActionLabel!=action&&m.CurrentRegion!=current&&m.StatusTitle!=status&&m.StepLabel!=step,"UI did not refresh into English");Assert(m.Target=="Global"&&m.Region=="EU"&&Files.HashFile(vars)==gameHash,"UI language changed game selection or locale");m.SetBusy(true);m.UiLanguage="zh-CN";Assert(m.UiLanguage=="en-US","Busy UI language change was allowed");m.SetBusy(false);m.UiLanguage="zh-CN";Assert(m.ActionLabel==action&&m.CurrentRegion==current&&m.StatusTitle==status&&m.StepLabel==step,"UI did not refresh back into Chinese");});
         Test("interface preferences default to English and preserve supported choices separately",()=>{
             Reset();
@@ -61,7 +61,7 @@ class Tests {
             File.WriteAllText(prefs,"{ invalid json");
             Assert(UiPreferences.Load(prefs)=="en-US","Invalid preference did not fall back to English");
             Assert(Files.HashFile(vars)==gameHash,"Loading an invalid UI preference changed game locale");
-            File.WriteAllText(prefs,"{\"Language\":\"fr-FR\"}");
+            File.WriteAllText(prefs,"{\"Language\":\"ja-JP\"}");
             Assert(UiPreferences.Load(prefs)=="en-US","Unsupported preference did not fall back to English");
             Assert(Files.HashFile(vars)==gameHash,"Loading an unsupported UI preference changed game locale");
             UiPreferences.Save(prefs,"zh-CN");
@@ -130,6 +130,7 @@ class Tests {
         });
         Test("inspection blocks competing actions until complete",()=>{var m=new Sc2Wpf.MainViewModel();m.SetReady(true);m.SetInspecting(true);Assert(!m.CanInspect&&!m.CanSwitch,"Concurrent action allowed");m.SetInspecting(false);Assert(m.CanInspect&&m.CanSwitch,"Controls stay locked");});
         Test("progress and error actions appear in matching states",()=>{var m=new Sc2Wpf.MainViewModel();m.SetBusy(true);m.SetStage(2);Assert(m.ProgressVisibility==System.Windows.Visibility.Visible&&m.StepLabel=="阶段 2 / 3","Progress stage");m.SetBusy(false);m.Status("Failed","Long failure detail","error");Assert(m.ProgressVisibility==System.Windows.Visibility.Collapsed&&m.ErrorVisibility==System.Windows.Visibility.Visible,"Error action missing");m.Status("Ready","Complete");Assert(m.ErrorVisibility==System.Windows.Visibility.Collapsed,"Stale error action");});
+        LanguageTests(); SwissTests(); UiFunctionalTests();
         Console.WriteLine("TOTAL "+pass+" PASSED");
         return 0;
     }catch(Exception error){Console.Error.WriteLine("FAIL "+error);return 1;}}

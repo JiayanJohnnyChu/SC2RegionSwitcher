@@ -6,8 +6,8 @@ The change description identifies the problem and the resulting behavior.
 
 ## Validation
 
-- Build and isolated regression results:
-- Additional checks for interface, installer or switching changes:
+- Checks relevant to this change and their results:
+- Interface, installer or switching evidence, where applicable:
 - Remaining unverified scope:
 
-The description and attachments must exclude real account configuration, game settings, personal paths and unredacted logs.
+Descriptions and attachments contain no real account configuration, game settings, personal paths or unredacted logs.

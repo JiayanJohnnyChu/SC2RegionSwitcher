@@ -1,66 +1,59 @@
 [English](DEVELOPMENT.md)
 
-# 开发与构建
+# 开发
 
-开发环境要求 Windows x64 和 `global.json` 固定的 .NET SDK **10.0.401**。仅有 Desktop Runtime 无法编译。`SC2RegionSwitcher.slnx` 解决方案包含应用、回归程序及图标工具。
+开发需要 Windows x64 和 .NET SDK **10.0.401**，版本由 `global.json` 固定。应用没有第三方 NuGet 依赖。
 
-## 工具与命令
+## 构建与检查
 
-下列命令的执行环境为项目根目录中的 PowerShell。脚本按自身位置定位根目录，因此也可用脚本绝对路径调用。
-
-| 命令 | 用途 |
-| --- | --- |
-| `.\scripts\Setup.ps1` | 在 `.tools/dotnet` 准备固定版本 SDK |
-| `.\scripts\Setup-WorkflowTools.ps1` | 准备固定版本 actionlint |
-| `.\scripts\Check-Workflows.ps1` | 校验工作流语法、表达式及 Action 使用 |
-| `.\scripts\Check-Repository.ps1` | 检查仓库内容、个人路径和 PowerShell 语法 |
-| `.\scripts\Build.ps1` | 以 Release 编译应用、测试及图标工具 |
-| `.\scripts\Test.ps1` | 编译并运行隔离回归 |
-| `.\scripts\Publish.ps1` | 生成依赖运行环境的 x64 程序文件 |
-| `.\scripts\Package.ps1` | 发布运行文件，生成 MSI、ZIP 及发布元数据 |
-| `.\scripts\Test-Package.ps1 -ReleaseDirectory <目录>` | 检查包内容及哈希 |
-| `.\scripts\Test-ReleaseGuards.ps1 -ReleaseDirectory <目录>` | 测试发布拒绝情形 |
-| `.\scripts\Test-InstallerSchema.ps1 -ReleaseDirectory <目录>` | 运行独立 Windows Installer ICE 验证 |
-
-Setup 按 `eng/dotnet-sdk.json` 校验 Microsoft SDK 压缩包后才解压。`-ArchivePath <本地SDK压缩包>` 支持离线准备，仍执行相同哈希检查。脚本优先使用项目 SDK，再查找 PATH。Build、Test、Publish 和 Package 支持 `-DotNet <dotnet.exe路径>`；Build 和 Test 另支持 `-Configuration Debug`。安装包固定使用 Release。
-
-工具版本和哈希记录在 `eng/`，下载的工具与缓存由 Git 忽略。`Common.ps1` 在执行期间为 NuGet 缓存、CLI 状态和 SDK 元数据查找设置项目内环境，结束后恢复。还原使用仓库的 `NuGet.Config`；项目没有第三方 NuGet 依赖，因此未配置包源。引入私有包、WinUI 或原生 SDK 依赖时需重新评估这些设置。
-
-回归套件是使用 `FakePlatform` 和临时安装的控制台程序。已记录基线有 52 项测试，成功时输出 `TOTAL 52 PASSED`，失败返回非零退出码。未发现测试的 `dotnet test` 不具有相同覆盖范围。
-
-## 输出
-
-编译输出位于各项目的 `bin/` 和 `obj/`，发布文件位于 `artifacts/publish/win-x64/`。每次测试在 `artifacts/tests/` 下有独立目录，安装包位于 `artifacts/packages/<本次构建>/release`。
-
-发布目录恰有四个文件：MSI、便携 ZIP、`release-manifest.json` 和 `SHA256SUMS.txt`。ZIP 包含十二个文件：四个运行文件、两份 README，以及[第三方声明](../THIRD-PARTY-NOTICES.zh-CN.md)标明的六个许可／源码文件。MSI 包含四个运行文件及相同的六个许可／源码文件。打包脚本生成文件，不执行安装。清单记录源码提交、工作树状态及 CI 来源。本地开发包不属于已接受的 CI 候选。MSI 文件名为 `SC2Switcher-<version>-x64.msi`，采用需要管理员权限的全机范围；构建时无需安装它。
-
-独立的 `installer-lifecycle.yml` 工作流通过 `tools/Installer/Test-MachineInstall.ps1` 隔离测试全机安装、维护、升级、回滚和移除，结果须标明输入候选及哈希。较早的恢复工作流保留用于历史当前用户设计诊断。当前范围与迁移规则见[安装器说明](../tools/Installer/README.zh-CN.md)。
-
-## 界面诊断
-
-程序默认使用 `%LOCALAPPDATA%\SC2RegionSwitcherV2`。`--data-dir <绝对目录>` 可重定向配置，但不会模拟战网或游戏。
-
-`--ui-report <绝对JSON路径>` 导出布局报告和 WPF 自渲染图。`--compact` 请求最小窗口尺寸。F12 捕获当前主页面、设置页或参考页。输出应放入 `artifacts/`。
-
-`--matrix` 必须同时指定独立的 `--data-dir`，用于导出两种语言的模拟状态。展示期间禁止真实切换和路径保存，报告标记 `SyntheticState=true`。DPI 检查要求通过生成的 EXE 启动应用，以使应用清单生效；经 dotnet 宿主运行 DLL 的渲染不能证明 EXE 的 PerMonitorV2 行为。诊断流程记录于[界面设计](UI-DESIGN.zh-CN.md)。
-
-## 图标
-
-应用与安装器共用 `assets/icon/switcher.ico`，同目录含矢量原稿和预览。以下命令在临时位置生成拟议变更：
+下列命令以仓库根目录为工作目录：
 
 ```powershell
-. .\scripts\Common.ps1
-Invoke-ProjectDotNet -Arguments @('run', '--project', '.\tools\IconGenerator\IconGenerator.csproj', '--configuration', 'Release', '--no-build', '--', '.\artifacts\icon-preview')
+.\scripts\Setup.ps1
+.\scripts\Build.ps1
+.\scripts\Test.ps1
+.\scripts\Check-Repository.ps1
+.\scripts\Package.ps1
 ```
 
-资源更新以 SVG、PNG、ICO 和对照图的预先检查为前提。主窗口相关几何图形另在 XAML 中维护。
+Setup 校验 SDK 压缩包，`-ArchivePath <zip>` 支持离线准备。脚本隔离并恢复 SDK／缓存环境。Build/Test 支持 `-Configuration Debug`，Build/Test/Publish/Package 支持 `-DotNet <exe>`。
 
-## 验证范围
+控制台回归使用模拟安装。成功须同时满足退出码 0 与 `TOTAL … PASSED`；未发现测试的 `dotnet test` 不构成等效验证。打包只生成文件，不安装 MSI 或启动战网。
 
-验证范围由受影响的变更确定。应用大版本发布前需要一次全面验证，后续小幅修订采用针对性检查。文档、许可和包内容修订需要内容与包验证，不要求重复安装、界面、DPI 或在线测试。必要的构建／包检查与既有 CI 检查仍适用，每个补丁不默认要求额外执行一轮完整的人工回归。
+| 其他检查 | 命令 |
+| --- | --- |
+| 工作流语法 | `scripts/Setup-WorkflowTools.ps1`，随后 `scripts/Check-Workflows.ps1` |
+| 包内容与哈希 | `scripts/Test-Package.ps1 -ReleaseDirectory <directory>` |
+| 发布拒绝场景 | `scripts/Test-ReleaseGuards.ps1 -ReleaseDirectory <directory>` |
+| 无抑制项的 MSI ICE 验证 | `scripts/Test-InstallerSchema.ps1 -ReleaseDirectory <directory>` |
+| 模拟原生界面 | `scripts/Test-Ui.ps1` |
 
-## CI 与发布维护
+主要版本进行一次完整验证，后续修改按影响范围检查。文档和包内容修改需要相关内容／包检查及适用 CI，无须重复无关的手动矩阵。提交前需要通过仓库检查。
 
-Windows CI 检查工作流与仓库内容，完成编译、回归、打包以及内容、结构和拒绝情形检查。Action 固定到提交；Dependabot 每月提出更新，不自动合并。升级 SDK 时同时更新 `global.json` 和 `eng/dotnet-sdk.json`；验证器及工作流工具更新也需修改对应版本与哈希元数据。
+## 应用结构
 
-每个分发预览使用新的三段版本号。重新构建的 MSI 字节和 PackageCode 均不同，因此安装结果必须标明确切哈希。提升已接受的 CI 原文件时不得重新构建。流程与证据记录于[安装器说明](../tools/Installer/README.zh-CN.md)、[发布流程](GITHUB-RELEASE.zh-CN.md)和[当前状态](HANDOFF.zh-CN.md)。
+| 位置 | 职责 |
+| --- | --- |
+| `src/SC2Switcher.Wpf/Core.cs` | 安装解析、活动检查、语言事务、恢复和战网启动 |
+| 同目录下的 `ConfigurationStore.cs` | 迁移、原子保存、备份和并发修改保护 |
+| `SwissWindow*`、`SwissSettingsView*`、`SwissReferenceView*` 及视图模型 | 原生 WPF 视图、设置草稿和操作状态 |
+| `Localization.cs`、`Strings.*.json`、`UiTypography.cs` | 独立界面语言和内嵌字体 |
+| `tests/SC2Switcher.Tests` | 隔离的控制台回归 |
+
+切换先验证路径、资源和游戏／编辑器状态，请求战网正常退出并重新检查安装，随后备份并原子修改语言键，最后以所选登录地区启动战网。待恢复事务在下次切换前处理，核对日志路径、备份位置和哈希。仅打开应用不会恢复。目标启动请求发出后，取消本身不会回滚语言。
+
+`%LOCALAPPDATA%\SC2RegionSwitcherV2` 保存配置、界面偏好、备份与日志，不归 MSI 管理。配置格式第 2 版的国际服文字／语音字段保存所选组合；已有混合组合保留至显式选择。语言检测取当前 Windows 文字与语音资源的交集，并丢弃过期的异步结果。安装不可用时保留偏好。待恢复状态阻止路径／语言变更，但允许登录地区变更。
+
+## 界面维护
+
+自适应原生界面共用颜色、控件与字体，参数和主操作位于同一滚动区域。界面语言独立于游戏语言，十一份翻译的键和占位符保持一致。内嵌 Inter／Noto 的来源及哈希记录于[字体文档](../src/SC2Switcher.Wpf/Fonts/README.zh-CN.md)和 [sources.json](../src/SC2Switcher.Wpf/Fonts/sources.json)。
+
+`Test-Ui.ps1` 使用隔离模拟数据，超时为 240 秒。`-Languages` 限定语言，`-InteractionsOnly` 运行五项 WPF 事件检查，`-StatusOnly` 捕获故障布局。清单／DPI 结论需要通过原生 EXE 启动。`--data-dir <absolute-directory>` 隔离偏好；`--ui-report <absolute-json-path>`、`--compact` 和 F12 提供诊断。真实输入、无障碍和在线行为需要单独检查。
+
+## 发布
+
+已忽略的 `artifacts/` 保存输出与证据，`eng/` 固定工具及哈希。发布目录包含 MSI、ZIP、`release-manifest.json` 和 `SHA256SUMS.txt`。包检查核对预期内容：MSI 13 个文件，ZIP 15 个文件。
+
+可验收候选产物来自成功且干净的 `main` CI。清单记录源码提交、运行／尝试编号、版本与哈希；安装及真实运行检查标明原始受测文件。**Promote tested candidate to draft prerelease** 接收匹配的已有 `version_tag` 和已验收 `candidate_run_id`，核对来源与附件哈希，不重新构建。验收未完成时保持草稿。
+
+每次分发预览均增加三段数字版本。已打标签／已分发文件保持不变，重复数字版本的发布被拒绝。[安装器维护](../tools/Installer/README.zh-CN.md)记录安装范围与升级。[验证](VALIDATION.zh-CN.md)区分构建、安装、渲染与真实运行；[更新记录](../CHANGELOG.zh-CN.md)记录公开变更。

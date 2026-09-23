@@ -1,54 +1,56 @@
-[简体中文](README.zh-CN.md)
+[English](README.md) · [简体中文](README.zh-CN.md) · [Français](README.fr-FR.md) · [Deutsch](README.de-DE.md) · [Nederlands](README.nl-NL.md)
 
 # SC2 Region Switcher
 
-**Release and downloads:** [v3.4.2-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1) — public prerelease published on 22 September 2026, with Windows x64 MSI and portable ZIP packages.
+**Downloads:** [v3.4.2-preview.1](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases/tag/v3.4.2-preview.1) · [All releases](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/releases)
 
-SC2 Region Switcher is a Windows x64 application for switching between separate China and Global installations of StarCraft II. It uses one official Battle.net desktop app, changes its login region, and updates the shared game-language settings. China uses Simplified Chinese (`zhCN`); Global uses English (`enUS`). The interface supports English and Simplified Chinese, with its own language setting.
+SC2 Region Switcher helps players use separate China and Global installations of StarCraft II with one Battle.net app. It switches the Battle.net login region and the game's shared language settings.
 
-The application is written in C# with WPF and .NET 10. Account login, game installation, updates, game-server selection and game startup take place in Battle.net. The Global labels **EU**, **US** and **KR** identify Battle.net login regions; they do not establish which game server is selected.
+The public download is **3.4.2**, with English and Simplified Chinese interfaces and fixed Chinese/English game languages. The screenshot shows the **3.5.1 development version** with simulated configuration. The 3.5.1 source supports eleven interface languages and selection of an installed Global game language; it has no published release package.
 
-**Current status: 3.4.2 public prerelease.** This revision adds MIT licensing for original project material and includes third-party license and source notices in both distribution formats. Local license-content and package verification passed; application behavior is unchanged. The original 3.4.1 preview files remain unchanged. Packages are unsigned and require **Microsoft .NET 10 Desktop Runtime x64**. The tested scope is documented in the [validation record](docs/VALIDATION.md).
+![SC2 Region Switcher 3.5.1 development interface with simulated configuration](assets/screenshots/sc2-switcher-3.5.1.png)
 
-## Documentation
+## Installation
 
-| Task | Guide |
+Windows x64 and **[Microsoft .NET 10 Desktop Runtime x64](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)** are required. The SDK is unnecessary for playing. The available packages are unsigned.
+
+| Package | Suitable use |
 | --- | --- |
-| Installation preparation, configuration and region switching | [Setup and use](docs/SETUP.md) |
-| Source compilation and testing | [Development](docs/DEVELOPMENT.md) |
-| Switching and configuration logic | [Architecture](docs/ARCHITECTURE.md) |
-| Interface and translation maintenance | [Interface design](docs/UI-DESIGN.md) |
-| Development and validation status | [Development status](docs/HANDOFF.md), [3.4.2 validation](docs/VALIDATION-3.4.2.md) |
-| MSI maintenance | [Installer](tools/Installer/README.md) |
-| Candidate and draft preparation | [Release workflow](docs/GITHUB-RELEASE.md) |
-| Version history | [Changelog](CHANGELOG.md) |
+| MSI | Installation for all Windows users, with administrator approval, a Start menu entry and normal Windows uninstall support. The app itself runs with ordinary user permissions. |
+| Portable ZIP | Complete extraction into a separate folder, with all included files kept together. `SC2Switcher.Wpf.exe` starts the app; no shortcut or uninstall entry is created. |
 
-## Build
+GitHub's “Source code” downloads are not runnable application packages.
 
-The following PowerShell commands prepare the SDK, build the source, run regressions and create packages from the project directory:
+## First configuration
 
-```powershell
-.\scripts\Setup.ps1
-.\scripts\Build.ps1
-.\scripts\Test.ps1
-.\scripts\Package.ps1
-```
+1. Battle.net contains two completed, separate game installations, for example `D:\Games\StarCraft II CN` and `D:\Games\StarCraft II Global`. China requires Chinese text and speech; the public Global version requires English text and speech.
+2. The final installation path is checked in Battle.net before installation, even when **Install** is shown. Battle.net may append a `StarCraft II` subfolder or detect the other installation.
+3. Settings records the Battle.net folder, both game folders and the actual `StarCraft II\Variables.txt` from the game's Documents folder. A normal game launch and exit creates this file if it is absent.
+4. **Save & check** validates and saves the paths. Saving alone does not change the game's language. Full preparation and path examples are in the [setup guide](docs/SETUP.md).
 
-`global.json` pins SDK **10.0.401**. Setup downloads and verifies the SDK into the ignored `.tools/dotnet` directory; the other scripts use it automatically. The project has no third-party NuGet dependencies. The regression runner uses simulated installations and does not start Battle.net or the game. Packaging produces a framework-dependent MSI and portable ZIP without installing them. Additional repository, workflow and package checks are described in the development guide.
+## Switching and language
 
-## Project layout
+Switching requires StarCraft II and its editor to be closed and Battle.net downloads, updates and repairs to be complete. The selected destination is China or Global; Global also has an EU, US or KR login-region choice. The switcher closes Battle.net normally, applies the game-language settings with a backup, and opens the requested login region. Controls remain locked until the operation finishes.
 
-| Path | Contents |
+Login, game-server selection and game launch take place in Battle.net. **EU, US and KR are Battle.net login regions, not a confirmation of the selected game server.** Interface language is independent of game language. The development version applies a saved Global language choice on the next switch; both text and speech resources must already be installed through Battle.net.
+
+## Saved games, backups and updates
+
+Within the game's shared settings, the switcher changes only the language keys. It does not copy, delete or manage campaign saves, replays or `Accounts` files. Game accounts and regions determine access to progress; the switcher does not provide cloud-save synchronization.
+
+Switcher settings and backups are stored in `%LOCALAPPDATA%\SC2RegionSwitcherV2` and remain after uninstall. A pending recovery needs the original configuration and backups. MSI updates use a newer installer with the app closed; a portable update uses a new folder and an updated shortcut. Neither method moves the game installations.
+
+## Common questions
+
+| Question | Answer |
 | --- | --- |
-| `SC2RegionSwitcher.slnx` | Application, regression runner and icon tool |
-| `src/SC2Switcher.Wpf/` | WPF interface, switching logic, configuration and language resources |
-| `tests/SC2Switcher.Tests/` | Isolated regression tests |
-| `tools/Installer/` | Per-machine MSI builder and validation support |
-| `tools/IconGenerator/`, `assets/icon/` | Icon generator and application artwork |
-| `scripts/`, `eng/`, `.github/` | Build commands, pinned tool metadata and CI workflows |
-| `docs/` | User and maintainer documentation |
-| `artifacts/`, `.tools/` | Ignored build outputs, evidence and local tools |
+| The app does not start | It needs Desktop Runtime 10 x64 and all included application files. |
+| A game folder or language is unavailable | The selected folder must be the game root, with installation and both required language resources complete. |
+| Switching fails or recovery is pending | The error details identify the next check. The original settings and backups remain necessary; detailed recovery steps are in the guide. |
 
-The MSI requires administrator approval, installs to `%ProgramFiles%\SC2RegionSwitcher\app` (64-bit Program Files), and creates one shared **SC2 Region Switcher** Start menu entry. The application runs with ordinary user permissions. Earlier current-user previews require a one-time uninstall before installation of this package. The migration procedure is documented in [Setup](docs/SETUP.md). Configuration and backups are stored separately in `%LOCALAPPDATA%\SC2RegionSwitcherV2` and are retained on uninstall.
+| More information | Links |
+| --- | --- |
+| Player guide | [Setup and troubleshooting](docs/SETUP.md) |
+| Versions and development | [Changelog](CHANGELOG.md), [Development](docs/DEVELOPMENT.md), [Validation](docs/VALIDATION.md) |
 
-Original project code, documentation and icons are licensed under [MIT](LICENSE), copyright 2026 Jiayan Chu. [Third-party notices](THIRD-PARTY-NOTICES.md) identify Radix Colors under MIT and WiX validation metadata under MS-RL. The [repository](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher) and release assets are publicly accessible.
+Original project material uses [MIT](LICENSE); [third-party notices](THIRD-PARTY-NOTICES.md) describe the included fonts and other licensed materials.

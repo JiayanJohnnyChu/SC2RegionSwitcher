@@ -5,6 +5,9 @@ function Get-LicensePayload {
         @('ThirdPartyEn','THIRD-PARTY-NOTICES.md','NOTICES.MD','THIRD-PARTY-NOTICES.md'),
         @('ThirdPartyZh','THIRD-PARTY-NOTICES.zh-CN.md','NOTICEZH.MD','THIRD-PARTY-NOTICES.zh-CN.md'),
         @('RadixLicense','licenses/LICENSE-Radix.txt','RADIX.TXT','licenses/LICENSE-Radix.txt'),
+        @('InterLicense','licenses/LICENSE-Inter.txt','INTER.TXT','licenses/LICENSE-Inter.txt'),
+        @('NotoScLicense','licenses/LICENSE-NotoSC.txt','NOTOSC.TXT','licenses/LICENSE-NotoSC.txt'),
+        @('NotoKrLicense','licenses/LICENSE-NotoKR.txt','NOTOKR.TXT','licenses/LICENSE-NotoKR.txt'),
         @('WixLicense','licenses/LICENSE-WiX.txt','WIX.TXT','tools/Installer/metadata/LICENSE-WiX.txt'),
         @('WixValidationSource','licenses/WiX-Validation.idt','WIXVALID.IDT','tools/Installer/metadata/_Validation.idt')
     )

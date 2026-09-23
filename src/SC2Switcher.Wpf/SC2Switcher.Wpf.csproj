@@ -5,7 +5,7 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>SC2Switcher.Wpf</AssemblyName>
     <RootNamespace>Sc2Wpf</RootNamespace>
-    <Version>3.4.2</Version>
+    <Version>3.5.1</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <ApplicationIcon>..\..\assets\icon\switcher.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -18,7 +18,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="..\..\assets\icon\switcher.ico" Link="switcher.ico" />
-    <EmbeddedResource Include="Strings.zh-CN.json" LogicalName="Sc2Switch2.Strings.zh-CN.json" WithCulture="false" />
-    <EmbeddedResource Include="Strings.en-US.json" LogicalName="Sc2Switch2.Strings.en-US.json" WithCulture="false" />
+    <EmbeddedResource Include="Strings.*.json" LogicalName="Sc2Switch2.%(Filename).json" WithCulture="false" />
+    <Resource Include="Fonts/*.ttf" />
   </ItemGroup>
 </Project>

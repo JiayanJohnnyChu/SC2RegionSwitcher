@@ -23,7 +23,7 @@ foreach($file in $files){$file.Component='Application';$file.Source=Join-Path $A
 foreach($license in $licensePayload){
  $files+=@{Id=$license.Id;Name=$license.Name;Short=$license.Short;Version=$null;Component=$license.Id;Source=$license.Source}
 }
-$ddl=@('.OPTION EXPLICIT','.Set CabinetNameTemplate=app.cab',('.Set DiskDirectoryTemplate="'+$stage+'"'),'.Set CompressionType=MSZIP','.Set Cabinet=on','.Set Compress=on')
+$ddl=@('.OPTION EXPLICIT','.Set CabinetNameTemplate=app.cab',('.Set DiskDirectoryTemplate="'+$stage+'"'),'.Set MaxDiskSize=0','.Set MaxCabinetSize=0','.Set CompressionType=MSZIP','.Set Cabinet=on','.Set Compress=on')
 foreach($file in $files){
  if(!(Test-Path -LiteralPath $file.Source -PathType Leaf)){throw "Missing package file: $($file.Name)"}
  if($file.Version -and [Diagnostics.FileVersionInfo]::GetVersionInfo($file.Source).FileVersion -ne $file.Version){throw "Runtime file version mismatch: $($file.Name)"}

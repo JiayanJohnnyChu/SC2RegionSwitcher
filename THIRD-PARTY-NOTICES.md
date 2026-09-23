@@ -2,11 +2,11 @@
 
 # Third-party notices
 
-Original SC2 Region Switcher code, documentation and icons are licensed under the MIT License in `LICENSE`, copyright 2026 Jiayan Chu. The third-party materials identified below retain their respective licenses and copyright notices.
+Original SC2 Region Switcher code, documentation and icons are licensed under the MIT License in `LICENSE`. The third-party materials identified below retain their respective licenses and copyright notices.
 
 ## Radix Colors
 
-The interface uses color values derived from [Radix Colors](https://github.com/radix-ui/colors), including the Sand, Tomato and Indigo scales. Their use is reflected in `src/SC2Switcher.Wpf/Palette.xaml` and the interface-design documentation. No Radix framework or runtime is included.
+Some supporting neutral colors derive from [Radix Colors](https://github.com/radix-ui/colors).
 
 The upstream material is licensed under MIT, with these copyright notices:
 
@@ -17,9 +17,15 @@ Copyright (c) 2022-Present WorkOS
 
 The complete upstream license is included unchanged in `licenses/LICENSE-Radix.txt`. Its source is the [Radix Colors license](https://github.com/radix-ui/colors/blob/main/LICENSE).
 
+## Inter and Noto Sans fonts
+
+The application interface embeds static instances of Inter 4.001, Noto Sans SC 2.004 and Noto Sans KR 2.004 under the SIL Open Font License 1.1. The derived families are Switcher Sans, Switcher Han and Switcher Hangul, with separate display families. Inter and CJK Regular retain full character coverage; heavier CJK weights use character subsets. Original copyright and license metadata is retained.
+
+Unmodified licenses are provided in `licenses/LICENSE-Inter.txt`, `licenses/LICENSE-NotoSC.txt` and `licenses/LICENSE-NotoKR.txt`. Exact upstream revisions and source URLs are recorded in [repository font sources](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/blob/main/src/SC2Switcher.Wpf/Fonts/sources.json); generated hashes are in [generated font manifest](https://github.com/JiayanJohnnyChu/SC2RegionSwitcher/blob/main/src/SC2Switcher.Wpf/Fonts/manifest.json). These licenses govern the fonts, not the application code.
+
 ## WiX Windows Installer validation metadata
 
-The MSI builder incorporates standard validation constraints derived from a control package generated with [WiX Toolset 3.14.1.8722](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm). The metadata subset includes additional standard AppSearch and RegLocator definitions. The resulting source is maintained in `tools/Installer/metadata/_Validation.idt` and is imported into the MSI database.
+The MSI builder incorporates standard validation constraints derived from a control package generated with [WiX Toolset 3.14.1.8722](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm). It also includes standard AppSearch and RegLocator definitions. The source is maintained in `tools/Installer/metadata/_Validation.idt` and is imported into the MSI database.
 
 This metadata is distributed under the Microsoft Reciprocal License (MS-RL), with the upstream notice:
 
@@ -27,8 +33,8 @@ This metadata is distributed under the Microsoft Reciprocal License (MS-RL), wit
 Copyright (c) .NET Foundation and contributors.
 ```
 
-The complete license is maintained in `tools/Installer/metadata/LICENSE-WiX.txt`. MSI and ZIP distributions include the license as `licenses/LICENSE-WiX.txt` and the corresponding metadata source as `licenses/WiX-Validation.idt`. The metadata retains MS-RL; the project MIT license does not replace it. WiX validation executables are development tools and are not included in the application distribution.
+The complete license is maintained in `tools/Installer/metadata/LICENSE-WiX.txt`. MSI and ZIP distributions include the license as `licenses/LICENSE-WiX.txt` and the corresponding metadata source as `licenses/WiX-Validation.idt`. WiX validation executables are development tools and are not included in the application distribution.
 
 ## Distribution contents
 
-MSI and ZIP distributions include `LICENSE`, `THIRD-PARTY-NOTICES.md`, `THIRD-PARTY-NOTICES.zh-CN.md` and the three files under `licenses/` identified above. The complete license texts govern their respective materials; this notice describes their scope.
+MSI and ZIP distributions include `LICENSE`, `THIRD-PARTY-NOTICES.md`, `THIRD-PARTY-NOTICES.zh-CN.md` and the license and source files under `licenses/` identified above.

@@ -74,6 +74,15 @@ public sealed class BuildInfo {
     public string Version {get;set;}
     public string Tags {get;set;}
     public string Fingerprint {get;set;}
+    public IReadOnlyList<string> TextLocales {get;private set;}=Array.Empty<string>();
+    public IReadOnlyList<string> SpeechLocales {get;private set;}=Array.Empty<string>();
+    public IReadOnlyList<string> AvailableLocales=>TextLocales.Intersect(SpeechLocales,StringComparer.Ordinal).OrderBy(x=>x,StringComparer.Ordinal).ToArray();
+    static string[] Locales(string tags,string kind) => tags.Split(':')
+        .Select(part=>part.Split((char[])null,StringSplitOptions.RemoveEmptyEntries))
+        .Where(tokens=>tokens.Length>=3&&(tokens[0]=="Windows"||tokens[0]=="Windows?")
+            &&(tokens[^1]==kind||tokens[^1]==kind+"?")&&Regex.IsMatch(tokens[^2],@"\A[a-z]{2}[A-Z]{2}\z"))
+        .Select(tokens=>tokens[^2])
+        .Distinct(StringComparer.Ordinal).OrderBy(x=>x,StringComparer.Ordinal).ToArray();
     public static BuildInfo Parse(string text) {
         string[] lines=text.Split(new [] {"\r\n","\n"},StringSplitOptions.RemoveEmptyEntries);
         if(lines.Length<2) throw new InvalidDataException(UiText.T("版本清单不完整。"));
@@ -91,10 +100,18 @@ public sealed class BuildInfo {
             active.Add(b);
         }
         if(active.Count!=1) throw new InvalidDataException(UiText.T("版本清单没有唯一的当前版本，可能仍在更新。"));
+        active[0].TextLocales=Locales(active[0].Tags,"text");
+        active[0].SpeechLocales=Locales(active[0].Tags,"speech");
         active[0].Fingerprint=Files.Hash(Encoding.UTF8.GetBytes(text));
         return active[0];
     }
     public static BuildInfo Load(Profile p,bool cn) {
+        BuildInfo b=ReadInstallation(p,cn);
+        if(!b.TextLocales.Contains(p.TextLocale) || !b.SpeechLocales.Contains(p.SpeechLocale)) throw new IOException(UiText.T(p.Name)+UiText.T("的版本清单未声明已安装所选语言。请检查战网语言设置。"));
+        return b;
+    }
+    // Discovery must remain possible when the previously selected language was removed.
+    public static BuildInfo ReadInstallation(Profile p,bool cn) {
         Paths.RejectLinks(p.GamePath);
         foreach(string part in new [] {"SC2Data","Versions","Support","Support64",".build.info",".patch.result"}) Paths.RejectLinks(Path.Combine(p.GamePath,part));
         string manifest=Path.Combine(p.GamePath,".build.info"), patch=Path.Combine(p.GamePath,".patch.result");
@@ -103,7 +120,6 @@ public sealed class BuildInfo {
         if(!File.Exists(Path.Combine(p.GamePath,"StarCraft II.exe")) || !Directory.Exists(Path.Combine(p.GamePath,"Versions"))) throw new IOException(UiText.T(p.Name)+UiText.T("安装文件不完整。"));
         BuildInfo b=Parse(File.ReadAllText(manifest,Encoding.UTF8));
         if(cn ? b.Branch!="cn" : !new [] {"eu","us","kr","tw"}.Contains(b.Branch)) throw new IOException(UiText.T(p.Name)+UiText.T("目录中的版本分支不正确。"));
-        if(!Regex.IsMatch(b.Tags,@"\b"+Regex.Escape(p.TextLocale)+@"\s+text(?:\?|\b)") || !Regex.IsMatch(b.Tags,@"\b"+Regex.Escape(p.SpeechLocale)+@"\s+speech(?:\?|\b)")) throw new IOException(UiText.T(p.Name)+UiText.T("的版本清单未声明已安装所选语言。请检查战网语言设置。"));
         return b;
     }
 }

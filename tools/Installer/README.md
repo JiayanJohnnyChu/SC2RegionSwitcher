@@ -1,40 +1,39 @@
 [简体中文](README.zh-CN.md)
 
-# Per-machine MSI
+# Per-machine MSI maintenance
 
-`scripts/Package.ps1` publishes the application and builds packages without installing them. Existing published files can be packaged with the following command:
+`scripts/Package.ps1` publishes and packages without installation. Existing runtime files can be packaged with:
 
 ```powershell
 .\tools\Installer\Build-MachineMsi.ps1 -AppDirectory <directory> -OutputDirectory <empty-directory>
 ```
 
-The builder uses Windows Installer COM and `makecab`. It reads the three-part version through `scripts/Release-Common.ps1`, checks the executable manifest and runtime versions, and packages four runtime files plus six licensing/source files. The current filename is `SC2Switcher-3.4.2-x64.msi`. Microsoft .NET 10 Desktop Runtime x64 is a separate dependency; packages are unsigned.
+The builder uses Windows Installer COM and `makecab`, reads the three-part version through `scripts/Release-Common.ps1`, and checks the executable manifest/runtime versions. The current definition has four runtime files and nine licensing/source files in one embedded cabinet. Version 3.5.1 packaging and hosted CI remain pending. Packages are unsigned; .NET 10 Desktop Runtime x64 is a separate dependency.
 
-## Installation and ownership
+## Ownership and upgrades
 
-The MSI sets `ALLUSERS=1` and requires administrator approval. It installs to `ProgramFiles64Folder\SC2RegionSwitcher\app`, registers HKLM App Paths and creates one common Start menu entry. The application remains `asInvoker` and runs with ordinary user permissions. Profiles, preferences, backups and recovery journals stay in each user's `%LOCALAPPDATA%\SC2RegionSwitcherV2`, outside MSI ownership and preserved on uninstall.
-
-The Application component owns the four runtime files and the advertised Start menu shortcut, with the EXE as its key path. AppRegistration owns the HKLM App Paths entry. Six independent file-keyed components own `LICENSE`, the two third-party notices and the three files under `licenses/`; their identities remain stable across compatible package revisions. The product-family UpgradeCode is retained, while machine installation uses new ProductCode and component identities. Each numerical version has a distinct ProductCode; each build has a new PackageCode.
-
-## Migration and upgrades
-
-The earlier 3.3.0 and 3.4.0 current-user packages were internal previews. Migration requires removal of the old package by its owning user before installation of the new MSI, with the separate user data directory retained. Windows Installer does not perform major upgrades across installation contexts, as documented in Microsoft's [Major Upgrades](https://learn.microsoft.com/en-us/windows/win32/msi/major-upgrades). A shared UpgradeCode does not remove this restriction.
-
-AppSearch and RegLocator check the invoking user's old HKCU App Paths entry. If found, the installer blocks the new installation and asks for the old preview to be uninstalled. This check does not search other users' profiles. The transition is a one-time uninstall/reinstall, followed by ordinary major upgrades between later machine releases.
-
-For machine upgrades, `RemoveExistingProducts` runs immediately after `InstallInitialize`, before `ProcessComponents` and new file installation, so removal is inside the rollback transaction. Newer related machine versions are rejected. Restart Manager automatic shutdown is disabled; installation requires the switcher to be closed. The original MSI supports maintenance invocation.
-
-## Validation
-
-The database uses standard MSI definitions and imports constraints from [metadata/_Validation.idt](metadata/_Validation.idt). The [metadata notice](metadata/README.md) records its source and license. `scripts/Setup-InstallerTools.ps1` prepares pinned, hash-verified WiX 3.14.1 tools under `.tools/`.
-
-| Check | Scope |
+| Area | Definition |
 | --- | --- |
-| `scripts/Test-Package.ps1 -ReleaseDirectory <directory>` | Package contents, authoring and hashes |
-| `scripts/Test-ReleaseGuards.ps1 -ReleaseDirectory <directory>` | Release rejection cases |
-| `scripts/Test-InstallerSchema.ps1 -ReleaseDirectory <directory>` | Full unsuppressed ICE suite; machine packages require zero errors and warnings |
-| `tools/Installer/Test-MachineInstall.ps1`, `installer-lifecycle.yml` | Isolated machine installation, maintenance, upgrade, recovery and removal |
+| Installation | `ALLUSERS=1`; administrator approval; `ProgramFiles64Folder\SC2RegionSwitcher\app` |
+| Entry points | HKLM App Paths and one common advertised Start menu shortcut |
+| Application | `asInvoker`; ordinary-user execution |
+| User data | `%LOCALAPPDATA%\SC2RegionSwitcherV2`; profiles, preferences, backups and recovery journals remain outside MSI ownership and survive uninstall |
+| Identity | Stable product-family UpgradeCode; new ProductCode for each numerical version and PackageCode for each build |
+| Components | Application owns runtime files/shortcut, AppRegistration owns App Paths, nine file-keyed components own licensing/source files |
 
-Version 3.4.2 verification covers licensing/source contents and the existing build, package and static CI checks. Local packaging and content checks passed, as recorded in [3.4.2 validation](../../docs/VALIDATION-3.4.2.md). CI results are associated with the candidate source commit in its release record. Prior machine lifecycle, UAC and UI evidence remains in [3.4.1 validation](../../docs/VALIDATION-3.4.1.md). The validation record identifies the exact package hashes and source revision for each result.
+Earlier current-user previews require uninstall by their owning user before machine installation. The invoking user's legacy HKCU App Paths entry blocks installation; other profiles are not searched. A shared UpgradeCode does not allow upgrades across installation contexts.
 
-Every distributed preview increments the three-part ProductVersion. Tagged or distributed versions must retain their original files, and promotion must use accepted CI artifacts without rebuilding. The original 3.3.0 MSI lacks downgrade protection. The procedure is documented in the [release workflow](../../docs/GITHUB-RELEASE.md).
+Later machine versions use normal major upgrades. `RemoveExistingProducts` follows `InstallInitialize`, keeping removal inside rollback. Newer related versions are rejected. Automatic Restart Manager shutdown is disabled; the application must be closed. The original MSI supports maintenance.
+
+## Checks
+
+| Command / workflow | Scope |
+| --- | --- |
+| `scripts/Test-Package.ps1 -ReleaseDirectory <directory>` | Contents, authoring and hashes |
+| `scripts/Test-ReleaseGuards.ps1 -ReleaseDirectory <directory>` | Rejection cases |
+| `scripts/Test-InstallerSchema.ps1 -ReleaseDirectory <directory>` | Full ICE suite without suppressions; zero errors/warnings required |
+| `tools/Installer/Test-MachineInstall.ps1`, `installer-lifecycle.yml` | Isolated installation, maintenance, upgrade, recovery and removal |
+
+`scripts/Setup-InstallerTools.ps1` prepares hash-verified WiX 3.14.1 tools. [Metadata provenance](metadata/README.md) covers the imported validation constraints.
+
+[Development](../../docs/DEVELOPMENT.md) defines versioning and release promotion; [Validation](../../docs/VALIDATION.md) records the packages and source versions covered by each check.

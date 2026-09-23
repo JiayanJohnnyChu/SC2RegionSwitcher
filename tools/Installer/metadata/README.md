@@ -2,10 +2,8 @@
 
 # Windows Installer validation metadata
 
-`_Validation.idt` contains standard column constraints for the eighteen tables used by this package builder. The original fifteen-table subset and the nine Signature rows were exported from a control package generated with WiX 3.14.1.8722. Seven rows for AppSearch and RegLocator were added from standard MSI definitions. The package includes an empty Signature table required by AppSearch; it is checked alongside the other tables by package validation and the unsuppressed ICE suite. The file contains no application identity, local paths, payload or test-user data.
+`_Validation.idt` contains standard column constraints for the eighteen tables used by the package builder. Constraints for sixteen tables, including Signature, were exported from a control package generated with WiX 3.14.1.8722. AppSearch and RegLocator constraints come from standard MSI definitions. The package includes the empty Signature table required by AppSearch.
 
-The builder imports these constraints before inserting application rows. Together with standard SQL column types, they support independent Windows Installer ICE validation. Optional UI and administrative sequence tables are not added to the application package.
+The builder imports these constraints before application rows. Together with SQL column types, they support Windows Installer ICE validation. [Installer maintenance](../README.md) covers schema checks and separate installation/recovery testing.
 
-Source: [WiX Toolset 3.14.1](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm). The upstream copyright and license are preserved in [LICENSE-WiX.txt](LICENSE-WiX.txt), which applies to this metadata. Original project material is licensed under [MIT](../../../LICENSE); this metadata retains MS-RL, as documented in [third-party notices](../../../THIRD-PARTY-NOTICES.md).
-
-Schema validation checks package structure. Actual installation and recovery require separate testing, as described in the [installer guide](../README.md).
+Source: [WiX Toolset 3.14.1](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm). The upstream copyright and Microsoft Reciprocal License (MS-RL) are preserved in [LICENSE-WiX.txt](LICENSE-WiX.txt). Distribution includes both the license and metadata source, as specified in [third-party notices](../../../THIRD-PARTY-NOTICES.md).

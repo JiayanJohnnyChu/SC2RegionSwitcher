@@ -1,66 +1,59 @@
 [简体中文](DEVELOPMENT.zh-CN.md)
 
-# Development and builds
+# Development
 
-Development requires Windows x64 and .NET SDK **10.0.401**, pinned in `global.json`. Desktop Runtime alone cannot compile the application. The `SC2RegionSwitcher.slnx` solution contains the application, regression runner and icon tool.
+Windows x64 and .NET SDK **10.0.401** are required; `global.json` pins the version. The application has no third-party NuGet dependencies.
 
-## Tools and commands
+## Build and checks
 
-The following commands are executed in PowerShell from the project root. Scripts resolve the root from their own location, so absolute script paths also work.
-
-| Command | Purpose |
-| --- | --- |
-| `.\scripts\Setup.ps1` | Prepares the pinned SDK in `.tools/dotnet` |
-| `.\scripts\Setup-WorkflowTools.ps1` | Prepares the pinned actionlint binary |
-| `.\scripts\Check-Workflows.ps1` | Validates workflow syntax, expressions and Action usage |
-| `.\scripts\Check-Repository.ps1` | Checks repository content, personal paths and PowerShell syntax |
-| `.\scripts\Build.ps1` | Compiles the application, tests and icon tool in Release mode |
-| `.\scripts\Test.ps1` | Builds and runs isolated regressions |
-| `.\scripts\Publish.ps1` | Produces framework-dependent x64 runtime files |
-| `.\scripts\Package.ps1` | Publishes runtime files and creates the MSI, ZIP and release metadata |
-| `.\scripts\Test-Package.ps1 -ReleaseDirectory <directory>` | Checks package content and hashes |
-| `.\scripts\Test-ReleaseGuards.ps1 -ReleaseDirectory <directory>` | Exercises release rejection cases |
-| `.\scripts\Test-InstallerSchema.ps1 -ReleaseDirectory <directory>` | Runs independent Windows Installer ICE validation |
-
-Setup verifies the Microsoft SDK archive against `eng/dotnet-sdk.json` before extraction. `-ArchivePath <local-sdk-zip>` supports offline preparation with the same hash check. Scripts prefer the project SDK, then PATH. Build, Test, Publish and Package accept `-DotNet <path-to-dotnet.exe>`; Build and Test also accept `-Configuration Debug`. Packages use Release builds.
-
-Tool versions and hashes are tracked in `eng/`; downloaded tools and caches are ignored. `Common.ps1` sets a project-local environment for NuGet caches, CLI state and SDK metadata lookup, then restores the environment. Restore uses the repository's `NuGet.Config`, which has no package sources because the project has no third-party NuGet dependencies. The addition of private packages, WinUI or native SDK dependencies requires reassessment of these settings.
-
-The regression suite is a console program using `FakePlatform` and temporary installations. The recorded baseline has 52 tests and prints `TOTAL 52 PASSED` on success. A failure returns a nonzero exit code. Running `dotnet test` without discovering tests does not provide equivalent coverage.
-
-## Outputs
-
-Build outputs remain in each project's `bin/` and `obj/`. Publish writes to `artifacts/publish/win-x64/`. Test runs have separate directories in `artifacts/tests/`; packages are under `artifacts/packages/<build>/release`.
-
-The release directory contains exactly four files: MSI, portable ZIP, `release-manifest.json` and `SHA256SUMS.txt`. The ZIP contains twelve files: four runtime files, two README files and six licensing/source files identified in [third-party notices](../THIRD-PARTY-NOTICES.md). The MSI includes the four runtime files and the same six licensing/source files. Package scripts create files but do not install them. The manifest records the source commit, working-tree state and CI provenance. Local development packages are not accepted CI candidates. The MSI is named `SC2Switcher-<version>-x64.msi` and uses the administrator-required machine scope; building it does not require installing it.
-
-The separate `installer-lifecycle.yml` workflow uses `tools/Installer/Test-MachineInstall.ps1` for isolated machine installation, maintenance, upgrades, rollback and removal. Its result must identify the input candidate and hash. The older recovery workflow is retained for historical current-user diagnostics. The current scope and migration rules are documented in [Installer](../tools/Installer/README.md).
-
-## Interface diagnostics
-
-The application normally uses `%LOCALAPPDATA%\SC2RegionSwitcherV2`. `--data-dir <absolute-directory>` redirects configuration; it does not simulate Battle.net or the game.
-
-`--ui-report <absolute-json-path>` exports a layout report and a WPF self-rendered image. `--compact` requests the minimum window size. F12 captures the active main, settings or reference page. These outputs are stored under `artifacts/`.
-
-`--matrix` requires an explicit separate `--data-dir` and exports synthetic states in both languages. Real switching and path saving are disabled while this presentation runs. Reports mark `SyntheticState=true`. DPI checks require execution of the generated EXE so that its application manifest applies; rendering the DLL through the dotnet host does not establish the EXE's PerMonitorV2 behavior. The diagnostic procedure is documented in [Interface design](UI-DESIGN.md).
-
-## Icons
-
-Application and installer share `assets/icon/switcher.ico`; the directory also contains the vector source and preview. The following command generates proposed changes in a temporary location:
+Commands run from the repository root:
 
 ```powershell
-. .\scripts\Common.ps1
-Invoke-ProjectDotNet -Arguments @('run', '--project', '.\tools\IconGenerator\IconGenerator.csproj', '--configuration', 'Release', '--no-build', '--', '.\artifacts\icon-preview')
+.\scripts\Setup.ps1
+.\scripts\Build.ps1
+.\scripts\Test.ps1
+.\scripts\Check-Repository.ps1
+.\scripts\Package.ps1
 ```
 
-Asset updates require prior inspection of the SVG, PNG, ICO and comparison outputs. Related geometry in the main window is maintained separately in XAML.
+Setup verifies the SDK archive; `-ArchivePath <zip>` supports offline preparation. Scripts isolate and restore SDK/cache settings. Build/Test accept `-Configuration Debug`; Build/Test/Publish/Package accept `-DotNet <exe>`.
 
-## Validation scope
+The console runner uses simulated installations. Success requires exit 0 and `TOTAL … PASSED`; an empty `dotnet test` run is not equivalent. Packaging creates files without installing an MSI or launching Battle.net.
 
-Validation is determined by the affected changes. A major application release requires one comprehensive pass; subsequent small revisions receive targeted checks. Documentation, licensing and package-content revisions require content and package verification. They do not require repetition of installation, UI, DPI or online testing. Necessary build/package checks and the existing CI checks remain applicable; a separate full manual regression run is not a default requirement for every patch.
+| Additional check | Command |
+| --- | --- |
+| Workflow syntax | `scripts/Setup-WorkflowTools.ps1`, then `scripts/Check-Workflows.ps1` |
+| Payload and hashes | `scripts/Test-Package.ps1 -ReleaseDirectory <directory>` |
+| Release rejection cases | `scripts/Test-ReleaseGuards.ps1 -ReleaseDirectory <directory>` |
+| Unsuppressed MSI ICE validation | `scripts/Test-InstallerSchema.ps1 -ReleaseDirectory <directory>` |
+| Synthetic native interface | `scripts/Test-Ui.ps1` |
 
-## CI and release maintenance
+A major release receives one comprehensive pass; subsequent revisions receive checks appropriate to their changes. Documentation and package-content changes need relevant content/package checks and applicable CI, without repeating unrelated manual matrices. Repository checks precede commits.
 
-Windows CI checks workflows and repository content, builds, runs regressions, packages, and checks contents, schema and rejection cases. Actions are pinned to commits. Dependabot proposes monthly Action updates without merging them automatically. SDK upgrades update both `global.json` and `eng/dotnet-sdk.json`; validator and workflow-tool updates also require their version and hash metadata to change.
+## Application structure
 
-Each distributed preview needs a new three-part version. A rebuilt MSI has new bytes and a new PackageCode, so installation results must identify the exact tested hash. Promotion must use the accepted CI files without rebuilding. The procedure and evidence are documented in [Installer](../tools/Installer/README.md), [release workflow](GITHUB-RELEASE.md) and [current status](HANDOFF.md).
+| Location | Responsibility |
+| --- | --- |
+| `src/SC2Switcher.Wpf/Core.cs` | Installation parsing, activity checks, language transactions, recovery and Battle.net launch |
+| `ConfigurationStore.cs` in the same directory | Migration, atomic saving, backups and concurrent-change protection |
+| `SwissWindow*`, `SwissSettingsView*`, `SwissReferenceView*`, view models | Native WPF views, settings drafts and operation state |
+| `Localization.cs`, `Strings.*.json`, `UiTypography.cs` | Independent interface language and embedded fonts |
+| `tests/SC2Switcher.Tests` | Isolated console regressions |
+
+A switch validates paths/resources and game/editor state, requests normal Battle.net exit, rechecks installations, backs up and atomically changes language keys, then launches Battle.net in the selected login region. Pending recovery runs before the next switch and verifies journal paths, backup placement and hashes. Opening the app alone does not recover. Cancellation after the target launch request does not alone roll back language changes.
+
+`%LOCALAPPDATA%\SC2RegionSwitcherV2` holds profiles, interface preferences, backups and journals outside MSI ownership. Schema-2 Global text/speech fields store the selected pair; existing mixed pairs remain until explicit selection. Discovery intersects active Windows text/speech resources and rejects stale asynchronous results. Missing installations preserve preferences. Pending recovery blocks path/language changes but permits login-region changes.
+
+## Interface maintenance
+
+The responsive native interface shares colors, controls and typography; parameters and the primary action use one scroll area. Interface language remains independent of game language. All eleven catalogues require matching keys/placeholders. Embedded Inter/Noto sources and hashes are recorded in [font documentation](../src/SC2Switcher.Wpf/Fonts/README.md) and [sources.json](../src/SC2Switcher.Wpf/Fonts/sources.json).
+
+`Test-Ui.ps1` uses isolated synthetic data and a 240-second timeout. `-Languages` limits locales, `-InteractionsOnly` runs five WPF event checks, and `-StatusOnly` captures fault layouts. Native EXE execution is required for manifest/DPI claims. `--data-dir <absolute-directory>` isolates preferences; `--ui-report <absolute-json-path>`, `--compact` and F12 provide diagnostics. Physical input, accessibility and online behavior require separate checks.
+
+## Release
+
+Ignored `artifacts/` holds outputs/evidence; `eng/` pins tools and hashes. A release directory contains MSI, ZIP, `release-manifest.json` and `SHA256SUMS.txt`. The package checks verify the expected payload of thirteen MSI files and fifteen ZIP files.
+
+Accepted candidates come from successful, clean `main` CI. The manifest identifies source commit, run/attempt, version and hashes. Installation and live checks identify the original tested files. **Promote tested candidate to draft prerelease** takes the matching existing `version_tag` and accepted `candidate_run_id`, verifies provenance and attachment hashes, and never rebuilds. Incomplete acceptance keeps the draft on hold.
+
+Every distributed preview increments the three-part numerical version. Tagged/distributed files remain immutable; duplicate numerical releases are rejected. [Installer maintenance](../tools/Installer/README.md) covers scope and upgrades. [Validation](VALIDATION.md) separates build, installation, rendering and live claims; [Changelog](../CHANGELOG.md) records public changes.
